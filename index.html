@@ -12,7 +12,7 @@
   </title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="/logo.ico" />
   
   
 <link rel="stylesheet" href="/css/main.css">
@@ -33,11 +33,6 @@
     <main class="content">
       
 <section class="cover">
-    
-      
-      <a class="forkMe" href="https://github.com/Shen-Yu/hexo-theme-ayer"
-        target="_blank"><img width="149" height="149" src="/images/forkme.png"
-          class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
     
   <div class="cover-frame">
     <div class="bg-box">
@@ -143,38 +138,9 @@
 <td>16 attention heads</td>
 </tr>
 </tbody></table>
-<h3 id="简单实用示例"><a href="#简单实用示例" class="headerlink" title="简单实用示例"></a>简单实用示例</h3><p>例如使用 BERT 进行垃圾邮件分类，将每段待分类文本的第一个词替换为 [CLS] (Classification 的缩写)，输入模型得到输出：</p>
-<p><img src="BERT_example.png" alt=""></p>
-<p>每个输入 token 对应的 output vector 的大小都是 hidden_size (768 in BERT-BASE)，对于这样的分类问题只需要关注第一个 output vector，即输入 [CLS] 对应的输出。将这个输出接入一个神经网络来分类（Linear + Softmax）输出垃圾邮件和非垃圾邮件的概率。</p>
-<p>ps：至于为什么只需要第一个 [CLS] 对应的 hidden units 作为特征，需要看一下论文。</p>
-<h3 id="发展历史"><a href="#发展历史" class="headerlink" title="发展历史"></a>发展历史</h3><h4 id="WordEmbedding"><a href="#WordEmbedding" class="headerlink" title="WordEmbedding"></a>WordEmbedding</h4><p>在向量空间中表示一个单词，能够反映单词之间的语义相似性、语法相似性，典型的有 Word2Vec 和 GloVe。这两种模型都是在大规模语料集上进行预训练（Word2Vec 使用 skip-gram 或者 cbow + negative sampling），在之后的任务直接拿来使用。</p>
-<h4 id="ElMo"><a href="#ElMo" class="headerlink" title="ElMo"></a>ElMo</h4><p>Word2Vec 和 GloVe 存在缺陷，同一个词在不同的上下文中有不同的语义，如果都用同一个向量表示可能不够准确，所以提出了 Contextualized word-embeddings。 ELMo (Embeddings from Language Models) 就是这个预训练模型，预训练使用的任务是 Language Modeling (给定一个句子的前一部分，预测下一个词，这样可以在大批量数据上进行（半）监督训练)。</p>
-<p>ELMo 使用双向 LSTM 进行特征提取，这样可以让一个单词具有它的上下文信息。模型预训练完成之后，输入单词所在的句子，拼接 LSTM 中单词对应的 hidden units 以及之前的 word embedding (Word2Vec 或 GloVe)，并进行加权，得到最后的 embedding，可以参考下面的图片：</p>
-<p><img src="ELMo_embedding.png" alt=""></p>
-<h4 id="ULM-FiT"><a href="#ULM-FiT" class="headerlink" title="ULM-FiT"></a>ULM-FiT</h4><p>一个用于任务迁移的预训练语言模型，训练好之后能够用极小的数据量获得较好的效果。类似于 CV 领域的迁移学习。</p>
-<h4 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer"></a>Transformer</h4><p>这是一个比 LSTM 更好的特征提取结构，一开始用在机器翻译领域，其结构如下：</p>
-<p><img src="Transformer.png" alt=""></p>
-<p>Multi-Head attention 能考虑上下文信息，重点关注有关联的单词，并且同一层能够进行并行，避免了像 LSTM 一样必须有一部分串行，提高了运算速度。</p>
-<h4 id="OpenAI-Transformer"><a href="#OpenAI-Transformer" class="headerlink" title="OpenAI Transformer"></a>OpenAI Transformer</h4><p>这个模型将 Transformer 用于 Language Modeling 任务上，选用 Transformer 的 decoder 部分（看不到后面的词）。选用 7000 本书籍作为数据训练（书籍中的语言更流畅），采用 12 层 decoder，输出下一个词的概率。</p>
-<p>OpenAI Transformer 模型也是一个预训练模型，在使用上面的任务预训练之后可以用于下游任务（情感分类，相似度分析等），只需要将输入按照约定的标准进行修改，经过 Transformer 之后，再连接一些特定的分类器等进行特定任务。可以参考下图进行理解。</p>
-<p><img src="OpenAI_Transformer.png" alt=""></p>
-<h4 id="BERT"><a href="#BERT" class="headerlink" title="BERT"></a>BERT</h4><p>OpenAI Transformer 是一个成功的模型，但是在提取特征方面，使用 decoder 只能提取单方向的语言，上下文之间的联系没能提取完全，所以 BERT 使用 Encoder Transformer 来解决这个问题，双向的模型能够提取单词周围的上下文关联。</p>
-<p>相应地，预训练任务不能使用像上面一样的普通 Language Modeling (已经知道了后面要出现的词，不能对已经作为输入的进行预测)，BERT 使用的是 Masked Language Modeling (灵感来源于完形填空)，以及 Two-sentence Task：</p>
-<ul>
-<li>Masked Language Modeling: 随机将一些词遮住，要求根据上下文预测这些词，还有可能随机把一些词替换为另一些词，要求模型预测正确的词是什么；</li>
-<li>Two-sentence Task: 预测两个句子是不是上下文关系，这有助于模型学习到一些高层次信息（句子的输入是 Tokenized 之后的 input，但这里使用的是 WordPieces，有可能会将一个单词分解为更小的 chunk 作为输入）。</li>
-</ul>
-<p>关于使用预训练模型，可以按照约定的要求更改输入格式，例如官方提供的例子：</p>
-<p><img src="BERT_usage.png" alt=""></p>
-<p>BERT 还可以用于特征抽取，像 VGG16 一样，每层 encoder 都包含一定的信息，可以代表输入的某部分特征，可以使用 encoder 中的 hidden units 作为特征用于其他的任务。</p>
-<p><img src="BERT_feature.png" alt=""></p>
-<p><em>PS：</em>BERT 预训练的时候使用的激活函数是 gelu:<br>$$<br>GLEU(x) = xP(X \leq x) = x \Phi(x)<br>$$<br>其中 $\Phi(x)$ 满足正态分布，x 越小，被 drop 掉的概率（变为 0 ）越大，这克服了 relu 缺乏一定的统计性的缺点。这个函数的输出与自身有关，同时具有非线性和随机正则性的因素，因此效果更好。</p>
-<p>激活函数能够自归一化（给定输入是标准化之后的数据，输出也是归一化数据 i.e. 均值为 0，方差为 1）的要求：</p>
-<blockquote>
-<p>这个激活函数需要有：（1）负值和正值，以便控制均值；（2）饱和区域（导数趋近于零），以便抑制更低层中较大的方差；（3）大于 1 的斜率，以便在更低层中的方差过小时增大方差（可以直观上考虑一下，输出的方差越大，那么梯度也就越大 e.g. MSE Loss）；（4）连续曲线。后者能确保一个固定点，其中方差抑制可通过方差增大来获得均衡。我们能通过乘上指数线性单元（ELU）来满足激活函数的这些性质，而且 λ&gt;1 能够确保正值净输入的斜率大于 1。</p>
-</blockquote>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://jalammar.github.io/illustrated-bert/" target="_blank" rel="noopener">1. Illustrated-bert.</a></p>
-
+      
+      <a class="article-more-link" href="/2020/03/20/BERT-illustration/">阅读更多...</a>
+      
       
       <!-- reward -->
       
@@ -248,7 +214,7 @@
 <nav class="navbar">
   
   <div class="logo">
-    <a href="/"><img src="/images/ayer-side.svg" alt="Bowen&#39;s Blog"></a>
+    <a href="/"><img src="/images/logo.svg" alt="Bowen&#39;s Blog"></a>
   </div>
   
   <ul class="nav nav-main">
@@ -332,7 +298,7 @@
 <script>
   try {
     var typed = new Typed("#subtitle", {
-      strings: ['面朝大海，春暖花开', '愿你一生努力，一生被爱', '想要的都拥有，得不到的都释怀'],
+      strings: ['没有什么会永垂不朽', '二十年后还是一样轻狂，一样不枉', '想要的都拥有，得不到的都释怀'],
       startDelay: 0,
       typeSpeed: 200,
       loop: true,

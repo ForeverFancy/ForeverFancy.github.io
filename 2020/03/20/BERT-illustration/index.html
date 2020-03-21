@@ -12,7 +12,7 @@
   </title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="/logo.ico" />
   
   
 <link rel="stylesheet" href="/css/main.css">
@@ -129,6 +129,8 @@
 <td>16 attention heads</td>
 </tr>
 </tbody></table>
+<a id="more"></a>
+
 <h3 id="简单实用示例"><a href="#简单实用示例" class="headerlink" title="简单实用示例"></a>简单实用示例</h3><p>例如使用 BERT 进行垃圾邮件分类，将每段待分类文本的第一个词替换为 [CLS] (Classification 的缩写)，输入模型得到输出：</p>
 <p><img src="BERT_example.png" alt=""></p>
 <p>每个输入 token 对应的 output vector 的大小都是 hidden_size (768 in BERT-BASE)，对于这样的分类问题只需要关注第一个 output vector，即输入 [CLS] 对应的输出。将这个输出接入一个神经网络来分类（Linear + Softmax）输出垃圾邮件和非垃圾邮件的概率。</p>
@@ -346,7 +348,7 @@
 <nav class="navbar">
   
   <div class="logo">
-    <a href="/"><img src="/images/ayer-side.svg" alt="Bowen&#39;s Blog"></a>
+    <a href="/"><img src="/images/logo.svg" alt="Bowen&#39;s Blog"></a>
   </div>
   
   <ul class="nav nav-main">
@@ -430,7 +432,7 @@
 <script>
   try {
     var typed = new Typed("#subtitle", {
-      strings: ['面朝大海，春暖花开', '愿你一生努力，一生被爱', '想要的都拥有，得不到的都释怀'],
+      strings: ['没有什么会永垂不朽', '二十年后还是一样轻狂，一样不枉', '想要的都拥有，得不到的都释怀'],
       startDelay: 0,
       typeSpeed: 200,
       loop: true,
