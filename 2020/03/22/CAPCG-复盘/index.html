@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.4k字</span>
+            <span class="post-count">2.5k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">5分钟</span>
+            <span class="post-count">10分钟</span>
         </span>
     </span>
 </div>
@@ -118,7 +118,8 @@
 <p>我们希望每次在残差的方向上的走一步之后尽可能使 $f$ 接近最小值，所以:</p>
 <p>$$<br>\begin{aligned}<br>\frac{d}{d \alpha} f\left(\mathbf{x_{(i+1)}}\right) &amp;= (\frac{d f}{d \mathbf{x_{i+1}}})^T \frac{d \mathbf{x_{i+1}}}{d \alpha}\<br>&amp;= -\mathbf{r_{i+1}}^T r_{i} = 0<br>\end{aligned}<br>$$</p>
 <p>这样我们可以看出需要 ${r_{i+1}}, r_{i}$ 相互正交，我们也可以来看一下两次搜索方向相互正交的几何含义：</p>
-<p><img src="steepest_descent.png" alt="steepest_descent"></p>
+<!-- ![steepest_descent](steepest_descent.png) -->
+<p><img src="https://pic4.zhimg.com/80/v2-379f4ca94cdee209d5f2fb4740d56a3c.png" alt="steepest_descent"></p>
 <p>实线方向即为本次搜索的方向（本次的梯度反方向），我们希望本次搜索到达的这条线上离最小值最近的点，这个点的特征是它的梯度（下次搜索方向）与本次搜索的方向（本次梯度）垂直。如果不垂直（比如直线上的其他点），我们可以按照梯度在直线上投影（虚线）的反方向继续往前走，可以达到更小的值（因为梯度的反方向是函数值变小的方向），以上就是一点 intuition。</p>
 <p>进一步推导：</p>
 <p>$$\begin{aligned}<br>r_{(i+1)}^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i+1)}\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A\left(x_{(i)}+\alpha r_{(i)}\right)\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i)}\right)^{T} r_{(i)}-\alpha\left(A r_{(i)}\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i)}\right)^{T} r_{(i)} &amp;=\alpha\left(A r_{(i)}\right)^{T} r_{(i)} \<br>r_{(i)}^{T} r_{(i)} &amp;=\alpha r_{(i)}^{T}\left(A r_{(i)}\right) \<br>\alpha &amp;=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i)}^{T} A r_{(i)}}<br>\end{aligned}$$</p>
@@ -127,11 +128,40 @@
 <p>这就是最速下降法的迭代公式，我们也可以将最后一个公式两侧同时乘 $-A$ 再加上 $b$，得到：</p>
 <p>$$r_{(i+1)}=r_{(i)}-\alpha_{(i)} A r_{(i)}$$</p>
 <p>我们可以通过最后三个式子迭代直到收敛，这样做比较方便，但有由于 $r$ 每次的迭代都没有 $x$ 的反馈，有可能最后存在一定的误差（浮点数计算误差），我们可以通过周期性用 $r_{(i)} =b-A x_{(i)}$ 更新 $r_{(i)}$ 来校正误差。</p>
+<h4 id="共轭梯度法-Conjugate-Gradient-Method"><a href="#共轭梯度法-Conjugate-Gradient-Method" class="headerlink" title="共轭梯度法 (Conjugate Gradient Method)"></a>共轭梯度法 (Conjugate Gradient Method)</h4><h5 id="Conjugate-Direction"><a href="#Conjugate-Direction" class="headerlink" title="Conjugate Direction"></a>Conjugate Direction</h5><p>使用最速梯度法的过程中，可能会遇到重复走之前走过的方向这种情况：</p>
+<!-- ![steepest-descent-problem](https://pic4.zhimg.com/80/v2-d2773fc54b2b8ce337f7089361217a56.png) -->
+
+<p>我们希望在搜索的方向上一次走合适的距离，之后就不再重复搜索这个方向，提高搜索的效率（有的时候最速下降法会在靠近解的时候来回震荡，这不是我们想要的结果）。所以我们将这样进行迭代</p>
+<p>$$x_{(i+1)}=x_{(i)}+\alpha_{(i)} d_{(i)}$$</p>
+<p>其中，$\mathbf{d_{(i)}}$ 是每次搜索的方向，如果要求 $\mathbf{e_{(i+1)}}$ 和 $\mathbf{d_{(i)}}$ 正交（这样就将在 $\mathbf{d_{(i)}}$ 的误差降为 0，之后不会再搜索这个方向）</p>
+<p>$$\begin{aligned}<br>x_{(i+1)} &amp;=x_{(i)}+\alpha_{(i)} d_{(i)} \<br>x_{(i+1)} - x &amp;=x_{(i)} - x +\alpha_{(i)} d_{(i)} \<br>e_{(i+1)} &amp;= e_{(i)} + \alpha_{(i)} d_{(i)} \<br>\end{aligned}$$</p>
+<p>所以有：</p>
+<p>$$\begin{aligned}<br>d_{(i)}^{T} e_{(i+1)} &amp;=0 \<br>d_{(i)}^{T}\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) &amp;=0 \quad  \<br>\alpha_{(i)} &amp;=-\frac{d_{(i)}^{T} e_{(i)}}{d_{(i)}^{T} d_{(i)}}<br>\end{aligned}$$</p>
+<p>但这个方差显然存在问题，如果我们知道了 $e_{(i)}$，那么也就相当于知道了问题的答案，也就不用迭代法求解了😂。</p>
+<p>为了解决这个问题，我们选择让本次搜索方向和之后的误差关于矩阵 $A$ 正交，而不是直接正交：</p>
+<p>$$d_{(i)}^{T} A e_{(i+1)}=0$$</p>
+<p>本质上，这就是在搜索方向上找到函数值最小的点，通过推导我们也能看出这个约束：</p>
+<p>$$\begin{aligned}<br>\frac{d}{d \alpha} f\left(x_{(i+1)}\right) &amp;=0 \<br>f^{\prime}\left(x_{(i+1)}\right)^{T} \frac{d}{d \alpha} x_{(i+1)} &amp;=0 \<br>-r_{(i+1)}^{T} d_{(i)} &amp;=0 \<br>d_{(i)}^{T} A e_{(i+1)} &amp;=0<br>\end{aligned}$$</p>
+<p>同上面的推导，可以推出：</p>
+<p>$$\begin{aligned}<br>\alpha_{(i)} &amp;=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \<br>&amp;=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}<br>\end{aligned}$$</p>
+<p>这次，表达式变成了我们可以求解的值。本质上，我们通过关于矩阵 $A$ 正交的这个条件，将原先 $\alpha$ 中的 $e_{(i)}$ 转化为了 $Ae_{(i)} = r_{(i)}$ 也就是我们可以通过迭代求解的值。<strong>注意，如果 $d_{(i)}$ 选择 $r_{(i)}$，那么迭代公式就和最速梯度法相同。</strong></p>
+<p>下面将证明共轭梯度法可以在 n 步之内得到 $x$ 的值，我们记误差为各个搜索方向的线性组合：</p>
+<p>$$e_{(0)}=\sum_{j=0}^{n-1} \delta_{j} d_{(j)}$$</p>
+<p>$$\begin{aligned}<br>d_{(k)}^{T} A e_{(0)}&amp;=\sum_{j} \delta_{(j)} d_{(k)}^{T} A d_{(j)} \<br>d_{(k)}^{T} A e_{(0)}&amp;=\delta_{(k)} d_{(k)}^{T} A d_{(k)} \text{   by A-orthogonality of $d$ vectors}\<br>\delta_{(k)} &amp;=\frac{d_{(k)}^{T} A e_{(0)}}{d_{(k)}^{T} A d_{(k)}} \ &amp;=\frac{d_{(k)}^{T} A\left(e_{(0)}+\sum_{i=0}^{k-1} \alpha_{(i)} d_{(i)}\right)}{d_{(k)}^{T} A d_{(k)}} \quad \text { (by } A \text { -orthogonality of } d \text { vectors) }\<br>&amp;=\frac{d_{(k)}^{T} A e_{(k)}}{d_{(k)}^{T} A d_{(k)}}\<br>&amp;=-\alpha_{(k)}<br>\end{aligned}$$</p>
+<p>事实上，我们可以看出迭代过程就是一项一项地将每个方向上的误差移除掉，最终得到期望值。</p>
+<h5 id="构建共轭方向"><a href="#构建共轭方向" class="headerlink" title="构建共轭方向"></a>构建共轭方向</h5><p>可以使用 Gram-Schmidt 进行构建，大概的过程就是在一组 n 个线性无关的向量 $u_0, u_1, \dots, u_n$ 中，$d_i$ 由 $u_i$ 减去与所有之前的 $d_j$ 不是 A 正交的向量，即：</p>
+<p>$$d_{(i)}=u_{i}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}$$</p>
+<p>为了求出系数 $\beta_{i k}$，我们可以根据定义令其与之前的方向 A-正交，即：</p>
+<p>$$\begin{aligned}<br>d_{(i)}^{T} A d_{(j)} &amp;=u_{i}^{T} A d_{(j)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}^{T} A d_{(j)} \<br>0 &amp;=u_{i}^{T} A d_{(j)}+\beta_{i j} d_{(j)}^{T} A d_{(j)}, \quad i&gt;j \quad \text{by A-orthogonality}\<br>\beta_{i j} &amp;=-\frac{u_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}<br>\end{aligned}$$</p>
+<p>一个缺点是这样需要保存之前的所有方向用来构建当前的方向，时间复杂度也较高。值得注意的是，参考文献中表示，当初始的搜索方向选定为坐标轴方向时，共轭方向法进行求解退化为高斯消元（未证明），但共轭梯度的出现解决了这些不足。但无论是共轭梯度还是共轭方向法，都是在 A 矩阵的空间中，进行每次迭代都全部移除该搜索方向上的误差的操作（A-正交）。</p>
 <!-- ## 性能分析
 
 使用 Intel Parallel Studio 对原始代码进行性能分析，结果如下：
 
 ![](profile.png) -->
+
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
+
       
       <!-- reward -->
       
