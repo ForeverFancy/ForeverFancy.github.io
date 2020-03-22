@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Bowen&#39;s Blog</title>
+  
+  <subtitle>Bowen&#39;s Blog</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2020-03-22T04:51:53.320Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>Bowen</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CAPCG 复盘</title>
+    <link href="http://yoursite.com/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/"/>
+    <id>http://yoursite.com/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/</id>
+    <published>2020-03-22T04:28:00.000Z</published>
+    <updated>2020-03-22T04:51:53.320Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;CAPCG-复盘&quot;&gt;&lt;a href=&quot;#CAPCG-复盘&quot; class=&quot;headerlink&quot; title=&quot;CAPCG 复盘&quot;&gt;&lt;/a&gt;CAPCG 复盘&lt;/h1&gt;&lt;h2 id=&quot;PCG-简介&quot;&gt;&lt;a href=&quot;#PCG-简介&quot; class=&quot;headerlink&quot; title=&quot;PCG 简介&quot;&gt;&lt;/a&gt;PCG 简介&lt;/h2&gt;&lt;p&gt;预处理共轭梯度法 (Preconditioned Conjugate Gradient) 从共轭梯度法 (Conjugate Gradient) 衍生而来，是常用的用于求解线性方程组 $Ax = b$ 的数值解法，目前主要应用于数值计算领域。&lt;/p&gt;
+&lt;h3 id=&quot;Conjugate-Gradient&quot;&gt;&lt;a href=&quot;#Conjugate-Gradient&quot; class=&quot;headerlink&quot; title=&quot;Conjugate Gradient&quot;&gt;&lt;/a&gt;Conjugate Gradient&lt;/h3&gt;&lt;p&gt;共轭梯度法主要适用于系数矩阵 $A$ 较为稀疏的情况下。如果矩阵 $A$ 不是稀疏的，那么最好的求解方法是对系数矩阵进行分解，这样也可以快速对不同的 $b$ 求得答案，在系数矩阵很大而且稀疏的情况下，分解产生的矩阵可能含有比 $A$ 更多的非零元素，并且在时间和空间上均不具有优势，所以使用迭代法是一种较好的选择。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="复盘" scheme="http://yoursite.com/categories/%E5%A4%8D%E7%9B%98/"/>
+    
+    
+      <category term="Optimization" scheme="http://yoursite.com/tags/Optimization/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>BERT-illustration</title>
+    <link href="http://yoursite.com/2020/03/20/BERT-illustration/"/>
+    <id>http://yoursite.com/2020/03/20/BERT-illustration/</id>
+    <published>2020-03-20T09:55:25.000Z</published>
+    <updated>2020-03-21T13:10:44.232Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;BERT-illustration&quot;&gt;&lt;a href=&quot;#BERT-illustration&quot; class=&quot;headerlink&quot; title=&quot;BERT illustration&quot;&gt;&lt;/a&gt;BERT illustration&lt;/h1&gt;&lt;h2 id=&quot;发展历史及主要想法&quot;&gt;&lt;a href=&quot;#发展历史及主要想法&quot; class=&quot;headerlink&quot; title=&quot;发展历史及主要想法&quot;&gt;&lt;/a&gt;发展历史及主要想法&lt;/h2&gt;&lt;p&gt;BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, BERT 是 Bidirectional Encoder Representations from Transformers 的缩写。这个预训练模型让 NLP 领域进入了类似于当时 CV 界的后 ImageNet 时代（大量预训练模型应用）。&lt;/p&gt;
+&lt;h3 id=&quot;How-BERT-is-developed&quot;&gt;&lt;a href=&quot;#How-BERT-is-developed&quot; class=&quot;headerlink&quot; title=&quot;How BERT is developed&quot;&gt;&lt;/a&gt;How BERT is developed&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Step 1：在大量数据上（Wikipedia 和 大量书籍）进行半监督预训练&lt;ul&gt;
+&lt;li&gt;预训练任务：Language Modeling，包含多个子任务：预测 masked 词，判读句子上下文关系等；&lt;/li&gt;
+&lt;li&gt;这使得预训练模型具有一定的特征抽取和判断上下文联系（提取语义）等能力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Step 2：在特定任务中进行监督学习&lt;ul&gt;
+&lt;li&gt;根据特定任务的不同，按照一定的约定方式处理输入；&lt;/li&gt;
+&lt;li&gt;输入内容通过预训练模型，后面根据任务要求添加分类器（e.g. Linear + Softmax）等得到输出。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;Model-Architecture&quot;&gt;&lt;a href=&quot;#Model-Architecture&quot; class=&quot;headerlink&quot; title=&quot;Model Architecture&quot;&gt;&lt;/a&gt;Model Architecture&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Model&lt;/th&gt;
+&lt;th&gt;encoder&lt;/th&gt;
+&lt;th&gt;hidden units(in feedforward network)&lt;/th&gt;
+&lt;th&gt;attention heads (in multi-head attention)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td&gt;BERT-BASE&lt;/td&gt;
+&lt;td&gt;12 encoder layers&lt;/td&gt;
+&lt;td&gt;768 hidden units&lt;/td&gt;
+&lt;td&gt;12 attention heads&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;BERT-LARGE&lt;/td&gt;
+&lt;td&gt;24 encoder layers&lt;/td&gt;
+&lt;td&gt;1024 hidden units&lt;/td&gt;
+&lt;td&gt;16 attention heads&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+    
+    </summary>
+    
+    
+      <category term="笔记" scheme="http://yoursite.com/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+      <category term="BERT" scheme="http://yoursite.com/tags/BERT/"/>
+    
+  </entry>
+  
+</feed>
