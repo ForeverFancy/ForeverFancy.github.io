@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    CAPCG 复盘 |  Bowen&#39;s Blog
+    CAPCG 复盘（二） |  Bowen&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   
@@ -33,7 +33,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-CAPCG-复盘" class="article article-type-post" itemscope
+  <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -41,7 +41,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  CAPCG 复盘
+  CAPCG 复盘（二）
 </h1>
   
 
@@ -50,8 +50,8 @@
 
     
     <div class="article-meta">
-      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/" class="article-date">
-  <time datetime="2020-03-22T04:28:00.000Z" itemprop="datePublished">2020-03-22</time>
+      <a href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
+  <time datetime="2020-03-23T03:42:38.000Z" itemprop="datePublished">2020-03-23</time>
 </a>
       
   <div class="article-category">
@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">2.5k字</span>
+            <span class="post-count">29字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">10分钟</span>
+            <span class="post-count">1分钟</span>
         </span>
     </span>
 </div>
@@ -99,68 +99,7 @@
       
 
       
-      <h1 id="CAPCG-复盘"><a href="#CAPCG-复盘" class="headerlink" title="CAPCG 复盘"></a>CAPCG 复盘</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><p>预处理共轭梯度法 (Preconditioned Conjugate Gradient) 从共轭梯度法 (Conjugate Gradient) 衍生而来，是常用的用于求解线性方程组 $Ax = b$ 的数值解法，目前主要应用于数值计算领域。</p>
-<h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>共轭梯度法主要适用于系数矩阵 $A$ 较为稀疏的情况下。如果矩阵 $A$ 不是稀疏的，那么最好的求解方法是对系数矩阵进行分解，这样也可以快速对不同的 $b$ 求得答案，在系数矩阵很大而且稀疏的情况下，分解产生的矩阵可能含有比 $A$ 更多的非零元素，并且在时间和空间上均不具有优势，所以使用迭代法是一种较好的选择。</p>
-<a id="more"></a>
-
-<h4 id="引理-1"><a href="#引理-1" class="headerlink" title="引理 1"></a>引理 1</h4><p>我们称</p>
-<p>$$<br>f(x) = \frac{1}{2}x^{T}Ax - b^Tx + c<br>$$</p>
-<p>是一个二次型，这是一个标量，其中 $A$ 是系数矩阵，$x$ 和 $b$ 均为向量，$c$ 为常数。</p>
-<p>下面将说明如果 $A$ 是一个对称正定矩阵，那么 $f(x)$ 将在 $Ax = b$ 的解处取到最小值。</p>
-<p>如果 $A$ 是对称正定矩阵，那么 $f(x)$ 的图像是一个碗状抛物面（有最小值且最小值唯一），我们可以看出：</p>
-<p>$$<br>\begin{aligned}<br>\nabla^{2} f(x) &amp;=\frac{1}{2} A^{T}+\frac{1}{2} A \<br>&amp;=A<br>\end{aligned}<br>$$</p>
-<p>$f(x)$ 的 hessian 矩阵是正定的，那么根据凸函数的二阶充分必要条件，$f(x)$ 是严格凸函数，有最小值且最小值唯一（当然也可以用朴素的方法证明 $x = A^{-1}b$ 处有唯一最小值）。</p>
-<p>所以 $f(x)$ 可以在梯度为 0 处取到最小值：<br>$$<br>\begin{aligned}<br>\nabla f(x) &amp;=\frac{1}{2} A^{T}x+\frac{1}{2} Ax - b \<br>&amp;=Ax - b = 0<br>\end{aligned}<br>$$<br>这也就证明了引理，即如果 $A$ 是一个对称正定矩阵，那么 $f(x)$ 将在 $Ax = b$ 的解处取到最小值（注意如果 $A$ 不是对称的，那么将会在 $\frac{1}{2}(A^T+A)x=b$ 处取到最小值）。</p>
-<h4 id="最速梯度法-Steepest-Descent"><a href="#最速梯度法-Steepest-Descent" class="headerlink" title="最速梯度法 (Steepest Descent)"></a>最速梯度法 (Steepest Descent)</h4><p>首先定义误差向量 $\mathbf{e_{(i)}} = \mathbf{x_{(i)}} - \mathbf{x}$，这个向量衡量了目前解到正确解的距离。然后定义残差向量 $\mathbf{r_{(i)}} = \mathbf{b} - A\mathbf{x_{(i)}}$，这个向量衡量 $A\mathbf{x_{(i)}}$ 与期望值 $\mathbf{b}$ 之间的误差。注意，我们可以看出 $\mathbf{r_{(i)}} = -A\mathbf{e_{(i)}}$，这可以看作是误差通过线性变换之后到了和 $\mathbf{b}$ 相同的空间中。并且根据上文中 $\nabla f(\mathbf{x}) |<em>{\mathbf{x} = \mathbf{x</em>{(i)}}} = A\mathbf{x_{(i)}} - \mathbf{b}$ ，可以发现 $\mathbf{r_{(i)}} = -\nabla f(\mathbf{x}) |<em>{\mathbf{x}= \mathbf{x</em>{(i)}}}$ ，而这对应了梯度的反方向，也就是函数 $f(\mathbf{x})$ 下降最快的方向，所以以后我们会将残差和函数梯度下降最快的方向对应起来。</p>
-<p>使用最速梯度法，从任意位置出发，我们可以通过迭代到达 $f(x)$ 的最小值点，迭代每次选取的方向是与梯度相反的方向（梯度是函数增长最快的方向），使用公式：</p>
-<p>$$<br>\mathbf{x_{(i+1)}} = \mathbf{x_{(i)}} + \alpha \mathbf{r_{i}}<br>$$</p>
-<p>其中 $\alpha$ 是步长，那么如何决定步长呢？</p>
-<p>我们希望每次在残差的方向上的走一步之后尽可能使 $f$ 接近最小值，所以:</p>
-<p>$$<br>\begin{aligned}<br>\frac{d}{d \alpha} f\left(\mathbf{x_{(i+1)}}\right) &amp;= (\frac{d f}{d \mathbf{x_{i+1}}})^T \frac{d \mathbf{x_{i+1}}}{d \alpha}\<br>&amp;= -\mathbf{r_{i+1}}^T r_{i} = 0<br>\end{aligned}<br>$$</p>
-<p>这样我们可以看出需要 ${r_{i+1}}, r_{i}$ 相互正交，我们也可以来看一下两次搜索方向相互正交的几何含义：</p>
-<!-- ![steepest_descent](steepest_descent.png) -->
-<p><img src="https://pic4.zhimg.com/80/v2-379f4ca94cdee209d5f2fb4740d56a3c.png" alt="steepest_descent"></p>
-<p>实线方向即为本次搜索的方向（本次的梯度反方向），我们希望本次搜索到达的这条线上离最小值最近的点，这个点的特征是它的梯度（下次搜索方向）与本次搜索的方向（本次梯度）垂直。如果不垂直（比如直线上的其他点），我们可以按照梯度在直线上投影（虚线）的反方向继续往前走，可以达到更小的值（因为梯度的反方向是函数值变小的方向），以上就是一点 intuition。</p>
-<p>进一步推导：</p>
-<p>$$\begin{aligned}<br>r_{(i+1)}^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i+1)}\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A\left(x_{(i)}+\alpha r_{(i)}\right)\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i)}\right)^{T} r_{(i)}-\alpha\left(A r_{(i)}\right)^{T} r_{(i)} &amp;=0 \<br>\left(b-A x_{(i)}\right)^{T} r_{(i)} &amp;=\alpha\left(A r_{(i)}\right)^{T} r_{(i)} \<br>r_{(i)}^{T} r_{(i)} &amp;=\alpha r_{(i)}^{T}\left(A r_{(i)}\right) \<br>\alpha &amp;=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i)}^{T} A r_{(i)}}<br>\end{aligned}$$</p>
-<p>总结上述过程可以得到：</p>
-<p>$$\begin{aligned}<br>r_{(i)} &amp;=b-A x_{(i)} \<br>\alpha_{(i)} &amp;=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i)}^{T} A r_{(i)}} \<br>x_{(i+1)} &amp;=x_{(i)}+\alpha_{(i)} r_{(i)}<br>\end{aligned}$$</p>
-<p>这就是最速下降法的迭代公式，我们也可以将最后一个公式两侧同时乘 $-A$ 再加上 $b$，得到：</p>
-<p>$$r_{(i+1)}=r_{(i)}-\alpha_{(i)} A r_{(i)}$$</p>
-<p>我们可以通过最后三个式子迭代直到收敛，这样做比较方便，但有由于 $r$ 每次的迭代都没有 $x$ 的反馈，有可能最后存在一定的误差（浮点数计算误差），我们可以通过周期性用 $r_{(i)} =b-A x_{(i)}$ 更新 $r_{(i)}$ 来校正误差。</p>
-<h4 id="共轭梯度法-Conjugate-Gradient-Method"><a href="#共轭梯度法-Conjugate-Gradient-Method" class="headerlink" title="共轭梯度法 (Conjugate Gradient Method)"></a>共轭梯度法 (Conjugate Gradient Method)</h4><h5 id="Conjugate-Direction"><a href="#Conjugate-Direction" class="headerlink" title="Conjugate Direction"></a>Conjugate Direction</h5><p>使用最速梯度法的过程中，可能会遇到重复走之前走过的方向这种情况：</p>
-<!-- ![steepest-descent-problem](https://pic4.zhimg.com/80/v2-d2773fc54b2b8ce337f7089361217a56.png) -->
-
-<p>我们希望在搜索的方向上一次走合适的距离，之后就不再重复搜索这个方向，提高搜索的效率（有的时候最速下降法会在靠近解的时候来回震荡，这不是我们想要的结果）。所以我们将这样进行迭代</p>
-<p>$$x_{(i+1)}=x_{(i)}+\alpha_{(i)} d_{(i)}$$</p>
-<p>其中，$\mathbf{d_{(i)}}$ 是每次搜索的方向，如果要求 $\mathbf{e_{(i+1)}}$ 和 $\mathbf{d_{(i)}}$ 正交（这样就将在 $\mathbf{d_{(i)}}$ 的误差降为 0，之后不会再搜索这个方向）</p>
-<p>$$\begin{aligned}<br>x_{(i+1)} &amp;=x_{(i)}+\alpha_{(i)} d_{(i)} \<br>x_{(i+1)} - x &amp;=x_{(i)} - x +\alpha_{(i)} d_{(i)} \<br>e_{(i+1)} &amp;= e_{(i)} + \alpha_{(i)} d_{(i)} \<br>\end{aligned}$$</p>
-<p>所以有：</p>
-<p>$$\begin{aligned}<br>d_{(i)}^{T} e_{(i+1)} &amp;=0 \<br>d_{(i)}^{T}\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) &amp;=0 \quad  \<br>\alpha_{(i)} &amp;=-\frac{d_{(i)}^{T} e_{(i)}}{d_{(i)}^{T} d_{(i)}}<br>\end{aligned}$$</p>
-<p>但这个方差显然存在问题，如果我们知道了 $e_{(i)}$，那么也就相当于知道了问题的答案，也就不用迭代法求解了😂。</p>
-<p>为了解决这个问题，我们选择让本次搜索方向和之后的误差关于矩阵 $A$ 正交，而不是直接正交：</p>
-<p>$$d_{(i)}^{T} A e_{(i+1)}=0$$</p>
-<p>本质上，这就是在搜索方向上找到函数值最小的点，通过推导我们也能看出这个约束：</p>
-<p>$$\begin{aligned}<br>\frac{d}{d \alpha} f\left(x_{(i+1)}\right) &amp;=0 \<br>f^{\prime}\left(x_{(i+1)}\right)^{T} \frac{d}{d \alpha} x_{(i+1)} &amp;=0 \<br>-r_{(i+1)}^{T} d_{(i)} &amp;=0 \<br>d_{(i)}^{T} A e_{(i+1)} &amp;=0<br>\end{aligned}$$</p>
-<p>同上面的推导，可以推出：</p>
-<p>$$\begin{aligned}<br>\alpha_{(i)} &amp;=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \<br>&amp;=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}<br>\end{aligned}$$</p>
-<p>这次，表达式变成了我们可以求解的值。本质上，我们通过关于矩阵 $A$ 正交的这个条件，将原先 $\alpha$ 中的 $e_{(i)}$ 转化为了 $Ae_{(i)} = r_{(i)}$ 也就是我们可以通过迭代求解的值。<strong>注意，如果 $d_{(i)}$ 选择 $r_{(i)}$，那么迭代公式就和最速梯度法相同。</strong></p>
-<p>下面将证明共轭梯度法可以在 n 步之内得到 $x$ 的值，我们记误差为各个搜索方向的线性组合：</p>
-<p>$$e_{(0)}=\sum_{j=0}^{n-1} \delta_{j} d_{(j)}$$</p>
-<p>$$\begin{aligned}<br>d_{(k)}^{T} A e_{(0)}&amp;=\sum_{j} \delta_{(j)} d_{(k)}^{T} A d_{(j)} \<br>d_{(k)}^{T} A e_{(0)}&amp;=\delta_{(k)} d_{(k)}^{T} A d_{(k)} \text{   by A-orthogonality of $d$ vectors}\<br>\delta_{(k)} &amp;=\frac{d_{(k)}^{T} A e_{(0)}}{d_{(k)}^{T} A d_{(k)}} \ &amp;=\frac{d_{(k)}^{T} A\left(e_{(0)}+\sum_{i=0}^{k-1} \alpha_{(i)} d_{(i)}\right)}{d_{(k)}^{T} A d_{(k)}} \quad \text { (by } A \text { -orthogonality of } d \text { vectors) }\<br>&amp;=\frac{d_{(k)}^{T} A e_{(k)}}{d_{(k)}^{T} A d_{(k)}}\<br>&amp;=-\alpha_{(k)}<br>\end{aligned}$$</p>
-<p>事实上，我们可以看出迭代过程就是一项一项地将每个方向上的误差移除掉，最终得到期望值。</p>
-<h5 id="构建共轭方向"><a href="#构建共轭方向" class="headerlink" title="构建共轭方向"></a>构建共轭方向</h5><p>可以使用 Gram-Schmidt 进行构建，大概的过程就是在一组 n 个线性无关的向量 $u_0, u_1, \dots, u_n$ 中，$d_i$ 由 $u_i$ 减去与所有之前的 $d_j$ 不是 A 正交的向量，即：</p>
-<p>$$d_{(i)}=u_{i}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}$$</p>
-<p>为了求出系数 $\beta_{i k}$，我们可以根据定义令其与之前的方向 A-正交，即：</p>
-<p>$$\begin{aligned}<br>d_{(i)}^{T} A d_{(j)} &amp;=u_{i}^{T} A d_{(j)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}^{T} A d_{(j)} \<br>0 &amp;=u_{i}^{T} A d_{(j)}+\beta_{i j} d_{(j)}^{T} A d_{(j)}, \quad i&gt;j \quad \text{by A-orthogonality}\<br>\beta_{i j} &amp;=-\frac{u_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}<br>\end{aligned}$$</p>
-<p>一个缺点是这样需要保存之前的所有方向用来构建当前的方向，时间复杂度也较高。值得注意的是，参考文献中表示，当初始的搜索方向选定为坐标轴方向时，共轭方向法进行求解退化为高斯消元（未证明），但共轭梯度的出现解决了这些不足。但无论是共轭梯度还是共轭方向法，都是在 A 矩阵的空间中，进行每次迭代都全部移除该搜索方向上的误差的操作（A-正交）。</p>
-<!-- ## 性能分析
-
-使用 Intel Parallel Studio 对原始代码进行性能分析，结果如下：
-
-![](profile.png) -->
-
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
+      <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍</p>
 
       
       <!-- reward -->
@@ -230,14 +169,14 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
 
 
     </footer>
@@ -249,9 +188,9 @@
   <nav class="article-nav">
     
     
-      <a href="/2020/03/20/BERT-illustration/" class="article-nav-link">
+      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">BERT-illustration</div>
+        <div class="article-nav-title">CAPCG 复盘（一）</div>
       </a>
     
   </nav>
@@ -646,6 +585,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

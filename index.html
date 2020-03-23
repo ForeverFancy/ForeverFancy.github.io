@@ -67,7 +67,7 @@
     
     
     
-    <article id="post-CAPCG-复盘" class="article article-type-post" itemscope
+    <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -75,8 +75,8 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/"
-    >CAPCG 复盘</a
+  <a class="article-title" href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/"
+    >CAPCG 复盘（二）</a
   >
 </h2>
   
@@ -86,7 +86,78 @@
 
     
     <div class="article-meta">
-      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/" class="article-date">
+      <a href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
+  <time datetime="2020-03-23T03:42:38.000Z" itemprop="datePublished">2020-03-23</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍</p>
+
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
+    <article id="post-CAPCG-复盘（一）" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/"
+    >CAPCG 复盘（一）</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
   <time datetime="2020-03-22T04:28:00.000Z" itemprop="datePublished">2020-03-22</time>
 </a>
       
@@ -108,10 +179,10 @@
       
 
       
-      <h1 id="CAPCG-复盘"><a href="#CAPCG-复盘" class="headerlink" title="CAPCG 复盘"></a>CAPCG 复盘</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><p>预处理共轭梯度法 (Preconditioned Conjugate Gradient) 从共轭梯度法 (Conjugate Gradient) 衍生而来，是常用的用于求解线性方程组 $Ax = b$ 的数值解法，目前主要应用于数值计算领域。</p>
+      <h1 id="CAPCG-复盘（一）"><a href="#CAPCG-复盘（一）" class="headerlink" title="CAPCG 复盘（一）"></a>CAPCG 复盘（一）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><p>预处理共轭梯度法 (Preconditioned Conjugate Gradient) 从共轭梯度法 (Conjugate Gradient) 衍生而来，是常用的用于求解线性方程组 $Ax = b$ 的数值解法，目前主要应用于数值计算领域。</p>
 <h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>共轭梯度法主要适用于系数矩阵 $A$ 较为稀疏的情况下。如果矩阵 $A$ 不是稀疏的，那么最好的求解方法是对系数矩阵进行分解，这样也可以快速对不同的 $b$ 求得答案，在系数矩阵很大而且稀疏的情况下，分解产生的矩阵可能含有比 $A$ 更多的非零元素，并且在时间和空间上均不具有优势，所以使用迭代法是一种较好的选择。</p>
       
-      <a class="article-more-link" href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98/">阅读更多...</a>
+      <a class="article-more-link" href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/">阅读更多...</a>
       
       
       <!-- reward -->
@@ -124,7 +195,7 @@
     <footer class="article-footer">
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
 
 
     </footer>
@@ -558,6 +629,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
