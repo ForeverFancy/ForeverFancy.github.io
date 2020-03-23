@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-23T14:59:26.819Z</updated>
+  <updated>2020-03-23T15:02:20.046Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,17 +21,21 @@
     <link href="http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/</id>
     <published>2020-03-23T03:42:38.000Z</published>
-    <updated>2020-03-23T14:59:26.819Z</updated>
+    <updated>2020-03-23T15:02:20.046Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          
-        
-      
+      &lt;h1 id=&quot;CAPCG-复盘（二）&quot;&gt;&lt;a href=&quot;#CAPCG-复盘（二）&quot; class=&quot;headerlink&quot; title=&quot;CAPCG 复盘（二）&quot;&gt;&lt;/a&gt;CAPCG 复盘（二）&lt;/h1&gt;&lt;h2 id=&quot;PCG-简介&quot;&gt;&lt;a href=&quot;#PCG-简介&quot; class=&quot;headerlink&quot; title=&quot;PCG 简介&quot;&gt;&lt;/a&gt;PCG 简介&lt;/h2&gt;&lt;h3 id=&quot;Conjugate-Gradient&quot;&gt;&lt;a href=&quot;#Conjugate-Gradient&quot; class=&quot;headerlink&quot; title=&quot;Conjugate Gradient&quot;&gt;&lt;/a&gt;Conjugate Gradient&lt;/h3&gt;&lt;p&gt;经过了前面&lt;strike&gt;（充分的）&lt;/strike&gt;的铺垫，终于到了 Conjugate Gradient 的介绍，其实共轭梯度法本质上就是将 Conjugate Direction 中构建的搜索方向的一组线性无关向量 $u_{(i)}$ 设定为残差 $r_{(i)}$，这样做的原因有以下几点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;残差在最速下降法中被作为搜索方向使用，虽然在 Conjugate Direction 中的搜索方向构建与最速下降法不同，但仍有相似之处，可以拿来尝试；&lt;/li&gt;
+&lt;li&gt;由之前的推导中 $d_{(i)}^{T} r_{(j)} =0$ 可知，残差具有和之前搜索方向正交的性质，这使得我们新的搜索方向总是与之前的搜索方向线性无关，除非 $r_{(j)} = 0$，但这种情况下问题已经被解决了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因为 $d_{(i)}$ 都是由 $r_{(i)}$ 构建而来，所以 $\operatorname{span}\left\{r_{(0)}, r_{(1)}, \ldots, r_{(i-1)}\right\} = \operatorname{span}\left\{d_{(0)}, d_{(1)}, \ldots, d_{(i-1)}\right\}$。并且每个残差都与之前的搜索方向正交，于是可以推出：&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;
+\begin{aligned}
+u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
+\Rightarrow r_{(i)}^{T} r_{(j)} &amp;= 0 \quad i&lt;j
+\end{aligned}&lt;/script&gt;
     
     </summary>
     
