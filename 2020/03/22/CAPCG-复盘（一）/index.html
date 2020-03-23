@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">2.7k字</span>
+            <span class="post-count">2.8k字</span>
         </span>
     </span>
 
@@ -172,7 +172,7 @@ d_{(i)}^{T} A e_{(i+1)} &=0
 <script type="math/tex; mode=display">\begin{aligned}
 \alpha_{(i)} &=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \\
 &=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}
-\end{aligned}</script><p>这次，表达式变成了我们可以求解的值。本质上，我们通过关于矩阵 $A$ 正交的这个条件，将原先 $\alpha$ 中的 $e_{(i)}$ 转化为了 $Ae_{(i)} = r_{(i)}$ 也就是我们可以通过迭代求解的值。<strong>注意，如果 $d_{(i)}$ 选择 $r_{(i)}$，那么迭代公式就和最速梯度法相同。</strong></p>
+\end{aligned}</script><p>这次，表达式变成了我们可以求解的值。本质上，我们通过关于矩阵 $A$ 正交的这个条件，将原先 $\alpha$ 中的 $e_{(i)}$ 转化为了 $Ae_{(i)} = r_{(i)}$ 也就是我们可以通过迭代求解的值。注意，如果<strong>某一个</strong> $d_{(i)}$ 选择 $r_{(i)}$，那么迭代公式就和最速梯度法中的公式相同，但实际上参考后面的构建规则，$d_{(i)}$ 和 $r_{(i)}$ 不会一直完全相等。</p>
 <p>下面将证明共轭梯度法可以在 n 步之内得到 $x$ 的值，我们记误差为各个搜索方向的线性组合：</p>
 <script type="math/tex; mode=display">e_{(0)}=\sum_{j=0}^{n-1} \delta_{j} d_{(j)}</script><script type="math/tex; mode=display">\begin{aligned}
 d_{(k)}^{T} A e_{(0)}&=\sum_{j} \delta_{(j)} d_{(k)}^{T} A d_{(j)} \\
@@ -181,7 +181,7 @@ d_{(k)}^{T} A e_{(0)}&=\delta_{(k)} d_{(k)}^{T} A d_{(k)} \text{   by A-orthogon
 &=\frac{d_{(k)}^{T} A e_{(k)}}{d_{(k)}^{T} A d_{(k)}}\\
 &=-\alpha_{(k)}
 \end{aligned}</script><p>事实上，我们可以看出迭代过程就是一项一项地将每个方向上的误差移除掉，最终得到期望值。</p>
-<h5 id="构建共轭方向"><a href="#构建共轭方向" class="headerlink" title="构建共轭方向"></a>构建共轭方向</h5><p>可以使用 Gram-Schmidt 进行构建，大概的过程就是在一组 n 个线性无关的向量 $u_0, u_1, \dots, u_n$ 中，$d_i$ 由 $u_i$ 减去与所有之前的 $d_j$ 不是 A 正交的向量，即：</p>
+<h5 id="构建共轭方向"><a href="#构建共轭方向" class="headerlink" title="构建共轭方向"></a>构建共轭方向</h5><p>可以使用 Gram-Schmidt 进行构建，大概的过程就是在一组 n 个线性无关的向量 $u_0, u_1, \dots, u_n$ 中，$d_i$ 由 $u_i$ 减去与所有之前的 $d_j$ 不是 A 正交的分量，即：</p>
 <script type="math/tex; mode=display">d_{(i)}=u_{(i)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}</script><p>为了求出系数 $\beta_{i k}$，我们可以根据定义令其与之前的方向 A-正交，即：</p>
 <script type="math/tex; mode=display">\begin{aligned}
 d_{(i)}^{T} A d_{(j)} &=u_{i}^{T} A d_{(j)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}^{T} A d_{(j)} \\
@@ -208,7 +208,7 @@ d_{(i)}^{T} r_{(j)} &=u_{i}^{T} r_{(j)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)}^{T}
 <script type="math/tex; mode=display">d_{(i)}^{T} r_{(i)}=u_{i}^{T} r_{(i)}</script><p>以及，我们的残差迭代公式可以进一步由矩阵和误差相乘改为由自身迭代产生：</p>
 <script type="math/tex; mode=display">\begin{aligned}
 e_{(i+1)} &=e_{(i)}+\alpha_{(i)} d_{(i)} \\
-r(i+1) &=-A e_{(i+1)} \\
+r_{(i+1)} &=-A e_{(i+1)} \\
 &=-A\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) \\
 &=r_{(i)}-\alpha_{(i)} A d_{(i)}
 \end{aligned}</script><!-- ## 性能分析
@@ -711,21 +711,6 @@ r(i+1) &=-A e_{(i+1)} \\
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
