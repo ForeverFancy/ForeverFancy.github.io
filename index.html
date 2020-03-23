@@ -109,7 +109,76 @@
 
       
       <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍，其实共轭梯度法本质上就是将 Conjugate Direction 中构建的搜索方向的一组线性无关向量 $u_{(i)}$ 设定为残差 $r_{(i)}$，这样做的原因有以下几点：</p>
-<p>- </p>
+<ul>
+<li>残差在最速下降法中被作为搜索方向使用，虽然在 Conjugate Direction 中的搜索方向构建与最速下降法不同，但仍有相似之处，可以拿来尝试；</li>
+<li>由之前的推导中 $d_{(i)}^{T} r_{(j)} =0$ 可知，残差具有和之前搜索方向正交的性质，这使得我们新的搜索方向总是与之前的搜索方向线性无关，除非 $r_{(j)} = 0$，但这种情况下问题已经被解决了。</li>
+</ul>
+<p>因为 $d_{(i)}$ 都是由 $r_{(i)}$ 构建而来，所以 $\operatorname{span}\left\{r_{(0)}, r_{(1)}, \ldots, r_{(i-1)}\right\} = \operatorname{span}\left\{d_{(0)}, d_{(1)}, \ldots, d_{(i-1)}\right\}$。并且每个残差都与之前的搜索方向正交，于是可以推出：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
+\Rightarrow r_{(i)}^{T} r_{(j)} &= 0 \quad i<j
+\end{aligned}</script><p>由之前的推导：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+r_{(i+1)} &=-A e_{(i+1)} \\
+&=-A\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) \\
+&=r_{(i)}-\alpha_{(i)} A d_{(i)}
+\end{aligned}</script><p>可以发现新的残差是旧的残差和 $A d_{(i)}$ 的一个线性组合。注意到 $d_{(i-1)}, r_{(i-1)} \in \mathcal{D_i}$，可以得到 $r_{(i)} \in \mathcal{D_i} \bigcup A\mathcal{D_i} = \mathcal{D_{i+1}}$，并且由 $\mathcal{D_0} = {span}\{d_0\}$ 以及<br>$d_0=u_0=r_0$ 可以推出：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathcal{D}_{i} &=\operatorname{span}\left\{d_{(0)}, A d_{(0)}, A^{2} d_{(0)}, \ldots, A^{i-1} d_{(0)}\right\} \\
+&=\operatorname{span}\left\{r_{(0)}, A r_{(0)}, A^{2} r_{(0)}, \ldots, A^{i-1} r_{(0)}\right\}
+\end{aligned}</script><p>这个子空间被称为 <em>krylov subspace</em>，子空间是由一个矩阵反复作用于一个向量产生的。<em>krylov subspace</em> 有比较好的性质，因为 $A\mathcal{D_i} \in \mathcal{D_{i+1}}$，而下一个残差又与之前的所有搜索方向，即搜索空间正交。</p>
+<script type="math/tex; mode=display">\begin{aligned}
+r_{(i+1)} &\perp \mathcal{D_{i+1}} \\
+\Rightarrow r_{(i+1)} &\perp A\mathcal{D_{i}} \\
+\end{aligned}</script><p>所以 $r_{(i+1)}$ 与 $\mathcal{D_i}$ (之前的所有搜索方向除 $d_{(i)}$) A-正交，这将为 Gram-Schimidt 共轭化提供方便。之前我们推出过：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+d_{(i)} &=u_{(i)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)} \\
+\beta_{i j} &=-\frac{u_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}
+\end{aligned}</script><p>将 $u_{(i)}$ 替换为 $r_{(i)}$ 可得 $\beta_{i j} =-\frac{r_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}$.</p>
+<p>我们将进一步简化系数的表达式：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+r_{(j+1)} &=r_{(j)}-\alpha_{(j)} A d_{(j)}\\
+\Rightarrow r_{(i)}^T r_{(j+1)} &=r_{(i)}^T r_{(j)}-\alpha_{(j)} r_{(i)}^T A d_{(j)}\\
+\Rightarrow \alpha_{(j)} r_{(i)}^T A d_{(j)} &= r_{(i)}^T r_{(j)} - r_{(i)}^T r_{(j+1)}\\
+
+r_{(i)}^{T} A d_{(j)} &=\left\{\begin{array}{ll}
+\frac{1}{\alpha_{(i)}} r_{(i)}^{T} r_{(i)}, & i=j \\
+-\frac{1}{\alpha_{(i-1)}} r_{(i)}^{T} r_{(i)}, &i=j+1 & \\
+0, & \text { otherwise. }
+\end{array}\right.\\
+\therefore \beta_{i j} &=\left\{\begin{array}{ll}
+\frac{1}{\alpha_{(i-1)}} \frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} A d_{(i-1)}}, & i=j+1 \\
+0, & i>j+1
+\end{array}\right.
+\end{aligned}</script><p>这样我们也就无需存储之前的搜索向量，而且大多数 $\beta_{ij}$ 都变成了 0，每次迭代的时间空间复杂度由 $\mathcal{O}\left(n^{2}\right)$ 降至 $\mathcal{O}(m)$，其中 m 是 A 中非零元素个数。代入 $\alpha_{(i-1)}$ 的值进一步简化表达式：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+
+\alpha_{(i)} &=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \\
+&=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}  \\
+
+d_{(i)}^{T} r_{(i)}&=u_{(i)}^{T} r_{(i)} = r_{(i)}^T r_{(i)}\\
+\Rightarrow \beta_{(i)} &=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} r_{(i-1)}} \\
+&=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i-1)}^{T} r_{(i-1)}}
+\end{aligned}</script><p>综上，我们得到：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+d_{(0)}&=r_{(0)}=b-A x_{(0)}\\
+\alpha_{(i)}&=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
+x_{(i+1)}&=x_{(i)}+\alpha_{(i)} d_{(i)} \\
+r_{(i+1)}&=r_{(i)}-\alpha_{(i)} A d_{(i)} \\
+\beta_{(i+1)}&=\frac{r_{(i+1)}^{T} r(i+1)}{r_{(i)}^{T} r_{(i)}} \\
+d_{(i+1)}&=r_{(i+1)}+\beta_{(i+1)} d_{(i)}
+\end{aligned}</script><p>其实共轭梯度法并不是以梯度作为搜索方向，准确地说是用梯度构建搜索方向。</p>
+<h3 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h3><p>不断迭代可能会残差精度不断损失降低，这可以通过像最速梯度法中每迭代固定步数就重新计算残差解决。但精度的损失可能使搜索方向丧失 A-正交性，不过后来经过证明，共轭梯度法的确可以收敛。证明略过，可以参照参考文献。最终可以推出：</p>
+<script type="math/tex; mode=display">\left\|e_{(i)}\right\|_{A} \leq 2\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^{i}\left\|e_{(0)}\right\|_{A}</script><h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p>在迭代过程中，对于矩阵向量乘法，需要 $\mathcal{O}(m)$ 的时间复杂度，m 是 A 矩阵中非零元的个数，如果 A 是稀疏矩阵，那么 $m \in \mathcal{O}(n)$。当我们要求误差足够小时，即 $\left|e_{(i)}\right| \leq \varepsilon\left|e_{(0)}\right|$，最速梯度法的迭代次数：</p>
+<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \kappa \ln \left(\frac{1}{\epsilon}\right)\right\rceil</script><p>使用共轭梯度法则需要：</p>
+<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \sqrt{\kappa} \ln \left(\frac{2}{\epsilon}\right)\right\rceil</script><p>综上最速梯度法的时间复杂度可以总结为 $\mathcal{O}(\kappa m)$，共轭梯度法的时间复杂度为 $\mathcal{O}(\sqrt\kappa m)$，空间复杂度均为 $\mathcal{O}(m)$。</p>
+<h2 id="Preconditioning"><a href="#Preconditioning" class="headerlink" title="Preconditioning"></a>Preconditioning</h2><p>预处理是数值计算中常用的技巧，用来降低待求解方程的条件数。</p>
+<h3 id="Condition-number"><a href="#Condition-number" class="headerlink" title="Condition number"></a>Condition number</h3><p>条件数是数值计算领域中用来衡量输出结果受到输出影响的程度的一个指标，简单来说，就是看输入发生轻微变化时，输出受到影响，发生变化的剧烈程度，变化越剧烈，则条件数越大，称该系统病态；反之变化越小，条件数越小，称该系统良好。良好的系统求解具有优势，选取不同的初始值或者参数不会对输出产生很大影响，是我们期望的结果。</p>
+<p>对称正定矩阵的条件数为：</p>
+<script type="math/tex; mode=display">\kappa=\lambda_{\max } / \lambda_{\min }</script><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
 
       
       <!-- reward -->
@@ -630,6 +699,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
