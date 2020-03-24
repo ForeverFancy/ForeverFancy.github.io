@@ -170,7 +170,23 @@ d_{(i+1)}&=r_{(i+1)}+\beta_{(i+1)} d_{(i)}
 <h2 id="Preconditioning"><a href="#Preconditioning" class="headerlink" title="Preconditioning"></a>Preconditioning</h2><p>预处理是数值计算中常用的技巧，用来降低待求解方程的条件数。</p>
 <h3 id="Condition-number"><a href="#Condition-number" class="headerlink" title="Condition number"></a>Condition number</h3><p>条件数是数值计算领域中用来衡量输出结果受到输出影响的程度的一个指标，简单来说，就是看输入发生轻微变化时，输出受到影响，发生变化的剧烈程度，变化越剧烈，则条件数越大，称该系统病态；反之变化越小，条件数越小，称该系统良好。良好的系统求解具有优势，选取不同的初始值或者参数不会对输出产生很大影响，是我们期望的结果。</p>
 <p>对称正定矩阵的条件数为：</p>
-<script type="math/tex; mode=display">\kappa=\lambda_{\max } / \lambda_{\min }</script><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
+<script type="math/tex; mode=display">\kappa=\lambda_{\max } / \lambda_{\min }</script><p>设 $M$ 是一个近似于 $A$ 的对称正定矩阵，并且容易得到 $M^{-1}$，我们可以用 $M^{-1}Ax=M^{-1}b$ 来间接求解 $Ax=b$。我们希望 $\kappa\left(M^{-1} A\right) \ll \kappa(A)$ 或者 $M^{-1}A$ 的特征值尽可能相互接近，这样迭代法将会更快地求解出方程。但问题是 $M^{-1}A$ 往往不是对称或者正定的，即使 $M$ 和 $A$ 都是。</p>
+<p>为了解决这个问题，一个对称、正定矩阵 $M$ 可以被分解为 $EE^T=M$ (例如 Cholesky 分解)，并且 $M^{-1}A$ 和 $E^{-1}AE^T$ 有相同的特征值，设 $M^{-1}A$ 有特征值 $\lambda$ 和特征向量 $v$，那么：</p>
+<script type="math/tex; mode=display">\left(E^{-1} A E^{-T}\right)\left(E^{T} v\right)=\left(E^{T} E^{-T}\right) E^{-1} A v=E^{T} M^{-1} A v=\lambda E^{T} v</script><p>问题 $Ax=b$ 转化为：</p>
+<script type="math/tex; mode=display">E^{-1} A E^{-T} \widehat{x}=E^{-1} b, \quad \widehat{x}=E^{T} x</script><p>因为 $E^{-1}AE^{-T}$ 对称正定，可以先用 CG 求得 $\widehat{x}$ 再求 $x$，得到 Preconditioned Conjugate Gradient 迭代公式如下：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+&r_{(0)}=b-A x_{(0)}\\
+&d_{(0)}=M^{-1} r_{(0)}\\
+&\alpha_{(i)}=\frac{r_{(i)}^{T} M^{-1} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
+&\begin{aligned}
+x_{(i+1)} &=x_{(i)}+\alpha_{(i)} d_{(i)} \\
+r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
+\end{aligned}\\
+&\beta_{(i+1)}=\frac{r_{(i+1)}^{T} M^{-1} r_{(i+1)}}{r_{(i)}^{T} M^{-1} r_{(i)}}\\
+&d_{(i+1)}=M^{-1} r_{(i+1)}+\beta_{(i+1)} d_{(i)}
+\end{aligned}</script><p>算法的效率还是取决于条件数减少所缩短的时间和多出来的一次矩阵乘法 $M^{-1}A$ 时间哪个比较短。可以看出可以选取 $M=A$，这样问题变成 $x=M^{-1}b=A^{-1}b$，问题的条件数为 1，但 $A^{-1}$ 求解复杂度很高，如果求解出来了我们可以直接得到答案，也不再需要迭代了。</p>
+<p>常用的一个预处理算子为 diagonal preconditioner or Jacobi preconditioner，预处理矩阵 $M$ 为 $A$ 的对角元素，这个预处理矩阵很容易求得逆矩阵，并且对降低条件数有还不错的效果。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
 
       
       <!-- reward -->
@@ -656,21 +672,6 @@ d_{(i+1)}&=r_{(i+1)}+\beta_{(i+1)} d_{(i)}
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
