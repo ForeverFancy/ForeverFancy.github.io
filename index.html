@@ -67,6 +67,94 @@
     
     
     
+    <article id="post-CAPCG-复盘（三）" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/"
+    >CAPCG 复盘（三）</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/" class="article-date">
+  <time datetime="2020-03-24T01:37:26.000Z" itemprop="datePublished">2020-03-24</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="CAPCG-复盘（三）"><a href="#CAPCG-复盘（三）" class="headerlink" title="CAPCG 复盘（三）"></a>CAPCG 复盘（三）</h1><h2 id="应用背景"><a href="#应用背景" class="headerlink" title="应用背景"></a>应用背景</h2><p>本次比赛的应用为 POP (Parallel Ocean Program)。</p>
+<p>POP 是由 LANL 在能源部的 CHAMMP 计划赞助下开发的，该计划将大规模并行计算机引入了气候建模领域。上世纪60年代末，美国国家海洋和大气管理局地球物理流体动力学实验室的 Kirk Bryan 和 Michael Cox  首次开发了 Bryan-Cox-semtner 海洋模型，而 POP 是在这个模型的基础上进行开发的。POP 的第一个版本是由 Semtner 和 Chervin 开发的。</p>
+<ol>
+<li>这是一个为了研究海洋气候系统提出的三维洋流模型，适用于海洋学和气候学研究；</li>
+<li>研究人员通过实验发现，POP 模拟得到的结果总体上符合真实数据的大致分布趋势，但是仍然需要在更高分辨率下进行预测才能进一步减小与真实数据之间的误差；</li>
+<li>由于 POP 里面的 stencil 计算以及 global reduction 存在一定的访存及通信瓶颈，所以实际工作性能不能达到平台的最佳性能（计算的瓶颈较小，访存的瓶颈较大）</li>
+</ol>
+<p>应用运行的大体过程如下：</p>
+<ul>
+<li>对地图进行网格划分，每个进程分配部分任务；</li>
+<li>每个进程独自计算自己的任务；</li>
+<li>每个网格需要和相邻的网格交换边界信息；</li>
+<li>每次迭代过程需要若干次 <code>global reduction</code> 收集全局信息。</li>
+</ul>
+<p>在这里多说一句，海洋模型为什么会跟共轭梯度法有关联。这是因为海洋模型本质上是通过连续的微分方程描述的，而求解微分方程的常用做法是离散化，之后通过一定的变换问题就能转化为求解 $Ax=b$ 这种线性方程，也就可以使用共轭梯度法进行求解了。</p>
+<p>应用中主要求解的是正压 (barotropic) 模型，stencil operator 的作用是差分，可以发现源码中矩阵乘法的部分都是使用 stencil 计算。这也和微分方程的离散化有所对应（可以看成稀疏矩阵乘法的一种替代形式）。</p>
+      
+      <a class="article-more-link" href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/">阅读更多...</a>
+      
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
     <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
@@ -641,6 +729,21 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

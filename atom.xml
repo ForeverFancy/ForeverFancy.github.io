@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-24T01:36:47.101Z</updated>
+  <updated>2020-03-25T04:45:05.303Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,11 +17,49 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>CAPCG 复盘（三）</title>
+    <link href="http://yoursite.com/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/"/>
+    <id>http://yoursite.com/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/</id>
+    <published>2020-03-24T01:37:26.000Z</published>
+    <updated>2020-03-25T04:45:05.303Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;CAPCG-复盘（三）&quot;&gt;&lt;a href=&quot;#CAPCG-复盘（三）&quot; class=&quot;headerlink&quot; title=&quot;CAPCG 复盘（三）&quot;&gt;&lt;/a&gt;CAPCG 复盘（三）&lt;/h1&gt;&lt;h2 id=&quot;应用背景&quot;&gt;&lt;a href=&quot;#应用背景&quot; class=&quot;headerlink&quot; title=&quot;应用背景&quot;&gt;&lt;/a&gt;应用背景&lt;/h2&gt;&lt;p&gt;本次比赛的应用为 POP (Parallel Ocean Program)。&lt;/p&gt;
+&lt;p&gt;POP 是由 LANL 在能源部的 CHAMMP 计划赞助下开发的，该计划将大规模并行计算机引入了气候建模领域。上世纪60年代末，美国国家海洋和大气管理局地球物理流体动力学实验室的 Kirk Bryan 和 Michael Cox  首次开发了 Bryan-Cox-semtner 海洋模型，而 POP 是在这个模型的基础上进行开发的。POP 的第一个版本是由 Semtner 和 Chervin 开发的。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;这是一个为了研究海洋气候系统提出的三维洋流模型，适用于海洋学和气候学研究；&lt;/li&gt;
+&lt;li&gt;研究人员通过实验发现，POP 模拟得到的结果总体上符合真实数据的大致分布趋势，但是仍然需要在更高分辨率下进行预测才能进一步减小与真实数据之间的误差；&lt;/li&gt;
+&lt;li&gt;由于 POP 里面的 stencil 计算以及 global reduction 存在一定的访存及通信瓶颈，所以实际工作性能不能达到平台的最佳性能（计算的瓶颈较小，访存的瓶颈较大）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;应用运行的大体过程如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对地图进行网格划分，每个进程分配部分任务；&lt;/li&gt;
+&lt;li&gt;每个进程独自计算自己的任务；&lt;/li&gt;
+&lt;li&gt;每个网格需要和相邻的网格交换边界信息；&lt;/li&gt;
+&lt;li&gt;每次迭代过程需要若干次 &lt;code&gt;global reduction&lt;/code&gt; 收集全局信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在这里多说一句，海洋模型为什么会跟共轭梯度法有关联。这是因为海洋模型本质上是通过连续的微分方程描述的，而求解微分方程的常用做法是离散化，之后通过一定的变换问题就能转化为求解 $Ax=b$ 这种线性方程，也就可以使用共轭梯度法进行求解了。&lt;/p&gt;
+&lt;p&gt;应用中主要求解的是正压 (barotropic) 模型，stencil operator 的作用是差分，可以发现源码中矩阵乘法的部分都是使用 stencil 计算。这也和微分方程的离散化有所对应（可以看成稀疏矩阵乘法的一种替代形式）。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="复盘" scheme="http://yoursite.com/categories/%E5%A4%8D%E7%9B%98/"/>
+    
+    
+      <category term="Optimization" scheme="http://yoursite.com/tags/Optimization/"/>
+    
+      <category term="Math" scheme="http://yoursite.com/tags/Math/"/>
+    
+  </entry>
+  
+  <entry>
     <title>CAPCG 复盘（二）</title>
     <link href="http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/</id>
     <published>2020-03-23T03:42:38.000Z</published>
-    <updated>2020-03-24T01:36:47.101Z</updated>
+    <updated>2020-03-25T01:35:14.222Z</updated>
     
     <summary type="html">
     
