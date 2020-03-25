@@ -120,34 +120,9 @@
 </ul>
 <p>但 Unikernel 也存在缺陷，最大的缺点就是调试非常困难。</p>
 <p>经过调研，我们选择了 IncludeOS 作为基础的 Unikernel 实现，并将其移植到 ARM 上。</p>
-<h3 id="IncludeOS"><a href="#IncludeOS" class="headerlink" title="IncludeOS"></a>IncludeOS</h3><ul>
-<li>使用语言：C/C++；</li>
-<li>构建工具：Cmake + Conan；</li>
-<li>目前支持平台：x86/x86_64.</li>
-</ul>
-<p>简单说一下 Conan，这是一个基于 Python 的 C++ 项目构建工具，它可以：</p>
-<ul>
-<li>自动安装需要的库（打包并根据包之间的依赖关系安装）；</li>
-<li>能够将自己的包放到 remote server 上，方便别人可以使用 <code>conan install</code> 安装；</li>
-<li>跨平台，可以生成多种平台的构建系统配置文件，如 <code>CMakeLists.txt</code>.</li>
-</ul>
-<h2 id="构建过程简介"><a href="#构建过程简介" class="headerlink" title="构建过程简介"></a>构建过程简介</h2><p>源代码结构如下：</p>
-<p><img src="https://pic4.zhimg.com/80/v2-80eb4821321030e9a91ee4db9b8d89bc.png" alt="Image"></p>
-<p>运行时结构如下：</p>
-<p><img src="https://pic4.zhimg.com/80/v2-eb7cf97ef97cc360edd6062ed8653589.png" alt="Image"></p>
-<p>实际构建过程非常复杂，可以参考我们的 <a href="https://github.com/OSH-2019/x-ridiculous-includeos/tree/master/reports/building_docs" target="_blank" rel="noopener">building doc</a> 了解详细信息，这里大概阐述一下思路：</p>
-<ul>
-<li>安装 IncludeOS 意味着构建所有 OS 组件，这些组件使用 GNU AR 生成为一个静态库。我们需要显式地将需要的库加入 CMakeLists.txt 中，这样设备驱动将会以静态库的形式构建；</li>
-<li>最终只有所有必须的组件被链接到一起，转换为一个最小的 ELF 文件，作为 Unikernel。</li>
-</ul>
-<h2 id="我所做的一些工作"><a href="#我所做的一些工作" class="headerlink" title="我所做的一些工作"></a>我所做的一些工作</h2><p>我在前期主要根据 LZT 同学完成构建，并和他一起进行了部分启动工作，之后我们分开行动，我完成了 GPIO, UART 以及 Framebuffer 的构建，具体的一些细节可以参考我们的 <a href="https://github.com/OSH-2019/x-ridiculous-includeos/blob/master/reports/concluding.md" target="_blank" rel="noopener">concluding.md</a>。</p>
-<h2 id="我们遇到的一些问题"><a href="#我们遇到的一些问题" class="headerlink" title="我们遇到的一些问题"></a>我们遇到的一些问题</h2><p>最终我们的移植并没有在裸机上成功运行，研究发现是内存对齐出了问题。ARM 对内存对齐的要求很高，在 <code>util::Lstack</code> 中的部分代码没有整理，里面有很多强制类型转换，可能出现的 <code>Alignment Fault</code> 也没有完成修复，这也就是裸机暂时不可用的原因。</p>
-<p>另外 QEMU 也并不检查内存是否对齐，这也导致我们在 QUME 上可以成功运行，但在裸机上却失败了。</p>
-<p>本来想写网卡驱动，也是项目的主要目的之一，但是网卡依赖于 USB 驱动，USB 驱动非常复杂，<del>而且又临近 DDL</del>，我们最终还是没有成功。</p>
-<h2 id="我们的学习到的一些调试技术和手段"><a href="#我们的学习到的一些调试技术和手段" class="headerlink" title="我们的学习到的一些调试技术和手段"></a>我们的学习到的一些调试技术和手段</h2><p>这次项目中也学到了一些调试技术和手段，对内核的调试还是比较麻烦，我们使用的是 QEMU + GDB/GDBGUI。</p>
-<p>QEMU 支持远程调试，指定远程端口后暂停，之后连接 GDB server 进行远程调试，配合 GDBGUI 可以清晰展示函数调用、堆栈信息、寄存器信息等，调试体验还不错。</p>
-<h2 id="未来的工作展望"><a href="#未来的工作展望" class="headerlink" title="未来的工作展望"></a>未来的工作展望</h2><p>LZT 同学已经受邀整理我们的 AArch64 源码，<del>在他不咕咕的情况下</del>有希望 Merge 进 includeOS 的官方工作，为开源社区做一点微小的贡献。</p>
-
+      
+      <a class="article-more-link" href="/2020/03/25/Introduction-to-IncludeOS/">阅读更多...</a>
+      
       
       <!-- reward -->
       
@@ -838,21 +813,6 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

@@ -111,6 +111,7 @@
 </ul>
 <p>但 Unikernel 也存在缺陷，最大的缺点就是调试非常困难。</p>
 <p>经过调研，我们选择了 IncludeOS 作为基础的 Unikernel 实现，并将其移植到 ARM 上。</p>
+<a id="more"></a>
 <h3 id="IncludeOS"><a href="#IncludeOS" class="headerlink" title="IncludeOS"></a>IncludeOS</h3><ul>
 <li>使用语言：C/C++；</li>
 <li>构建工具：Cmake + Conan；</li>
@@ -623,21 +624,6 @@
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
