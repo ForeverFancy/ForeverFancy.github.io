@@ -108,7 +108,7 @@
       
 
       
-      <h1 id="Introduction-to-IncludeOS"><a href="#Introduction-to-IncludeOS" class="headerlink" title="Introduction to IncludeOS"></a>Introduction to IncludeOS</h1><p>这是我和队友在 2018 年操作系统（H）课程中做的项目，这里做一个简单的回顾。</p>
+      <h1 id="Introduction-to-IncludeOS"><a href="#Introduction-to-IncludeOS" class="headerlink" title="Introduction to IncludeOS"></a>Introduction to IncludeOS</h1><p>这是我和队友在 2019 年操作系统（H）课程中做的项目，这里做一个简单的回顾。</p>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="Unikernel"><a href="#Unikernel" class="headerlink" title="Unikernel"></a>Unikernel</h3><p>传统内核都选择对硬件做了抽象，避免应用程序直接访问硬件资源，只提供抽象层提供的接口，例如 Linux 的应用程序全部运行在用户态，对硬件的操作全部通过系统调用进入内核态实现。这样做当然有好处，可以隐藏复杂的硬件细节，使用户专注于逻辑实现，但用户态和内核态之间的切换开销很大，损伤应用性能（在通常情况下影响不大，但对一些特殊场景，例如延迟敏感的 IoT 设备，会对影响性能）。</p>
 <p>Unikernel 不区分用户态和内核态，所有应用都运行在同一层级，减少不必要的硬件抽象，（大多数 Unikernel）每次只运行一个应用，最大程度精简以提升性能表现。</p>
 <p>当前社会，IoT 设备具有极大发展，具有很多有潜力的应用场景，我们希望在大量基于 ARM 架构的 IoT 设备上部署 Unikernel，因为 Unikernel 有如下优势：</p>
