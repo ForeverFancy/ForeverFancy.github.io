@@ -135,26 +135,9 @@
 </ul>
 </li>
 </ul>
-<h2 id="慢速图像重建"><a href="#慢速图像重建" class="headerlink" title="慢速图像重建"></a>慢速图像重建</h2><h3 id="基于统计分布的参数化纹理建模方法"><a href="#基于统计分布的参数化纹理建模方法" class="headerlink" title="基于统计分布的参数化纹理建模方法"></a>基于统计分布的参数化纹理建模方法</h3><h4 id="Image-Style-Transfer-Using-Convolutional-Neural-Networks"><a href="#Image-Style-Transfer-Using-Convolutional-Neural-Networks" class="headerlink" title="Image Style Transfer Using Convolutional Neural Networks"></a>Image Style Transfer Using Convolutional Neural Networks</h4><p>风格迁移领域开山之作，使用预训练的 VGG-19 作为特征提取器。</p>
-<ul>
-<li>内容表达：在第 $l$ 个卷积层，输出图像 $\vec{x}$ 和内容图像 $\vec{p}$ 的损失函数为 $\mathcal{L}_{\text {content }}(\vec{p}, \vec{x}, l)=\frac{1}{2} \sum_{i, j}\left(F_{i j}^{l}-P_{i j}^{l}\right)^{2}$，这里 $F_{i j}^{l}, P_{i j}^{l} \in \mathcal{R}^{N_{channels}\times(N_{height*width})}$；</li>
-<li>风格表达：在第 $l$ 个卷积层中，不同卷积核之间的 Gram 矩阵 $G_{i j}^{l}=\sum_{k} F_{i k}^{l} F_{j k}^{l}$ 可以用来表达图像风格。第 $l$ 层的风格损失为 $E_{l}=\frac{1}{4 N_{l}^{2} M_{l}^{2}} \sum_{i, j}\left(G_{i j}^{l}-A_{i j}^{l}\right)^{2}$，这里 $A^l$ 为风格图片的 style represention，$G^l$ 为待生成图片的 style represention。所有的 style loss 为 $\mathcal{L}_{\text {style }}(\vec{a}, \vec{x})=\sum_{l=0}^{L} w_{l} E_{l}$ 其中 $w_{l}$ 是对不同层的一个加权。</li>
-<li>总损失函数为：$\mathcal{L}_{\text {total }}(\vec{p}, \vec{a}, \vec{x})=\alpha \mathcal{L}_{\text {content }}(\vec{p}, \vec{x})+\beta \mathcal{L}_{\text {style }}(\vec{a}, \vec{x})$，其中 $\alpha, \beta$ 为风格和内容的权重系数。</li>
-</ul>
-<p>至于 Gram Matrix 为什么可以用来表达特征，实际上它是同一层不同 feature 之间的偏心协方差矩阵，它衡量不同 feature 之间的相关性，哪些共同出现，哪些相互影响较小。点乘是计算相关性的一种很好的方式，这点从 attention 的应用也可以得到体现。</p>
-<blockquote>
-<p>style transfer 当中，什么是风格，存在自己特性的才叫做风格。因此如何去度量这个自己的特性勒，自己的特点越突出，别人的越不突出最好。这样我们知道：当同一个维度上面的值相乘的时候原来越小酒变得更小，原来越大就变得越大；二不同维度上的关系也在相乘的表达当中表示出来 :</p>
-<p>$G=A^{T} A=\left[\begin{array}{c}\mathbf{a}_{1}^{T} \ \mathbf{a}_{2}^{T} \ \vdots \ \mathbf{a}_{n}^{T}\end{array}\right]\left[\begin{array}{llll}\mathbf{a}_{1} &amp; \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{n}\end{array}\right]=\left[\begin{array}{cccc}\mathbf{a}_{1}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{1}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{1}^{T} \mathbf{a}_{n} \ \mathbf{a}_{2}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{2}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{2}^{T} \mathbf{a}_{n} \ \mathbf{a}_{n}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{n}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{n}^{T} \mathbf{a}_{n}\end{array}\right]$</p>
-</blockquote>
-<p>存在的一些问题：</p>
-<ul>
-<li>速度很慢，实时性很差，对应用场景有限制；</li>
-<li>对于艺术风格的迁移看上去没有太大问题，对于风格图片也是真实场景的迁移，会出现很多噪声，图片细节也有较多丢失。</li>
-</ul>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
-<p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[3] Neural Style Transfer: A Review</a></p>
-
+      
+      <a class="article-more-link" href="/2020/03/29/Neural-Style-Transfer-Review/">阅读更多...</a>
+      
       
       <!-- reward -->
       
@@ -929,6 +912,21 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

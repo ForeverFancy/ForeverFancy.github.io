@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-29T14:56:55.240Z</updated>
+  <updated>2020-03-29T14:58:46.558Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,17 +21,37 @@
     <link href="http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/"/>
     <id>http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/</id>
     <published>2020-03-29T13:54:05.000Z</published>
-    <updated>2020-03-29T14:56:55.240Z</updated>
+    <updated>2020-03-29T14:58:46.558Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          
-        
-      
+      &lt;h1 id=&quot;Neural-Style-Transfer-Review&quot;&gt;&lt;a href=&quot;#Neural-Style-Transfer-Review&quot; class=&quot;headerlink&quot; title=&quot;Neural Style Transfer Review&quot;&gt;&lt;/a&gt;Neural Style Transfer Review&lt;/h1&gt;&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;在众多图像风格迁移算法中，图像被看作内容和风格的结合。图像风格迁移算法也可以看成是图像重建算法和纹理建模算法的结合。&lt;/p&gt;
+&lt;h3 id=&quot;纹理建模&quot;&gt;&lt;a href=&quot;#纹理建模&quot; class=&quot;headerlink&quot; title=&quot;纹理建模&quot;&gt;&lt;/a&gt;纹理建模&lt;/h3&gt;&lt;p&gt;常用的方法主要有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于统计分布的参数化纹理建模方法：将纹理建模为 N 阶统计量；&lt;/li&gt;
+&lt;li&gt;基于 MRF 的非参数化纹理建模方法：用 patch 相似度匹配进行逐点合成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;纹理建模的主要任务是研究如何表示图像的纹理特征，在图像风格转换中，主要用于对风格的建模和提取。&lt;/p&gt;
+&lt;h3 id=&quot;图像重建&quot;&gt;&lt;a href=&quot;#图像重建&quot; class=&quot;headerlink&quot; title=&quot;图像重建&quot;&gt;&lt;/a&gt;图像重建&lt;/h3&gt;&lt;p&gt;图像重建的主要目的是利用输入的图像特征尽可能对图像进行还原。这和传统的图像特征提取其实属于相反的过程，在 CNN 中，我们也经常根据某个卷积层的特征对图像进行重建，以了解该卷积层的作用（根据图像的哪一部分建立特征）。在图像风格转换领域中，图像重建主要用于对图像内容的建模和提取。&lt;/p&gt;
+&lt;p&gt;常用的算法也可以分为两类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；&lt;/li&gt;
+&lt;li&gt;基于离线模型优化的快速图像重建方法：即训练好一个网络，对于给定输入只需一次前向传播即可得到输出图片。优点是实时性较好，缺点是有可能不如慢速方法精细。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以上述的方法相结合我们就可以得到 5 大类图像风格迁移算法：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于在线图像优化的慢速图像重建方法：&lt;ul&gt;
+&lt;li&gt;基于统计分布的参数化纹理建模方法；&lt;/li&gt;
+&lt;li&gt;基于 MRF 的非参数化纹理建模方法；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;基于离线模型优化的快速图像重建方法：&lt;ul&gt;
+&lt;li&gt;Per-style-per-model;&lt;/li&gt;
+&lt;li&gt;Multiple-style-per-model;&lt;/li&gt;
+&lt;li&gt;Arbitrary-style-per-model.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     

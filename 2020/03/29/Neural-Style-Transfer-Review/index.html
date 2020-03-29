@@ -126,6 +126,7 @@
 </ul>
 </li>
 </ul>
+<a id="more"></a>
 <h2 id="慢速图像重建"><a href="#慢速图像重建" class="headerlink" title="慢速图像重建"></a>慢速图像重建</h2><h3 id="基于统计分布的参数化纹理建模方法"><a href="#基于统计分布的参数化纹理建模方法" class="headerlink" title="基于统计分布的参数化纹理建模方法"></a>基于统计分布的参数化纹理建模方法</h3><h4 id="Image-Style-Transfer-Using-Convolutional-Neural-Networks"><a href="#Image-Style-Transfer-Using-Convolutional-Neural-Networks" class="headerlink" title="Image Style Transfer Using Convolutional Neural Networks"></a>Image Style Transfer Using Convolutional Neural Networks</h4><p>风格迁移领域开山之作，使用预训练的 VGG-19 作为特征提取器。</p>
 <ul>
 <li>内容表达：在第 $l$ 个卷积层，输出图像 $\vec{x}$ 和内容图像 $\vec{p}$ 的损失函数为 $\mathcal{L}_{\text {content }}(\vec{p}, \vec{x}, l)=\frac{1}{2} \sum_{i, j}\left(F_{i j}^{l}-P_{i j}^{l}\right)^{2}$，这里 $F_{i j}^{l}, P_{i j}^{l} \in \mathcal{R}^{N_{channels}\times(N_{height*width})}$；</li>
@@ -630,6 +631,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
