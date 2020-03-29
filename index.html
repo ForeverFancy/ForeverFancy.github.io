@@ -67,6 +67,122 @@
     
     
     
+    <article id="post-Neural-Style-Transfer-Review" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/03/29/Neural-Style-Transfer-Review/"
+    >Neural Style Transfer Review</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/03/29/Neural-Style-Transfer-Review/" class="article-date">
+  <time datetime="2020-03-29T13:54:05.000Z" itemprop="datePublished">2020-03-29</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Review/">Review</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="Neural-Style-Transfer-Review"><a href="#Neural-Style-Transfer-Review" class="headerlink" title="Neural Style Transfer Review"></a>Neural Style Transfer Review</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在众多图像风格迁移算法中，图像被看作内容和风格的结合。图像风格迁移算法也可以看成是图像重建算法和纹理建模算法的结合。</p>
+<h3 id="纹理建模"><a href="#纹理建模" class="headerlink" title="纹理建模"></a>纹理建模</h3><p>常用的方法主要有：</p>
+<ul>
+<li>基于统计分布的参数化纹理建模方法：将纹理建模为 N 阶统计量；</li>
+<li>基于 MRF 的非参数化纹理建模方法：用 patch 相似度匹配进行逐点合成。</li>
+</ul>
+<p>纹理建模的主要任务是研究如何表示图像的纹理特征，在图像风格转换中，主要用于对风格的建模和提取。</p>
+<h3 id="图像重建"><a href="#图像重建" class="headerlink" title="图像重建"></a>图像重建</h3><p>图像重建的主要目的是利用输入的图像特征尽可能对图像进行还原。这和传统的图像特征提取其实属于相反的过程，在 CNN 中，我们也经常根据某个卷积层的特征对图像进行重建，以了解该卷积层的作用（根据图像的哪一部分建立特征）。在图像风格转换领域中，图像重建主要用于对图像内容的建模和提取。</p>
+<p>常用的算法也可以分为两类：</p>
+<ul>
+<li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；</li>
+<li>基于离线模型优化的快速图像重建方法：即训练好一个网络，对于给定输入只需一次前向传播即可得到输出图片。优点是实时性较好，缺点是有可能不如慢速方法精细。</li>
+</ul>
+<p>所以上述的方法相结合我们就可以得到 5 大类图像风格迁移算法：</p>
+<ul>
+<li>基于在线图像优化的慢速图像重建方法：<ul>
+<li>基于统计分布的参数化纹理建模方法；</li>
+<li>基于 MRF 的非参数化纹理建模方法；</li>
+</ul>
+</li>
+<li>基于离线模型优化的快速图像重建方法：<ul>
+<li>Per-style-per-model;</li>
+<li>Multiple-style-per-model;</li>
+<li>Arbitrary-style-per-model.</li>
+</ul>
+</li>
+</ul>
+<h2 id="慢速图像重建"><a href="#慢速图像重建" class="headerlink" title="慢速图像重建"></a>慢速图像重建</h2><h3 id="基于统计分布的参数化纹理建模方法"><a href="#基于统计分布的参数化纹理建模方法" class="headerlink" title="基于统计分布的参数化纹理建模方法"></a>基于统计分布的参数化纹理建模方法</h3><h4 id="Image-Style-Transfer-Using-Convolutional-Neural-Networks"><a href="#Image-Style-Transfer-Using-Convolutional-Neural-Networks" class="headerlink" title="Image Style Transfer Using Convolutional Neural Networks"></a>Image Style Transfer Using Convolutional Neural Networks</h4><p>风格迁移领域开山之作，使用预训练的 VGG-19 作为特征提取器。</p>
+<ul>
+<li>内容表达：在第 $l$ 个卷积层，输出图像 $\vec{x}$ 和内容图像 $\vec{p}$ 的损失函数为 $\mathcal{L}_{\text {content }}(\vec{p}, \vec{x}, l)=\frac{1}{2} \sum_{i, j}\left(F_{i j}^{l}-P_{i j}^{l}\right)^{2}$，这里 $F_{i j}^{l}, P_{i j}^{l} \in \mathcal{R}^{N_{channels}\times(N_{height*width})}$；</li>
+<li>风格表达：在第 $l$ 个卷积层中，不同卷积核之间的 Gram 矩阵 $G_{i j}^{l}=\sum_{k} F_{i k}^{l} F_{j k}^{l}$ 可以用来表达图像风格。第 $l$ 层的风格损失为 $E_{l}=\frac{1}{4 N_{l}^{2} M_{l}^{2}} \sum_{i, j}\left(G_{i j}^{l}-A_{i j}^{l}\right)^{2}$，这里 $A^l$ 为风格图片的 style represention，$G^l$ 为待生成图片的 style represention。所有的 style loss 为 $\mathcal{L}_{\text {style }}(\vec{a}, \vec{x})=\sum_{l=0}^{L} w_{l} E_{l}$ 其中 $w_{l}$ 是对不同层的一个加权。</li>
+<li>总损失函数为：$\mathcal{L}_{\text {total }}(\vec{p}, \vec{a}, \vec{x})=\alpha \mathcal{L}_{\text {content }}(\vec{p}, \vec{x})+\beta \mathcal{L}_{\text {style }}(\vec{a}, \vec{x})$，其中 $\alpha, \beta$ 为风格和内容的权重系数。</li>
+</ul>
+<p>至于 Gram Matrix 为什么可以用来表达特征，实际上它是同一层不同 feature 之间的偏心协方差矩阵，它衡量不同 feature 之间的相关性，哪些共同出现，哪些相互影响较小。点乘是计算相关性的一种很好的方式，这点从 attention 的应用也可以得到体现。</p>
+<blockquote>
+<p>style transfer 当中，什么是风格，存在自己特性的才叫做风格。因此如何去度量这个自己的特性勒，自己的特点越突出，别人的越不突出最好。这样我们知道：当同一个维度上面的值相乘的时候原来越小酒变得更小，原来越大就变得越大；二不同维度上的关系也在相乘的表达当中表示出来 :</p>
+<p>$G=A^{T} A=\left[\begin{array}{c}\mathbf{a}_{1}^{T} \ \mathbf{a}_{2}^{T} \ \vdots \ \mathbf{a}_{n}^{T}\end{array}\right]\left[\begin{array}{llll}\mathbf{a}_{1} &amp; \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{n}\end{array}\right]=\left[\begin{array}{cccc}\mathbf{a}_{1}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{1}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{1}^{T} \mathbf{a}_{n} \ \mathbf{a}_{2}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{2}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{2}^{T} \mathbf{a}_{n} \ \mathbf{a}_{n}^{T} \mathbf{a}_{1} &amp; \mathbf{a}_{n}^{T} \mathbf{a}_{2} &amp; \cdots &amp; \mathbf{a}_{n}^{T} \mathbf{a}_{n}\end{array}\right]$</p>
+</blockquote>
+<p>存在的一些问题：</p>
+<ul>
+<li>速度很慢，实时性很差，对应用场景有限制；</li>
+<li>对于艺术风格的迁移看上去没有太大问题，对于风格图片也是真实场景的迁移，会出现很多噪声，图片细节也有较多丢失。</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
+<p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[3] Neural Style Transfer: A Review</a></p>
+
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CV/" rel="tag">CV</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Style-Transfer/" rel="tag">Style Transfer</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
     <article id="post-Introduction-to-IncludeOS" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 

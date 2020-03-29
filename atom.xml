@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-26T12:26:35.365Z</updated>
+  <updated>2020-03-29T14:56:55.240Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Neural Style Transfer Review</title>
+    <link href="http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/"/>
+    <id>http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/</id>
+    <published>2020-03-29T13:54:05.000Z</published>
+    <updated>2020-03-29T14:56:55.240Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="CV" scheme="http://yoursite.com/tags/CV/"/>
+    
+      <category term="Style Transfer" scheme="http://yoursite.com/tags/Style-Transfer/"/>
+    
+  </entry>
   
   <entry>
     <title>Introduction to IncludeOS</title>
