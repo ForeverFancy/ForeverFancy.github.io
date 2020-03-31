@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.7k字</span>
+            <span class="post-count">3k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">6分钟</span>
+            <span class="post-count">13分钟</span>
         </span>
     </span>
 </div>
@@ -148,6 +148,39 @@
 </ul>
 <h4 id="INCORPORATING-LONG-RANGE-CONSISTENCY-IN-CNN-BASED-TEXTURE-GENERATION"><a href="#INCORPORATING-LONG-RANGE-CONSISTENCY-IN-CNN-BASED-TEXTURE-GENERATION" class="headerlink" title="INCORPORATING LONG-RANGE CONSISTENCY IN CNN-BASED TEXTURE GENERATION"></a>INCORPORATING LONG-RANGE CONSISTENCY IN CNN-BASED TEXTURE GENERATION</h4><p>实际上是对上面的一些改进，为了捕捉到更多图片的连续信息，style loss 不是每个点和其对应位置点乘，而变成每个位置和图像进行一个位置变换之后的像素进行点乘，例如 $(i, j)$ 和 $(i, j+\delta)$ 或者 $(i, j)$ 和 $(i+\delta, j)$ 点乘，这样可以捕获到具有一定间隔的图像连续特征。</p>
 <p>一定程度上解决了图片连续信息缺失的问题，但可以看出在一些应用场景中还是不尽人意，例如 season transfer 中，图像的像素位置信息出现了较大偏差，导致观感不太好。</p>
+<h4 id="Demystifying-Neural-Style-Transfer"><a href="#Demystifying-Neural-Style-Transfer" class="headerlink" title="Demystifying Neural Style Transfer"></a>Demystifying Neural Style Transfer</h4><p>这篇文章从 <strong>Domain Adaptation</strong> （属于迁移学习）的角度分析风格转换。一般的机器学习方法都是假设训练数据和测试数据属于相同的分布，而 Domain Adaptation 是假设训练数据和测试数据的分布不同，我们试图根据测试数据集训练出来可以预测（符合、逼近）测试数据集分布的模型。</p>
+<p>Domain Adaptation 中一种常用的训练方法是最小化 MMD (Maximum Mean Discrepancy)，这是衡量两种不同分布差异的一个统计值，只有当两个分布 $p=q$ 时，MMD 为 0。假设训练集和测试集分别为 $X=\left\{\mathbf{x}_{i}\right\}_{i=1}^{n},Y=\left\{\mathbf{y}_{i}\right\}_{i=1}^{n}$，其中 $x, y$ 是由分布 $p,q$ 生成的。MMD 定义如下：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+&\operatorname{MMD}[\mathcal{F}, X, Y]:=\sup _{f \in \mathcal{F}}\left(\frac{1}{m} \sum_{i=1}^{m} f\left(x_{i}\right)-\frac{1}{n} \sum_{i=1}^{n} f\left(y_{i}\right)\right)\\
+\end{aligned}</script><p>我们进一步限制 $f$ 可能的取值空间，选取 $f$ 只能取 Reproducing Kernel Hilbert Space 单位球中的某点作为约束，进一步推导：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+& \mathrm{MMD}^{2}[X, Y] \\
+=&\left\|\mathbf{E}_{x}[\phi(\mathbf{x})]-\mathbf{E}_{y}[\phi(\mathbf{y})]\right\|^{2} \\
+=&\left\|\frac{1}{n} \sum_{i=1}^{n} \phi\left(\mathbf{x}_{i}\right)-\frac{1}{m} \sum_{j=1}^{m} \phi\left(\mathbf{y}_{j}\right)\right\|^{2} \\
+=& \frac{1}{n^{2}} \sum_{i=1}^{n} \sum_{i^{\prime}=1}^{n} \phi\left(\mathbf{x}_{i}\right)^{T} \phi\left(\mathbf{x}_{i^{\prime}}\right)+\frac{1}{m^{2}} \sum_{j=1}^{m} \sum_{j^{\prime}=1}^{m} \phi\left(\mathbf{y}_{j}\right)^{T} \phi\left(\mathbf{y}_{j^{\prime}}\right) \\
+&-\frac{2}{n m} \sum_{i=1}^{n} \sum_{j=1}^{m} \phi\left(\mathbf{x}_{i}\right)^{T} \phi\left(\mathbf{y}_{j}\right)
+\end{aligned}</script><p>其中 $\phi \in \mathcal{X} \rightarrow \mathcal{H}$，定义 Kernel Function $k(\mathbf{x}, \mathbf{y}) = \langle\phi(\mathbf{x}), \phi(\mathbf{y})\rangle$，于是有：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+& \mathrm{MMD}^{2}[X, Y] \\
+=& \frac{1}{n^{2}} \sum_{i=1}^{n} \sum_{i^{\prime}=1}^{n} k\left(\mathbf{x}_{i}, \mathbf{x}_{i^{\prime}}\right)+\frac{1}{m^{2}} \sum_{j=1}^{m} \sum_{j^{\prime}=1}^{m} k\left(\mathbf{y}_{j}, \mathbf{y}_{j^{\prime}}\right) \\
+&-\frac{2}{n m} \sum_{i=1}^{n} \sum_{j=1}^{m} k\left(\mathbf{x}_{i}, \mathbf{y}_{j}\right)
+\end{aligned}</script><p>$k(\mathbf{x}, \mathbf{y})$ 是向高维特征空间的一个映射。<em>（PS:这部分理论推导没有完全看懂，需要再学习一下。）</em></p>
+<p>文章给出了由 Gram Matrix 建立的 style loss 可以 work 的理论依据，回忆 style loss 的表达式 $\mathcal{L}_{\text {style}}^{l}=\frac{1}{4 N_{l}^{2} M_{l}^{2}} \sum_{i=1}^{N_{l}} \sum_{j=1}^{N_{l}}\left(G_{i j}^{l}-A_{i j}^{l}\right)^{2}$，其中 $G_{i j}^{l}=\sum_{k=1}^{M_{l}} F_{i k}^{l} F_{j k}^{l}$。取二阶多项式 kernel $k(\mathbf{x}, \mathbf{y})=\left(\mathbf{x}^{T} \mathbf{y}\right)^{2}$，那么 style loss 可以写为：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+\mathcal{L}_{\text {style}}^{l}=& \frac{1}{4 N_{l}^{2} M_{l}^{2}} \sum_{k_{1}=1}^{M_{l}} \sum_{k_{2}=1}^{M_{l}}\left(k\left(\mathbf{f}_{\cdot k_{1}}^{l}, \mathbf{f}_{\cdot k_{2}}^{l}\right)\right.\left.+k\left(\mathbf{s}_{\cdot k_{1}}^{l}, \mathbf{s}_{\cdot k_{2}}^{l}\right)-2 k\left(\mathbf{f}_{\cdot k_{1}}^{l}, \mathbf{s}_{\cdot k_{2}}^{l}\right)\right) \\
+=& \frac{1}{4 N_{l}^{2}} \operatorname{MMD}^{2}\left[\mathcal{F}^{l}, \mathcal{S}^{l}\right]
+\end{aligned}</script><p>其中 $\mathbf{f}_{. k}^{l}$ 和 $\mathbf{s}_{. k}^{l}$ 是 $\mathbf{F}^{l}$ 和 $\mathbf{S}^{l}$ 的第 k 列。</p>
+<p>这个发现证明了 style 可以通过不同卷积层的特征分布来建模，并且 style transfer 可以看作拟合 style image 的特征分布的过程。</p>
+<p>文章提出类似可以使用不同的 kernel function 来建模损失函数：</p>
+<script type="math/tex; mode=display">\begin{array}{l}
+\mathcal{L}_{s t y l e}^{l}=\frac{1}{Z_{k}^{l}} \mathrm{MMD}^{2}\left[\mathcal{F}^{l}, \mathcal{S}^{l}\right] \\
+=\frac{1}{Z_{k}^{l}} \sum_{i=1}^{M_{l}} \sum_{j=1}^{M_{l}}\left(k\left(\mathbf{f}_{\cdot i}^{l}, \mathbf{f}_{\cdot j}^{l}\right)+k\left(\mathbf{s}_{\cdot i}^{l}, \mathbf{s}_{\cdot j}^{l}\right)-2 k\left(\mathbf{f}_{. i}^{l}, \mathbf{s}_{\cdot j}^{l}\right)\right)
+\end{array}</script><p>kernel function 可以取 linear kernel, polynomial kernel 和 gauss kernel 等，均取得很好的效果。</p>
+<p>作者还提出在 Batch Normalization layer 也包含不同 domain 特征，可以通过 BN 层的统计特征进行 style 建模：</p>
+<script type="math/tex; mode=display">\mathcal{L}_{s t y l e}^{l}=\frac{1}{N_{l}} \sum_{i=1}^{N_{l}}\left(\left(\mu_{F^{l}}^{i}-\mu_{S^{l}}^{i}\right)^{2}+\left(\sigma_{F^{l}}^{i}-\sigma_{S^{l}}^{i}\right)^{2}\right)</script><p>均取得不错的效果。</p>
+<blockquote>
+<p>这种 Gram-based style transfer algorithm 具有不稳定性，因为有研究发现即使两张图片的均值和方差差异很大，也有可能具有相似的 Gram Matrix，所以有人提出加入直方图损失，使输出图片的像素灰度值分布尽可能接近风格图片，但这样做的计算复杂度很高。另外，针对这类算法抽取特征都是在 <strong>CNN feature space</strong> 会不可避免导致细节缺失的问题，有人提出加入 Laplacian Loss，即内容图片和输出图片都经过拉普拉斯算子卷积（常用的边缘检测的手段）之后的欧几里得距离，这样可以保留更多的细节，效果也不错。但该类算法本质的问题并没有得到完全解决。</p>
+</blockquote>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
 <p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[3] Neural Style Transfer: A Review</a></p>
