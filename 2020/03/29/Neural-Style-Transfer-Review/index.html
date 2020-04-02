@@ -199,7 +199,7 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 <p>分析：高层次上的 matching 更能把握内容的一致性，在高层次上的融合效果更好（相比像素级别）。</p>
 <p>缺陷：</p>
 <ul>
-<li>在建筑物等有较强透视结构的风格转换时，会引入 style image 的内容导致 content image 中的内容被替换，只适用于允许结构发生形变的场景，应用场景存在局限。</li>
+<li>在建筑物等透视结构差异较大的风格转换时，会引入 style image 的内容导致 content image 中的内容被替换，只适用于允许结构发生形变的场景，应用场景存在局限。</li>
 </ul>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
@@ -690,21 +690,6 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
