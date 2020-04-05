@@ -47,7 +47,7 @@
     <link href="http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/"/>
     <id>http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/</id>
     <published>2020-03-29T13:54:05.000Z</published>
-    <updated>2020-04-05T15:18:57.847Z</updated>
+    <updated>2020-04-05T15:25:12.772Z</updated>
     
     <summary type="html">
     
@@ -57,12 +57,12 @@
 &lt;li&gt;纹理建模的定义：生成纹理的一种方式（同样是抽象定义）；&lt;/li&gt;
 &lt;li&gt;纹理建模的目标：给定一个纹理样例，生成一幅新的图像使得观察到新图像的纹理特征与样例相似。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&quot;image-20200404095233929.png&quot; alt=&quot;image-20200404095233929&quot; style=&quot;zoom:67%;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;image-20200404095233929.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;常用的方法主要有：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;基于统计分布的参数化纹理建模方法：将纹理建模为 N 阶统计量；&lt;/li&gt;
 &lt;li&gt;基于 MRF 的非参数化纹理建模方法：用 patch 相似度匹配进行逐点合成。&lt;/li&gt;
-&lt;li&gt;e.g. &lt;img src=&quot;image-20200404094204319.png&quot; alt=&quot;image-20200404094204319&quot; style=&quot;zoom:67%;&quot; /&gt;&lt;/li&gt;
+&lt;li&gt;e.g. &lt;img src=&quot;image-20200404094204319.png&quot; alt=&quot;&quot;&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;纹理建模的主要任务是研究如何表示图像的纹理特征，在图像风格转换中，主要用于对风格的建模和提取。&lt;/p&gt;
 &lt;h3 id=&quot;图像重建&quot;&gt;&lt;a href=&quot;#图像重建&quot; class=&quot;headerlink&quot; title=&quot;图像重建&quot;&gt;&lt;/a&gt;图像重建&lt;/h3&gt;&lt;p&gt;图像重建的主要目的是利用输入的图像特征尽可能对图像进行还原。这和传统的图像特征提取其实属于相反的过程，在 CNN 中，我们也经常根据某个卷积层的特征对图像进行重建，以了解该卷积层的作用（根据图像的哪一部分建立特征）。在图像风格转换领域中，图像重建主要用于对图像内容的建模和提取。&lt;/p&gt;
