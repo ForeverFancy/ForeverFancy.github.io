@@ -67,6 +67,82 @@
     
     
     
+    <article id="post-Neural-Style-Transfer-Review-II" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/04/05/Neural-Style-Transfer-Review-II/"
+    >Neural Style Transfer Review II</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/04/05/Neural-Style-Transfer-Review-II/" class="article-date">
+  <time datetime="2020-04-05T15:11:46.000Z" itemprop="datePublished">2020-04-05</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Review/">Review</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="Neural-Style-Transfer-Review-II"><a href="#Neural-Style-Transfer-Review-II" class="headerlink" title="Neural Style Transfer Review II"></a>Neural Style Transfer Review II</h1><h2 id="快速图像重建"><a href="#快速图像重建" class="headerlink" title="快速图像重建"></a>快速图像重建</h2><ul>
+<li>提出的原因：解决慢速图像重建效率过低的问题，只需一次前向传播即可完成风格的转换。</li>
+<li>问题的目标：在训练集 $I_c$ （内容图片），$I_s$ （风格图片，一种风格或者多种风格）上训练网络 $g$，找到参数 $\theta$:<script type="math/tex; mode=display">\theta^{*}=\underset{\theta}{\arg \min } \mathcal{L}_{\text {total}}\left(I_{c}, I_{s}, g_{\theta^{*}}\left(I_{c}\right)\right), I^{*}=g_{\theta^{*}}\left(I_{c}\right)</script></li>
+</ul>
+      
+      <a class="article-more-link" href="/2020/04/05/Neural-Style-Transfer-Review-II/">阅读更多...</a>
+      
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CV/" rel="tag">CV</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Style-Transfer/" rel="tag">Style Transfer</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
     <article id="post-Neural-Style-Transfer-Review" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
@@ -76,7 +152,7 @@
        
 <h2 itemprop="name">
   <a class="article-title" href="/2020/03/29/Neural-Style-Transfer-Review/"
-    >Neural Style Transfer Review</a
+    >Neural Style Transfer Review I</a
   >
 </h2>
   
@@ -108,14 +184,22 @@
       
 
       
-      <h1 id="Neural-Style-Transfer-Review"><a href="#Neural-Style-Transfer-Review" class="headerlink" title="Neural Style Transfer Review"></a>Neural Style Transfer Review</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在众多图像风格迁移算法中，图像被看作内容和风格的结合。图像风格迁移算法也可以看成是图像重建算法和纹理建模算法的结合。</p>
-<h3 id="纹理建模"><a href="#纹理建模" class="headerlink" title="纹理建模"></a>纹理建模</h3><p>常用的方法主要有：</p>
+      <h1 id="Neural-Style-Transfer-Review-I"><a href="#Neural-Style-Transfer-Review-I" class="headerlink" title="Neural Style Transfer Review I"></a>Neural Style Transfer Review I</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在众多图像风格迁移算法中，图像被看作内容和风格的结合。图像风格迁移算法也可以看成是图像重建算法和纹理建模算法的结合。</p>
+<h3 id="纹理建模"><a href="#纹理建模" class="headerlink" title="纹理建模"></a>纹理建模</h3><ul>
+<li>纹理的定义：只有比较抽象的定义，包含任意模式的图像（image containing arbitrary patterns）；</li>
+<li>纹理建模的定义：生成纹理的一种方式（同样是抽象定义）；</li>
+<li>纹理建模的目标：给定一个纹理样例，生成一幅新的图像使得观察到新图像的纹理特征与样例相似。</li>
+</ul>
+<p><img src="image-20200404095233929.png" alt="image-20200404095233929" style="zoom:67%;" /></p>
+<p>常用的方法主要有：</p>
 <ul>
 <li>基于统计分布的参数化纹理建模方法：将纹理建模为 N 阶统计量；</li>
 <li>基于 MRF 的非参数化纹理建模方法：用 patch 相似度匹配进行逐点合成。</li>
+<li>e.g. <img src="image-20200404094204319.png" alt="image-20200404094204319" style="zoom:67%;" /></li>
 </ul>
 <p>纹理建模的主要任务是研究如何表示图像的纹理特征，在图像风格转换中，主要用于对风格的建模和提取。</p>
 <h3 id="图像重建"><a href="#图像重建" class="headerlink" title="图像重建"></a>图像重建</h3><p>图像重建的主要目的是利用输入的图像特征尽可能对图像进行还原。这和传统的图像特征提取其实属于相反的过程，在 CNN 中，我们也经常根据某个卷积层的特征对图像进行重建，以了解该卷积层的作用（根据图像的哪一部分建立特征）。在图像风格转换领域中，图像重建主要用于对图像内容的建模和提取。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-1af1ab49257d807f9cdfe396871e0839_720w.jpg" alt=""></p>
 <p>常用的算法也可以分为两类：</p>
 <ul>
 <li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；</li>
@@ -912,6 +996,21 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
