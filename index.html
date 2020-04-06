@@ -110,8 +110,9 @@
       
       <h1 id="Neural-Style-Transfer-Review-II"><a href="#Neural-Style-Transfer-Review-II" class="headerlink" title="Neural Style Transfer Review II"></a>Neural Style Transfer Review II</h1><h2 id="快速图像重建"><a href="#快速图像重建" class="headerlink" title="快速图像重建"></a>快速图像重建</h2><ul>
 <li>提出的原因：解决慢速图像重建效率过低的问题，只需一次前向传播即可完成风格的转换。</li>
-<li>问题的目标：在训练集 $I_c$ （内容图片），$I_s$ （风格图片，一种风格或者多种风格）上训练网络 $g$，找到参数 $\theta$:<script type="math/tex; mode=display">\theta^{*}=\underset{\theta}{\arg \min } \mathcal{L}_{\text {total}}\left(I_{c}, I_{s}, g_{\theta^{*}}\left(I_{c}\right)\right), I^{*}=g_{\theta^{*}}\left(I_{c}\right)</script></li>
+<li>问题的目标：在训练集 $I_c$ （内容图片），$I_s$ （风格图片，一种风格或者多种风格）上训练网络 $g$，找到参数 $\theta$:</li>
 </ul>
+<script type="math/tex; mode=display">\theta^{*}=\underset{\theta}{\arg \min } \mathcal{L}_{\text {total}}\left(I_{c}, I_{s}, g_{\theta^{*}}\left(I_{c}\right)\right), I^{*}=g_{\theta^{*}}\left(I_{c}\right)</script>
       
       <a class="article-more-link" href="/2020/04/05/Neural-Style-Transfer-Review-II/">阅读更多...</a>
       
@@ -996,21 +997,6 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

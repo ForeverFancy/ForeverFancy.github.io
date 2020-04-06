@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">169字</span>
+            <span class="post-count">2.1k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1分钟</span>
+            <span class="post-count">8分钟</span>
         </span>
     </span>
 </div>
@@ -101,12 +101,87 @@
       
       <h1 id="Neural-Style-Transfer-Review-II"><a href="#Neural-Style-Transfer-Review-II" class="headerlink" title="Neural Style Transfer Review II"></a>Neural Style Transfer Review II</h1><h2 id="快速图像重建"><a href="#快速图像重建" class="headerlink" title="快速图像重建"></a>快速图像重建</h2><ul>
 <li>提出的原因：解决慢速图像重建效率过低的问题，只需一次前向传播即可完成风格的转换。</li>
-<li>问题的目标：在训练集 $I_c$ （内容图片），$I_s$ （风格图片，一种风格或者多种风格）上训练网络 $g$，找到参数 $\theta$:<script type="math/tex; mode=display">\theta^{*}=\underset{\theta}{\arg \min } \mathcal{L}_{\text {total}}\left(I_{c}, I_{s}, g_{\theta^{*}}\left(I_{c}\right)\right), I^{*}=g_{\theta^{*}}\left(I_{c}\right)</script></li>
+<li>问题的目标：在训练集 $I_c$ （内容图片），$I_s$ （风格图片，一种风格或者多种风格）上训练网络 $g$，找到参数 $\theta$:</li>
 </ul>
-<a id="more"></a>
-<h3 id="Per-style-per-model"><a href="#Per-style-per-model" class="headerlink" title="Per-style-per-model"></a>Per-style-per-model</h3><p><img src="https://adriancolyer.files.wordpress.com/2016/09/texture-nets-fig-2.png?w=640&amp;zoom=2" alt=""></p>
+<script type="math/tex; mode=display">\theta^{*}=\underset{\theta}{\arg \min } \mathcal{L}_{\text {total}}\left(I_{c}, I_{s}, g_{\theta^{*}}\left(I_{c}\right)\right), I^{*}=g_{\theta^{*}}\left(I_{c}\right)</script><a id="more"></a>
+<h3 id="Parametric-Per-Style-Per-Model"><a href="#Parametric-Per-Style-Per-Model" class="headerlink" title="Parametric Per-Style-Per-Model"></a>Parametric Per-Style-Per-Model</h3><h4 id="Perceptual-losses-for-realtime-style-transfer-and-super-resolution-amp-Texture-networks-Feed-forward-synthesis-of-textures-and-stylized-images"><a href="#Perceptual-losses-for-realtime-style-transfer-and-super-resolution-amp-Texture-networks-Feed-forward-synthesis-of-textures-and-stylized-images" class="headerlink" title="Perceptual losses for realtime style transfer and super-resolution &amp; Texture networks: Feed-forward synthesis of textures and stylized images"></a>Perceptual losses for realtime style transfer and super-resolution &amp; Texture networks: Feed-forward synthesis of textures and stylized images</h4><p>两者的想法相似，都是基于 Gatys 的方法，将其改为一个网络，测试时可以通过一次前向传播得到结果，只不过两者的网络结构不同。</p>
+<p><img src="https://adriancolyer.files.wordpress.com/2016/09/texture-nets-fig-2.png?w=640&amp;zoom=2" alt=""></p>
+<ul>
+<li>训练目标：训练 <strong>Generator Network</strong> 中的参数（卷积核参数等）；</li>
+<li>输入：内容图像 $y$；</li>
+<li>输出：Generator Network 的 output；</li>
+<li>训练手段：$y$ 加上一些随机噪声，经过 Generator Network 之后得到的输出和 style image (不作为显示输入，但计算 loss 的时候需要用到，需要指定) 以及 $y$ 本身（作为 content image）计算 loss，之后 SGD 训练；</li>
+<li>训练集：part of ImageNet ILSVRC 2012.</li>
+</ul>
+<p>Generator Network 使用 multi-scale 的结果。</p>
 <p><img src="JohnsonECCV16.png" alt=""></p>
+<ul>
+<li>训练目标：和上面类似，$f_W$ 里面的参数；</li>
+<li>输入：$x$；</li>
+<li>输出：$\hat{y}$；</li>
+<li>$x = y_c$；</li>
+<li>计算损失并反向传播。</li>
+</ul>
+<p>Image Transform Net 结构使用了 resnet.</p>
+<ul>
+<li>优点：速度有明显提升；</li>
+<li>缺点：有 Gatys 类方法本身存在的缺陷。</li>
+</ul>
+<h4 id="Improved-texture-networks-Maximizing-quality-and-diversity-in-feed-forward-stylization-and-texture-synthesis"><a href="#Improved-texture-networks-Maximizing-quality-and-diversity-in-feed-forward-stylization-and-texture-synthesis" class="headerlink" title="Improved texture networks: Maximizing quality and diversity in feed-forward stylization and texture synthesis"></a>Improved texture networks: Maximizing quality and diversity in feed-forward stylization and texture synthesis</h4><p>想法：使用 Instance Normalization 代替 Batch Normalization 即 batch size = 1.</p>
+<p>实验发现这样做收敛更快，并且视觉效果更好。一个可能的解释是之前也提到过均值和方差某种意义上也可以代表风格，使用 BN 可能会使得不同的输入图像之间相互干扰，使用 IN 可以更好地消除掉该图像的风格特征，方便学习 style 风格图像的特征。</p>
+<h3 id="Non-parametric-Per-Style-Per-Model"><a href="#Non-parametric-Per-Style-Per-Model" class="headerlink" title="Non-parametric Per-Style-Per-Model"></a>Non-parametric Per-Style-Per-Model</h3><h4 id="Precomputed-real-time-texture-synthesis-with-markovian-generative-adversarial-networks"><a href="#Precomputed-real-time-texture-synthesis-with-markovian-generative-adversarial-networks" class="headerlink" title="Precomputed real-time texture synthesis with markovian generative adversarial networks"></a>Precomputed real-time texture synthesis with markovian generative adversarial networks</h4><p>基于 MRF Patch-base 匹配策略，使用 GAN.</p>
+<p>由于使用 patch 匹配，空间连续性和观感较好，但对于图像语义的理解有欠缺。</p>
+<h3 id="Multiple-Style-Per-Model"><a href="#Multiple-Style-Per-Model" class="headerlink" title="Multiple-Style-Per-Model"></a>Multiple-Style-Per-Model</h3><p>想法：PSPM 每个模型只适用于一种风格，灵活性不够，所以之后提出了 MSPM，一个模型可以完成多种风格的迁移。大致思路有两种：</p>
+<ul>
+<li>为每个 style 绑定一部分参数，训练时对每个特定的 style 只需改变它所对应的参数，测试时根据想要生成哪种风格的图片决定使用哪种参数，只需输入内容图片并选择参数即可；</li>
+<li>无需设置绑定，风格图像和内容图像同时作为输入。</li>
+</ul>
+<h4 id="每个-style-绑定一部分参数"><a href="#每个-style-绑定一部分参数" class="headerlink" title="每个 style 绑定一部分参数"></a>每个 style 绑定一部分参数</h4><h5 id="A-learned-representation-for-artistic-style"><a href="#A-learned-representation-for-artistic-style" class="headerlink" title="A learned representation for artistic style"></a>A learned representation for artistic style</h5><p>想法：结合之前的工作以及实验发现，将图像进行不同的仿射变换就可以达到不同的风格效果，于是他们将 IN 层变为 CIN (Conditional Instance Normalization)，即：</p>
+<script type="math/tex; mode=display">\operatorname{CIN}\left(\mathcal{F}\left(I_{c}\right), s\right)=\gamma^{s}\left(\frac{\mathcal{F}\left(I_{c}\right)-\mu\left(\mathcal{F}\left(I_{c}\right)\right)}{\sigma\left(\mathcal{F}\left(I_{c}\right)\right)}\right)+\beta^{s}</script><p>其中，$s$ 是想要变换的风格在风格集中的序号，每个风格变换需要额外学习 $\gamma, \beta$ 这两个参数。</p>
+<p>网络结构：U-Net</p>
+<p><img src="U-Net.png" alt=""></p>
+<h5 id="StyleBank-An-Explicit-Representation-for-Neural-Image-Style-Transfer"><a href="#StyleBank-An-Explicit-Representation-for-Neural-Image-Style-Transfer" class="headerlink" title="StyleBank: An Explicit Representation for Neural Image Style Transfer"></a>StyleBank: An Explicit Representation for Neural Image Style Transfer</h5><p>想法：将 style 和 content 的训练部分解耦，使用不同的网络部分分别训练这两部分，content 部分由所有风格共享，style 部分根据风格不同划分为不同的子部分，对应不同的风格。</p>
+<p>网络结构：</p>
+<p><img src="style&#32;bank.png" alt=""></p>
+<p>Style bank 层本质上是一个卷积层，对每个不同风格学习一个不同的卷积参数。loss 还是和 Gatys 用的损失函数一样。</p>
+<p>上述两种方法确实能够更灵活地转换多种风格，但随着风格数量的增多，网络也将不可避免地变大。</p>
+<h4 id="风格图像和内容图像同时作为输入"><a href="#风格图像和内容图像同时作为输入" class="headerlink" title="风格图像和内容图像同时作为输入"></a>风格图像和内容图像同时作为输入</h4><h5 id="Diversified-texture-synthesis-with-feed-forward-networks"><a href="#Diversified-texture-synthesis-with-feed-forward-networks" class="headerlink" title="Diversified texture synthesis with feed-forward networks"></a>Diversified texture synthesis with feed-forward networks</h5><p>想法：只用同一个网络结构，style 和 image 同时输入。</p>
+<p>对支持的 style 进行 one-hot 编码，style 部分的网络将对应的 style 加上一个随机噪声之后经过卷积等操作得到 style encoding，再结合上面的 content 部分子网络最后得到输出图片。</p>
 <p><img src="DiversifiedTextureSynthesis.png" alt=""></p>
+<p>PS：diversity loss 是在保证 style 大致类似的情况下做一些变化，避免完全重复。</p>
+<h5 id="Multi-style-generative-network-for-realtime-transfer"><a href="#Multi-style-generative-network-for-realtime-transfer" class="headerlink" title="Multi-style generative network for realtime transfer"></a>Multi-style generative network for realtime transfer</h5><p>想法：和上面类似。</p>
+<blockquote>
+<p>通过 VGG 网络提取到的风格特征与风格化网络中的多个尺度的中间层的 feature map 通过提出的 Inspiration Layer 结合在一起，相当于将风格特征作为信号输入到网络中来决定要风格化成哪一个风格。</p>
+</blockquote>
+<p><img src="MGN.png" alt=""></p>
+<p>对希望学习到的 $\hat{\mathcal{Y}}^{i}$:</p>
+<script type="math/tex; mode=display">\begin{aligned}
+\hat{\mathcal{Y}}^{i} &=\underset{\mathcal{Y}^{i}}{\operatorname{argmin}}\left\{\left\|\mathcal{Y}^{i}-\mathcal{F}^{i}\left(x_{c}\right)\right\|_{F}^{2}\right.\\
+&\left.+\alpha\left\|\mathcal{G}\left(\mathcal{Y}^{i}\right)-\mathcal{G}\left(\mathcal{F}^{i}\left(x_{s}\right)\right)\right\|_{F}^{2}\right\}
+\end{aligned}</script><p>进行一个 content feature 和 target style 进行近似：</p>
+<script type="math/tex; mode=display">\hat{\mathcal{Y}}^{i}=\Phi^{-1}\left[\Phi\left(\mathcal{F}^{i}\left(x_{c}\right)\right)^{T} W \mathcal{G}\left(\mathcal{F}^{i}\left(x_{s}\right)\right)\right]^{T}</script><p>$W$ 是需要学习的矩阵。</p>
+<p>上面的两种方法在速度上有提升，并且提高了网络的灵活性，但还是只能指定固定的风格种类进行迁移，并且图像结构布局上的一致性有待提升。</p>
+<h3 id="Arbitrary-Style-Per-Model"><a href="#Arbitrary-Style-Per-Model" class="headerlink" title="Arbitrary-Style-Per-Model"></a>Arbitrary-Style-Per-Model</h3><p>由于上述模型还是存在局限性，这一类模型希望能够对任意的输入风格进行迁移，而不只局限于特定的几种风格。</p>
+<h4 id="Non-parametric-ASPM-with-MRFs"><a href="#Non-parametric-ASPM-with-MRFs" class="headerlink" title="Non-parametric ASPM with MRFs"></a>Non-parametric ASPM with MRFs</h4><h5 id="Fast-patch-based-style-transfer-of-arbitrary-style"><a href="#Fast-patch-based-style-transfer-of-arbitrary-style" class="headerlink" title="Fast patch-based style transfer of arbitrary style"></a>Fast patch-based style transfer of arbitrary style</h5><p>想法：使用 patch 匹配方法在风格图像中抽取特征。</p>
+<p>通过 VGG 抽取 style image 和 content image 的 feature 之后对每个 content patch 与最相似的 style patch 交换，之后再进行图像重建。</p>
+<p>基本实现了任意风格转换，但效果不是特别优秀。</p>
+<h4 id="Parametric-ASPM"><a href="#Parametric-ASPM" class="headerlink" title="Parametric ASPM"></a>Parametric ASPM</h4><h5 id="Arbitrary-style-transfer-in-real-time-with-adaptive-instance-normalization"><a href="#Arbitrary-style-transfer-in-real-time-with-adaptive-instance-normalization" class="headerlink" title="Arbitrary style transfer in real-time with adaptive instance normalization"></a>Arbitrary style transfer in real-time with adaptive instance normalization</h5><p>基于 “A learned representation for artistic style” 的想法，使用 IN 可以拟合风格。</p>
+<p>作者提出 AdaIN 来代替 CIN，根据输入风格图像的 feature 来确定 $\sigma, \mu$：</p>
+<script type="math/tex; mode=display">\begin{array}{l}
+\operatorname{AdaIN}\left(\mathcal{F}\left(I_{c}\right), \mathcal{F}\left(I_{s}\right)\right)= \\
+\qquad \sigma\left(\mathcal{F}\left(I_{s}\right)\right)\left(\frac{\mathcal{F}\left(I_{c}\right)-\mu\left(\mathcal{F}\left(I_{c}\right)\right)}{\sigma\left(\mathcal{F}\left(I_{c}\right)\right)}\right)+\mu\left(\mathcal{F}\left(I_{s}\right)\right)
+\end{array}</script><p>其中 $\mathcal{F}$ 来源于预训练 VGG，之后的 decode 部分通过生成图片来计算的损失来学习参数。</p>
+<p>优点是基本实现了快速转换，缺点是在训练集没有见过的风格上的泛化能力较差，并且如果风格图片比较复杂，生成的效果较差，可能的原因是 AdaIN 结构相对来说太简单了，均值和方差不能完全描述复杂风格。</p>
+<h5 id="Universal-Style-Transfer-via-Feature-Transforms"><a href="#Universal-Style-Transfer-via-Feature-Transforms" class="headerlink" title="Universal Style Transfer via Feature Transforms"></a>Universal Style Transfer via Feature Transforms</h5><p>想法：如果使用学习的方法，那么能够支持的风格就和训练集中的风格明显相关，作者希望通过一系列特征变换来解决不能泛化的问题。</p>
+<blockquote>
+<p>作者发现在 VGG 提取的特征上用 ZCA whitening transform 能够把一张图片的风格信息抹去，而保留原有高级语义信息，之后应用 coloring transform 将风格图的颜色进行迁移，即可重建出效果不错的风格化结果。</p>
+</blockquote>
+<p>WTC 过程：</p>
+<script type="math/tex; mode=display">\hat{f}_{c}=E_{c} D_{c}^{-\frac{1}{2}} E_{c}^{\top} f_{c}</script><p>其中：$D$ 是协方差矩阵的对角矩阵、$E$协方差矩阵的正交矩阵。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190414151039827.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21hcXVuZmk=,size_16,color_FFFFFF,t_70" alt=""></p>
+<p>上色过程（实际上是 WTC 的逆过程）：</p>
+<script type="math/tex; mode=display">\hat{f}_{c s}=E_{s} D_{s}^{\frac{1}{2}} E_{s}^{\top} \hat{f}_{c}</script><p>只需预训练重建的 decoder，之后对输入的图像和内容图片进行变换即可。</p>
+<p>优点：泛化能力很强，细节方面（笔锋大小等）有待提升。</p>
 <h2 id="一些拓展领域"><a href="#一些拓展领域" class="headerlink" title="一些拓展领域"></a>一些拓展领域</h2><h2 id="实验及评价"><a href="#实验及评价" class="headerlink" title="实验及评价"></a>实验及评价</h2><p>从 qualitative evaluation 和 quantitative evaluation 两个方面进行分析。</p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[1] 图像风格化算法综述三部曲</a></p>
 <p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[2] Neural Style Transfer: A Review</a></p>
@@ -595,21 +670,6 @@
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

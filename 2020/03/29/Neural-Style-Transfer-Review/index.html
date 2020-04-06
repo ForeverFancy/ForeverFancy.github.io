@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">3.7k字</span>
+            <span class="post-count">3.8k字</span>
         </span>
     </span>
 
@@ -191,8 +191,10 @@
 <blockquote>
 <p>这种 Gram-based style transfer algorithm 具有不稳定性，因为有研究发现即使两张图片的均值和方差差异很大，也有可能具有相似的 Gram Matrix，所以有人提出加入直方图损失，使输出图片的像素灰度值分布尽可能接近风格图片，但这样做的计算复杂度很高。另外，针对这类算法抽取特征都是在 <strong>CNN feature space</strong> 会不可避免导致细节缺失的问题，有人提出加入 Laplacian Loss，即内容图片和输出图片都经过拉普拉斯算子卷积（常用的边缘检测的手段）之后的欧几里得距离，这样可以保留更多的细节，效果也不错。但该类算法本质的问题并没有得到完全解决。</p>
 </blockquote>
-<h3 id="基于-MRF-的非参数化纹理建模方法"><a href="#基于-MRF-的非参数化纹理建模方法" class="headerlink" title="基于 MRF 的非参数化纹理建模方法"></a>基于 MRF 的非参数化纹理建模方法</h3><h4 id="Combining-Markov-Random-Fields-and-Convolutional-Neural-Networks-for-Image-Synthesis"><a href="#Combining-Markov-Random-Fields-and-Convolutional-Neural-Networks-for-Image-Synthesis" class="headerlink" title="Combining Markov Random Fields and Convolutional Neural Networks for Image Synthesis"></a>Combining Markov Random Fields and Convolutional Neural Networks for Image Synthesis</h4><p>基于 MRF：一个像素的取值分布和其周围的 $k\times k$ 个像素相关</p>
-<p>主要想法是希望输出图片的 CNN 高层次 encoding 尽可能接近内容图片，但 local patch 和风格图片的相似度更高，以保留风格图片的连续特征。</p>
+<h3 id="基于-MRF-的非参数化纹理建模方法"><a href="#基于-MRF-的非参数化纹理建模方法" class="headerlink" title="基于 MRF 的非参数化纹理建模方法"></a>基于 MRF 的非参数化纹理建模方法</h3><p>这类方法的主要想法：使用统计量进行纹理建模大多只考虑两张图片像素级别的关联，容易丢失一些空间分布特征，而使用基于 MRF 的 patch 匹配可以更好地保留图像的空间分布信息，使生成的图像更自然。</p>
+<h4 id="Combining-Markov-Random-Fields-and-Convolutional-Neural-Networks-for-Image-Synthesis"><a href="#Combining-Markov-Random-Fields-and-Convolutional-Neural-Networks-for-Image-Synthesis" class="headerlink" title="Combining Markov Random Fields and Convolutional Neural Networks for Image Synthesis"></a>Combining Markov Random Fields and Convolutional Neural Networks for Image Synthesis</h4><p>基于 MRF：一个像素的取值分布和其周围的 $k\times k$ 个像素相关</p>
+<p>主要想法是<strong>希望输出图片的 CNN 高层次 encoding 尽可能接近内容图片，但 local patch 和风格图片的相似度更高，以保留风格图片的连续特征</strong>。</p>
+<p>输入：style image, content image.</p>
 <p>损失函数：</p>
 <script type="math/tex; mode=display">\begin{aligned}
 \mathbf{x}=& \arg \min _{x} E_{s}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{s}\right)\right)+\\
@@ -208,6 +210,7 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 <p>缺陷：</p>
 <ul>
 <li>在建筑物等透视结构差异较大的风格转换时，会引入 style image 的内容导致 content image 中的内容被替换，只适用于允许结构发生形变的场景，应用场景存在局限。</li>
+<li>e.g.<img src="MRFShortcoming.png" alt=""></li>
 </ul>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
@@ -707,21 +710,6 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
