@@ -106,6 +106,7 @@
 <li>MS-COCO is used for training (offline model) and all content images are not used in training.</li>
 </ul>
 <p>为了公平性，本文作者尽量使用原作者提供的模型及参数，尽量使得每组模型都达到最好的效果。</p>
+<a id="more"></a>
 <h3 id="Qualitative-Evaluation"><a href="#Qualitative-Evaluation" class="headerlink" title="Qualitative Evaluation"></a>Qualitative Evaluation</h3><p>主要考虑风格转换后的图像的质量，因为没有比较客观的评价方法，所以只能主观判别转换的质量。</p>
 <p>Saliency map 能够表达一幅图像的重点所在，所以作者也对生成之后和之前的 content saliency map 进行考察，看一看是否经过转换之后丢失了很多原有的特征，或者破坏了原来的形状。</p>
 <h4 id="IOB-NST-amp-PSPM-MOB-NST"><a href="#IOB-NST-amp-PSPM-MOB-NST" class="headerlink" title="IOB-NST &amp; PSPM-MOB-NST"></a>IOB-NST &amp; PSPM-MOB-NST</h4><ul>
@@ -630,21 +631,6 @@
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
