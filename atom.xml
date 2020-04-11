@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-04-08T14:45:49.957Z</updated>
+  <updated>2020-04-11T13:55:47.154Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,11 +17,40 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Neural Style Transfer Review III</title>
+    <link href="http://yoursite.com/2020/04/09/Neural-Style-Transfer-Review-III/"/>
+    <id>http://yoursite.com/2020/04/09/Neural-Style-Transfer-Review-III/</id>
+    <published>2020-04-09T02:44:11.000Z</published>
+    <updated>2020-04-11T13:55:47.154Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="CV" scheme="http://yoursite.com/tags/CV/"/>
+    
+      <category term="Style Transfer" scheme="http://yoursite.com/tags/Style-Transfer/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Neural Style Transfer Review II</title>
     <link href="http://yoursite.com/2020/04/05/Neural-Style-Transfer-Review-II/"/>
     <id>http://yoursite.com/2020/04/05/Neural-Style-Transfer-Review-II/</id>
     <published>2020-04-05T15:11:46.000Z</published>
-    <updated>2020-04-08T14:45:49.957Z</updated>
+    <updated>2020-04-11T12:49:55.620Z</updated>
     
     <summary type="html">
     
@@ -210,7 +239,7 @@ u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
     <link href="http://yoursite.com/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>http://yoursite.com/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/</id>
     <published>2020-03-22T04:28:00.000Z</published>
-    <updated>2020-03-23T06:52:55.374Z</updated>
+    <updated>2020-04-11T03:22:27.609Z</updated>
     
     <summary type="html">
     

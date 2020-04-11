@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    CAPCG 复盘（二） |  Bowen&#39;s Blog
+    Neural Style Transfer Review III |  Bowen&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   
@@ -33,7 +33,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
+  <article id="post-Neural-Style-Transfer-Review-III" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -41,7 +41,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  CAPCG 复盘（二）
+  Neural Style Transfer Review III
 </h1>
   
 
@@ -50,12 +50,12 @@
 
     
     <div class="article-meta">
-      <a href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
-  <time datetime="2020-03-23T03:42:38.000Z" itemprop="datePublished">2020-03-23</time>
+      <a href="/2020/04/09/Neural-Style-Transfer-Review-III/" class="article-date">
+  <time datetime="2020-04-09T02:44:11.000Z" itemprop="datePublished">2020-04-09</time>
 </a>
       
   <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
+    <a class="article-category-link" href="/categories/Review/">Review</a>
   </div>
 
       
@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">280字</span>
+            <span class="post-count">888字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1分钟</span>
+            <span class="post-count">3分钟</span>
         </span>
     </span>
 </div>
@@ -99,94 +99,52 @@
       
 
       
-      <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍，其实共轭梯度法本质上就是将 Conjugate Direction 中构建的搜索方向的一组线性无关向量 $u_{(i)}$ 设定为残差 $r_{(i)}$，这样做的原因有以下几点：</p>
-<ul>
-<li>残差在最速下降法中被作为搜索方向使用，虽然在 Conjugate Direction 中的搜索方向构建与最速下降法不同，但仍有相似之处，可以拿来尝试；</li>
-<li>由之前的推导中 $d_{(i)}^{T} r_{(j)} =0$ 可知，残差具有和之前搜索方向正交的性质，这使得我们新的搜索方向总是与之前的搜索方向线性无关，除非 $r_{(j)} = 0$，但这种情况下问题已经被解决了。</li>
+      <h1 id="Neural-Style-Transfer-Review-III"><a href="#Neural-Style-Transfer-Review-III" class="headerlink" title="Neural Style Transfer Review III"></a>Neural Style Transfer Review III</h1><h2 id="实验及评价"><a href="#实验及评价" class="headerlink" title="实验及评价"></a>实验及评价</h2><p>从 qualitative evaluation 和 quantitative evaluation 两个方面进行分析。</p>
+<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><ul>
+<li>10 style images: try to cover a range of image characteristics;</li>
+<li>20 content images: select from <em>NPRgeneral</em>;</li>
+<li>MS-COCO is used for training (offline model) and all content images are not used in training.</li>
 </ul>
-<p>因为 $d_{(i)}$ 都是由 $r_{(i)}$ 构建而来，所以 $\operatorname{span}\left\{r_{(0)}, r_{(1)}, \ldots, r_{(i-1)}\right\} = \operatorname{span}\left\{d_{(0)}, d_{(1)}, \ldots, d_{(i-1)}\right\}$。并且每个残差都与之前的搜索方向正交，于是可以推出：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
-\Rightarrow r_{(i)}^{T} r_{(j)} &= 0 \quad i<j
-\end{aligned}</script><a id="more"></a>
-<p>由之前的推导：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-r_{(i+1)} &=-A e_{(i+1)} \\
-&=-A\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) \\
-&=r_{(i)}-\alpha_{(i)} A d_{(i)}
-\end{aligned}</script><p>可以发现新的残差是旧的残差和 $A d_{(i)}$ 的一个线性组合。注意到 $d_{(i-1)}, r_{(i-1)} \in \mathcal{D_i}$，可以得到 $r_{(i)} \in \mathcal{D_i} \bigcup A\mathcal{D_i} = \mathcal{D_{i+1}}$，并且由 $\mathcal{D_0} = {span}\{d_0\}$ 以及<br>$d_0=u_0=r_0$ 可以推出：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-\mathcal{D}_{i} &=\operatorname{span}\left\{d_{(0)}, A d_{(0)}, A^{2} d_{(0)}, \ldots, A^{i-1} d_{(0)}\right\} \\
-&=\operatorname{span}\left\{r_{(0)}, A r_{(0)}, A^{2} r_{(0)}, \ldots, A^{i-1} r_{(0)}\right\}
-\end{aligned}</script><p>这个子空间被称为 <em>krylov subspace</em>，子空间是由一个矩阵反复作用于一个向量产生的。<em>krylov subspace</em> 有比较好的性质，因为 $A\mathcal{D_i} \in \mathcal{D_{i+1}}$，而下一个残差又与之前的所有搜索方向，即搜索空间正交。</p>
-<script type="math/tex; mode=display">\begin{aligned}
-r_{(i+1)} &\perp \mathcal{D_{i+1}} \\
-\Rightarrow r_{(i+1)} &\perp A\mathcal{D_{i}} \\
-\end{aligned}</script><p>所以 $r_{(i+1)}$ 与 $\mathcal{D_i}$ (之前的所有搜索方向除 $d_{(i)}$) A-正交，这将为 Gram-Schimidt 共轭化提供方便。之前我们推出过：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-d_{(i)} &=u_{(i)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)} \\
-\beta_{i j} &=-\frac{u_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}
-\end{aligned}</script><p>将 $u_{(i)}$ 替换为 $r_{(i)}$ 可得 $\beta_{i j} =-\frac{r_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}$.</p>
-<p>我们将进一步简化系数的表达式：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-r_{(j+1)} &=r_{(j)}-\alpha_{(j)} A d_{(j)}\\
-\Rightarrow r_{(i)}^T r_{(j+1)} &=r_{(i)}^T r_{(j)}-\alpha_{(j)} r_{(i)}^T A d_{(j)}\\
-\Rightarrow \alpha_{(j)} r_{(i)}^T A d_{(j)} &= r_{(i)}^T r_{(j)} - r_{(i)}^T r_{(j+1)}\\
-
-r_{(i)}^{T} A d_{(j)} &=\left\{\begin{array}{ll}
-\frac{1}{\alpha_{(i)}} r_{(i)}^{T} r_{(i)}, & i=j \\
--\frac{1}{\alpha_{(i-1)}} r_{(i)}^{T} r_{(i)}, &i=j+1 & \\
-0, & \text { otherwise. }
-\end{array}\right.\\
-\therefore \beta_{i j} &=\left\{\begin{array}{ll}
-\frac{1}{\alpha_{(i-1)}} \frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} A d_{(i-1)}}, & i=j+1 \\
-0, & i>j+1
-\end{array}\right.
-\end{aligned}</script><p>这样我们也就无需存储之前的搜索向量，而且大多数 $\beta_{ij}$ 都变成了 0，每次迭代的时间空间复杂度由 $\mathcal{O}\left(n^{2}\right)$ 降至 $\mathcal{O}(m)$，其中 m 是 A 中非零元素个数。代入 $\alpha_{(i-1)}$ 的值进一步简化表达式：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-
-\alpha_{(i)} &=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \\
-&=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}  \\
-
-d_{(i)}^{T} r_{(i)}&=u_{(i)}^{T} r_{(i)} = r_{(i)}^T r_{(i)}\\
-\Rightarrow \beta_{(i)} &=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} r_{(i-1)}} \\
-&=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i-1)}^{T} r_{(i-1)}}
-\end{aligned}</script><p>综上，我们得到：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-d_{(0)}&=r_{(0)}=b-A x_{(0)}\\
-\alpha_{(i)}&=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
-x_{(i+1)}&=x_{(i)}+\alpha_{(i)} d_{(i)} \\
-r_{(i+1)}&=r_{(i)}-\alpha_{(i)} A d_{(i)} \\
-\beta_{(i+1)}&=\frac{r_{(i+1)}^{T} r_{(i+1)}}{r_{(i)}^{T} r_{(i)}} \\
-d_{(i+1)}&=r_{(i+1)}+\beta_{(i+1)} d_{(i)}
-\end{aligned}</script><p>其实共轭梯度法并不是以梯度作为搜索方向，准确地说是用梯度构建搜索方向。</p>
-<h3 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h3><p>不断迭代可能会残差精度不断损失降低，这可以通过像最速梯度法中每迭代固定步数就重新计算残差解决。但精度的损失可能使搜索方向丧失 A-正交性，不过后来经过证明，共轭梯度法的确可以收敛。证明略过，可以参照参考文献。最终可以推出：</p>
-<script type="math/tex; mode=display">\left\|e_{(i)}\right\|_{A} \leq 2\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^{i}\left\|e_{(0)}\right\|_{A}</script><h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p>在迭代过程中，对于矩阵向量乘法，需要 $\mathcal{O}(m)$ 的时间复杂度，m 是 A 矩阵中非零元的个数，如果 A 是稀疏矩阵，那么 $m \in \mathcal{O}(n)$。当我们要求误差足够小时，即 $\left|e_{(i)}\right| \leq \varepsilon\left|e_{(0)}\right|$，最速梯度法的迭代次数：</p>
-<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \kappa \ln \left(\frac{1}{\epsilon}\right)\right\rceil</script><p>使用共轭梯度法则需要：</p>
-<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \sqrt{\kappa} \ln \left(\frac{2}{\epsilon}\right)\right\rceil</script><p>综上最速梯度法的时间复杂度可以总结为 $\mathcal{O}(\kappa m)$，共轭梯度法的时间复杂度为 $\mathcal{O}(\sqrt\kappa m)$，空间复杂度均为 $\mathcal{O}(m)$。</p>
-<h2 id="Preconditioning"><a href="#Preconditioning" class="headerlink" title="Preconditioning"></a>Preconditioning</h2><p>预处理是数值计算中常用的技巧，用来降低待求解方程的条件数。</p>
-<h3 id="Condition-number"><a href="#Condition-number" class="headerlink" title="Condition number"></a>Condition number</h3><p>条件数是数值计算领域中用来衡量输出结果受到输出影响的程度的一个指标，简单来说，就是看输入发生轻微变化时，输出受到影响，发生变化的剧烈程度，变化越剧烈，则条件数越大，称该系统病态；反之变化越小，条件数越小，称该系统良好。良好的系统求解具有优势，选取不同的初始值或者参数不会对输出产生很大影响，是我们期望的结果。</p>
-<p>对称正定矩阵的条件数为：</p>
-<script type="math/tex; mode=display">\kappa=\lambda_{\max } / \lambda_{\min }</script><p>设 $M$ 是一个近似于 $A$ 的对称正定矩阵，并且容易得到 $M^{-1}$，我们可以用 $M^{-1}Ax=M^{-1}b$ 来间接求解 $Ax=b$。我们希望 $\kappa\left(M^{-1} A\right) \ll \kappa(A)$ 或者 $M^{-1}A$ 的特征值尽可能相互接近，这样迭代法将会更快地求解出方程。但问题是 $M^{-1}A$ 往往不是对称或者正定的，即使 $M$ 和 $A$ 都是。</p>
-<p>为了解决这个问题，一个对称、正定矩阵 $M$ 可以被分解为 $EE^T=M$ (例如 Cholesky 分解)，并且 $M^{-1}A$ 和 $E^{-1}AE^T$ 有相同的特征值，设 $M^{-1}A$ 有特征值 $\lambda$ 和特征向量 $v$，那么：</p>
-<script type="math/tex; mode=display">\left(E^{-1} A E^{-T}\right)\left(E^{T} v\right)=\left(E^{T} E^{-T}\right) E^{-1} A v=E^{T} M^{-1} A v=\lambda E^{T} v</script><p>问题 $Ax=b$ 转化为：</p>
-<script type="math/tex; mode=display">E^{-1} A E^{-T} \widehat{x}=E^{-1} b, \quad \widehat{x}=E^{T} x</script><p>因为 $E^{-1}AE^{-T}$ 对称正定，可以先用 CG 求得 $\widehat{x}$ 再求 $x$，得到 Preconditioned Conjugate Gradient 迭代公式如下：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-&r_{(0)}=b-A x_{(0)}\\
-&d_{(0)}=M^{-1} r_{(0)}\\
-&\alpha_{(i)}=\frac{r_{(i)}^{T} M^{-1} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
-&\begin{aligned}
-x_{(i+1)} &=x_{(i)}+\alpha_{(i)} d_{(i)} \\
-r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
-\end{aligned}\\
-&\beta_{(i+1)}=\frac{r_{(i+1)}^{T} M^{-1} r_{(i+1)}}{r_{(i)}^{T} M^{-1} r_{(i)}}\\
-&d_{(i+1)}=M^{-1} r_{(i+1)}+\beta_{(i+1)} d_{(i)}
-\end{aligned}</script><p>算法的效率还是取决于条件数减少所缩短的时间和多出来的一次矩阵乘法 $M^{-1}A$ 时间哪个比较短。可以看出可以选取 $M=A$，这样问题变成 $x=M^{-1}b=A^{-1}b$，问题的条件数为 1，但 $A^{-1}$ 求解复杂度很高，如果求解出来了我们可以直接得到答案，也不再需要迭代了。</p>
-<p>常用的一个预处理算子为 diagonal preconditioner or Jacobi preconditioner，预处理矩阵 $M$ 为 $A$ 的对角元素，这个预处理矩阵很容易求得逆矩阵，并且对降低条件数有还不错的效果。</p>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
+<p>为了公平性，本文作者尽量使用原作者提供的模型及参数，尽量使得每组模型都达到最好的效果。</p>
+<h3 id="Qualitative-Evaluation"><a href="#Qualitative-Evaluation" class="headerlink" title="Qualitative Evaluation"></a>Qualitative Evaluation</h3><p>主要考虑风格转换后的图像的质量，因为没有比较客观的评价方法，所以只能主观判别转换的质量。</p>
+<p>Saliency map 能够表达一幅图像的重点所在，所以作者也对生成之后和之前的 content saliency map 进行考察，看一看是否经过转换之后丢失了很多原有的特征，或者破坏了原来的形状。</p>
+<h4 id="IOB-NST-amp-PSPM-MOB-NST"><a href="#IOB-NST-amp-PSPM-MOB-NST" class="headerlink" title="IOB-NST &amp; PSPM-MOB-NST"></a>IOB-NST &amp; PSPM-MOB-NST</h4><ul>
+<li>Gatys 的原方法转换的效果还是比较不错，也因此经常被同类方法拿来对比；</li>
+<li>Johnson 和 Ulyanov 的方法得到的结果大体上类似，但不如 Gatys 的结果精致；</li>
+<li>以上方法都较好地保存了原图中物体形状；</li>
+<li>Li 的 GAN 方法观感稍差，因为 GAN 可能不太稳定；</li>
+<li>GAN 的形状保存不好。</li>
+</ul>
+<h4 id="MSPM-MOB-NST"><a href="#MSPM-MOB-NST" class="headerlink" title="MSPM-MOB-NST"></a>MSPM-MOB-NST</h4><ul>
+<li>Dumoulin 和 Chen 得到的结果类似，保存形状的能力较好；</li>
+<li>Zhang 和 Li 的方法相似，质量不如上面，但模型较小。</li>
+</ul>
+<h4 id="ASPM-MOB-NST"><a href="#ASPM-MOB-NST" class="headerlink" title="ASPM-MOB-NST"></a>ASPM-MOB-NST</h4><ul>
+<li>Chen and Schmidt 的基于 patch 交换的方法效果不太好；</li>
+<li>Li 的方法细节不够；</li>
+<li>Ghiasi 和 Huang 的方法受训练集中出现的风格影响较大，泛化能力稍差，复杂风格的迁移表现不好，但内容保存方面的质量比上面两种方法高。</li>
+</ul>
+<h3 id="Quantitative-Evaluation"><a href="#Quantitative-Evaluation" class="headerlink" title="Quantitative Evaluation"></a>Quantitative Evaluation</h3><ul>
+<li>迁移时间：IOB &lt; PSPM &lt; MSPM &lt; ASPM</li>
+<li>Loss 比较：IOB &gt; PSPM &gt; MSPM &gt; ASPM</li>
+</ul>
+<p>从中也体现出速度和质量之间的 trade-off.</p>
+<h2 id="一些应用"><a href="#一些应用" class="headerlink" title="一些应用"></a>一些应用</h2><ul>
+<li>作为社交产品上线，用户评论作为反馈改进；</li>
+<li>用户创作工具；</li>
+<li>商业动画制作工具。</li>
+</ul>
+<h2 id="一些未解决的问题"><a href="#一些未解决的问题" class="headerlink" title="一些未解决的问题"></a>一些未解决的问题</h2><h3 id="评价指标与-benchmark-数据集"><a href="#评价指标与-benchmark-数据集" class="headerlink" title="评价指标与 benchmark 数据集"></a>评价指标与 benchmark 数据集</h3><p>对于一个任务，有一个客观合理的评价指标是必要的，这有利于研究者明确自己提出的方法是否真正有效，并与前人方法进行对比。之前有人提出过投票的方法，但显然这种方法的主观性太强，每个人的审美有比较大的差异，无法比较客观地反应质量。</p>
+<p>另外 benchmark 的缺乏也使得比较之前缺乏一致的数据，大家都是用自己选择的图片说明效果，无法反应是否对某种风格存在局限性，所以需要一个覆盖广泛风格的数据集，能充分反应各种方法的优点和局限性。</p>
+<h3 id="可解释性"><a href="#可解释性" class="headerlink" title="可解释性"></a>可解释性</h3><ul>
+<li>对于风格和内容是否可以完全解耦，各种细节在有监督学习中如何体现，很难有合适的数据（比如有没有相同内容但笔锋走向不同的训练数据）；</li>
+<li>对于归一化，没有可信的数学原理推导；</li>
+<li>很容易受到噪声影响，鲁棒性交叉。</li>
+</ul>
+<h3 id="Trade-off"><a href="#Trade-off" class="headerlink" title="Trade-off"></a>Trade-off</h3><ul>
+<li>速度、灵活性和质量三者的 trade-off，这三者往往不能同时实现，相互制约；</li>
+<li>不同的风格转换需要不同的超参数才能达到各自最好的效果，而这些超参数往往需要手动调整，不能自动调节。</li>
+</ul>
 
       
       <!-- reward -->
@@ -256,14 +214,14 @@ r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/04/09/Neural-Style-Transfer-Review-III/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CV/" rel="tag">CV</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Style-Transfer/" rel="tag">Style Transfer</a></li></ul>
 
 
     </footer>
@@ -274,19 +232,10 @@ r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
   
   <nav class="article-nav">
     
-      <a href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            CAPCG 复盘（三）
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-nav-link">
+      <a href="/2020/04/05/Neural-Style-Transfer-Review-II/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">CAPCG 复盘（一）</div>
+        <div class="article-nav-title">Neural Style Transfer Review II</div>
       </a>
     
   </nav>
