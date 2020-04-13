@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">3.8k字</span>
+            <span class="post-count">4.3k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">16分钟</span>
+            <span class="post-count">18分钟</span>
         </span>
     </span>
 </div>
@@ -212,6 +212,17 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 <li>在建筑物等透视结构差异较大的风格转换时，会引入 style image 的内容导致 content image 中的内容被替换，只适用于允许结构发生形变的场景，应用场景存在局限。</li>
 <li>e.g.<img src="MRFShortcoming.png" alt=""></li>
 </ul>
+<h4 id="Arbitrary-Style-Transfer-with-Deep-Feature-Reshuffle"><a href="#Arbitrary-Style-Transfer-with-Deep-Feature-Reshuffle" class="headerlink" title="Arbitrary Style Transfer with Deep Feature Reshuffle"></a>Arbitrary Style Transfer with Deep Feature Reshuffle</h4><p>Gu et al. 2018 CVPR</p>
+<p>主要想法是将基于统计量的风格转换和基于 patch 匹配的方法结合在一起，使风格能够具有高层的语义和底层的平滑性。</p>
+<p>研究人员提出了基于 feature reshuffle 的方法，即希望输出图像 feature 中的某个 patch $F_o(p)$ 是由风格图片 feature 对应的 patch 打乱之后 $F_{s}(SF(p))$ 得到。</p>
+<p>这样代入到 gram-loss 和 MRF-loss (patch size = 1) 中都会发现 loss 为 0，作者认为这样能够说明这种方法可以充分融合全局和局部的风格。</p>
+<p>损失函数：</p>
+<script type="math/tex; mode=display">\mathcal{L}_{\text {total}}=\alpha \mathcal{L}_{\text {cont}}+(1-\alpha) \mathcal{L}_{\text {shuf}}</script><script type="math/tex; mode=display">\mathcal{L}_{\text {cont}}=\left\|F_{o}-F_{c}\right\|_{\mathrm{F}}^{2}</script><script type="math/tex; mode=display">\mathcal{L}_{s h u f}=\sum_{p}\left\|\Psi_{p}\left(F_{o}\right)-\Psi_{\mathrm{NNC}(p)}\left(F_{s}\right)\right\|_{\mathrm{F}}^{2}</script><script type="math/tex; mode=display">\begin{aligned}
+\operatorname{NNC}(p)=\underset{p^{\prime}=1,2, \ldots, \Theta}{\arg \max }\left(\frac{\Psi_{p}\left(F_{o}\right) \cdot \Psi_{p^{\prime}}\left(F_{s}\right)}{\left\|\Psi_{p}\left(F_{o}\right)\right\|_{\mathrm{F}}^{2} \cdot\left\|\Psi_{p^{\prime}}\left(F_{s}\right)\right\|_{\mathrm{F}}^{2}}\right.\\
+\left.-\lambda \frac{\Gamma\left(\Psi_{p^{\prime}}\left(F_{s}\right)\right)}{R \times R}\right)
+\end{aligned}</script><script type="math/tex; mode=display">\Gamma\left(\Psi_{p}\right)=\sum_{p \in \Psi_{p}} \frac{\Gamma(p)}{R \times R}</script><p>其中 $NNC$ 是在基于匹配的基础上，希望 style image 中的每个 patch 尽量只出现一次（因为 shuffle 本身就是每个只出现一次，这里做了一些宽松处理）。$\Gamma(p)$ 是 p 为中心的 patch 使用的次数。</p>
+<p>训练是在 feature 空间进行，之后使用 VGG-Decoder 进行解码，输出图像的 feature 为内容和风格的线性组合 $F_{o}^{l,(i)}=\alpha F_{c}^{l}+(1-\alpha) F_{s}^{l}\left(\mathrm{NNC}^{l,(i)}\right)$。训练的过程是在多个层次上依次进行的，第 $l$ 层的输出 decode 为 $F_o^{l-1}$ 之后，第 $l-1$ 层的内容图片重写为 $F_{c}^{l-1} \leftarrow \beta \hat{F_o}^{l-1}+(1-\beta)F_c^{l-1}$ 这样能将不同层次之间的信息结合在一起。</p>
+<p>但从效果来看，feature 层面进行 patch 交换不可避免地会引入 style image 中的内容信息。</p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.zhihu.com/question/49805962" target="_blank" rel="noopener">[1] 如何用简单易懂的例子解释格拉姆矩阵/Gram matrix？</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[2] 图像风格化算法综述三部曲</a></p>
 <p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[3] Neural Style Transfer: A Review</a></p>
@@ -710,6 +721,21 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

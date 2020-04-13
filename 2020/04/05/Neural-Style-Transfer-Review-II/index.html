@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">2.2k字</span>
+            <span class="post-count">3.7k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">8分钟</span>
+            <span class="post-count">15分钟</span>
         </span>
     </span>
 </div>
@@ -172,18 +172,62 @@
 \qquad \sigma\left(\mathcal{F}\left(I_{s}\right)\right)\left(\frac{\mathcal{F}\left(I_{c}\right)-\mu\left(\mathcal{F}\left(I_{c}\right)\right)}{\sigma\left(\mathcal{F}\left(I_{c}\right)\right)}\right)+\mu\left(\mathcal{F}\left(I_{s}\right)\right)
 \end{array}</script><p>其中 $\mathcal{F}$ 来源于预训练 VGG，之后的 decode 部分通过生成图片来计算的损失来学习参数。</p>
 <p>优点是基本实现了快速转换，缺点是在训练集没有见过的风格上的泛化能力较差，并且如果风格图片比较复杂，生成的效果较差，可能的原因是 AdaIN 结构相对来说太简单了，均值和方差不能完全描述复杂风格。</p>
+<h5 id="Dynamic-Instance-Normalization-for-Arbitrary-Style-Transfer"><a href="#Dynamic-Instance-Normalization-for-Arbitrary-Style-Transfer" class="headerlink" title="Dynamic Instance Normalization for Arbitrary Style Transfer"></a>Dynamic Instance Normalization for Arbitrary Style Transfer</h5><p>Yongcheng Jing et al. AAAI 2020.</p>
+<p>作者针对 IN 层进行了一些改进，之前有 IN, CIN, AdaIN 三种 IN 类技术，对于 ASPM 使用的 AdaIN，如果希望表现比较好，需要如下条件：</p>
+<ul>
+<li>content image 和 style image 必须通过同一个 encoder 提取特征；</li>
+<li>encoder 的结构要比较复杂，例如使用 VGG，否则可能提取不到特征。</li>
+</ul>
+<p>这样就导致在一些计算资源受限的场景下，AdaIN 无法很好地发挥作用，因此需要一种不需要很多计算资源也能有很好效果的模型，作者提出了 DIN (Dynamic Instance Normalization)。</p>
+<script type="math/tex; mode=display">\operatorname{DIN}\left(\mathcal{F}_{c}, \mathcal{F}_{s}\right)=f\left[\mathcal{F}_{s}, \operatorname{IN}\left(\mathcal{F}_{c}\right)\right]</script><p>DIN 实际上是 IN + Dynamic Convolution，先对 content feature 进行 IN，之后根据 style feature 生成卷积核参数，对 IN 之后的 content feature 进行卷积，并且支持多种卷积操作。</p>
+<p>该方法的优点是速度较快，由于可以使用不同的的卷积操作，合成的图像质量还不错。</p>
 <h5 id="Universal-Style-Transfer-via-Feature-Transforms"><a href="#Universal-Style-Transfer-via-Feature-Transforms" class="headerlink" title="Universal Style Transfer via Feature Transforms"></a>Universal Style Transfer via Feature Transforms</h5><p>想法：如果使用学习的方法，那么能够支持的风格就和训练集中的风格明显相关，作者希望通过一系列特征变换来解决不能泛化的问题。</p>
 <blockquote>
 <p>作者发现在 VGG 提取的特征上用 ZCA whitening transform 能够把一张图片的风格信息抹去，而保留原有高级语义信息，之后应用 coloring transform 将风格图的颜色进行迁移，即可重建出效果不错的风格化结果。</p>
 </blockquote>
 <p>WTC 过程：</p>
-<script type="math/tex; mode=display">\hat{f}_{c}=E_{c} D_{c}^{-\frac{1}{2}} E_{c}^{\top} f_{c}</script><p>其中：$D$ 是协方差矩阵的对角矩阵、$E$协方差矩阵的正交矩阵。</p>
+<script type="math/tex; mode=display">\hat{f}_{c}=E_{c} D_{c}^{-\frac{1}{2}} E_{c}^{\top} f_{c}</script><p>其中：$D$ 是协方差矩阵的对角矩阵、$E$ 协方差矩阵的正交矩阵。</p>
 <p><img src="https://img-blog.csdnimg.cn/20190414151039827.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21hcXVuZmk=,size_16,color_FFFFFF,t_70" alt=""></p>
 <p>上色过程（实际上是 WTC 的逆过程）：</p>
 <script type="math/tex; mode=display">\hat{f}_{c s}=E_{s} D_{s}^{\frac{1}{2}} E_{s}^{\top} \hat{f}_{c}</script><p>只需预训练重建的 decoder，之后对输入的图像和内容图片进行变换即可。</p>
 <p>优点：泛化能力很强，细节方面（笔锋大小等）有待提升。</p>
+<h5 id="Avatar-Net-Multi-scale-Zero-shot-Style-Transfer-by-Feature-Decoration"><a href="#Avatar-Net-Multi-scale-Zero-shot-Style-Transfer-by-Feature-Decoration" class="headerlink" title="Avatar-Net Multi-scale Zero-shot Style Transfer by Feature Decoration"></a>Avatar-Net Multi-scale Zero-shot Style Transfer by Feature Decoration</h5><p>Sheng at el. CVPR 2018.</p>
+<p>作者提出的也是基于 patch 匹配 + multi-scale 的迁移策略。之前的 style-swap 是基于 patch 匹配的实现，但是实验发现生成的图片太偏向与内容图片，在匹配的时候寻找的 patch 基本上都是风格图片中服从内容图片取值分布的 patch，所以在风格和内容图片差异很大时，效果不好，所以研究人员提出将两张图片变换到同样的特征空间中，在这个空间进行交换，并通过 multi-scale 网络进行重建。</p>
+<p>主要步骤：</p>
+<p>先将其都投影到相同的特征空间：</p>
+<script type="math/tex; mode=display">\overline{\mathbf{z}}_{c}=\mathbf{W}_{c} \otimes\left(\mathbf{z}_{c}-\boldsymbol{\mu}\left(\mathbf{z}_{c}\right)\right), \overline{\mathbf{z}}_{s}=\mathbf{W}_{s} \otimes\left(\mathbf{z}_{s}-\boldsymbol{\mu}\left(\mathbf{z}_{s}\right)\right)</script><p>$W_c, W_s$ 是根据两者协方差矩阵计算出来的 whitening 算子，进行卷积操作之后能保留原本特征的同时服从均匀分布。</p>
+<p>之后匹配并进行重组，和 style-swap 类似，这里变换为高效的卷积操作：</p>
+<script type="math/tex; mode=display">\overline{\mathbf{z}}_{c s}=\mathbf{\Phi}\left(\overline{\mathbf{z}}_{s}\right)^{\top} \otimes \mathcal{B}\left(\overline{\mathbf{\Phi}}\left(\overline{\mathbf{z}}_{s}\right) \otimes \overline{\mathbf{z}}_{c}\right)</script><p>$\mathcal{B}$ 是对每个 content patch 的匹配结果进行 0-1 打分，取接近的 style patch 为 1，之后交换。</p>
+<p>然后将其进行反变换：</p>
+<script type="math/tex; mode=display">\mathbf{z}_{c s}=\mathbf{C}_{s} \otimes \overline{\mathbf{z}}_{c s}+\boldsymbol{\mu}\left(\mathbf{z}_{s}\right)</script><p>网络结构：</p>
+<p><img src="Avatar-Net.png" alt=""></p>
+<p>其中，也用到了一些 AdaIN 的思想：</p>
+<script type="math/tex; mode=display">\mathcal{F}_{\mathrm{SF}}\left(\mathbf{d}_{c s}^{l} ; \mathbf{e}_{s}^{l}\right)=\boldsymbol{\sigma}\left(\mathbf{e}_{s}^{l}\right) \circ\left(\frac{\mathbf{d}_{c s}^{l}-\boldsymbol{\mu}\left(\mathbf{d}_{c s}^{l}\right)}{\boldsymbol{\sigma}\left(\mathbf{d}_{c s}^{l}\right)}\right)+\boldsymbol{\mu}\left(\mathbf{e}_{s}^{l}\right)</script><p>通过引入风格特征的统计数值来进一步提升效果。</p>
+<p>观察发现图像的总体风格比较一致，但是细节方面可能有轻微形变，也就是 content 内容可能会丢失或改变。</p>
+<h5 id="ZM-Net-Real-time-Zero-shot-Image-Manipulation-Network"><a href="#ZM-Net-Real-time-Zero-shot-Image-Manipulation-Network" class="headerlink" title="ZM-Net: Real-time Zero-shot Image Manipulation Network"></a>ZM-Net: Real-time Zero-shot Image Manipulation Network</h5><p>Wang at el. </p>
+<p>作者将风格迁移重新归纳为给定指导信号，根据该信号对图像重新变形的过程。这里的指导信号不局限于风格图片，还有可能是文本信号或者直方图信息等等，这使得任务适应的领域更加广泛。</p>
+<p>作者提出了 P-Net + T-Net 的网络结构方式，T-Net 用来对图像进行变换，P-Net 用来生成 T-Net 中的一些跟指导信号有关的参数，这样来实现泛化（对任意风格都能进行变换）。</p>
+<p>实际上，为了实现 T-Net 中动态根据不同指导信号生成风格，作者提出了 DIN 层，这里的 DIN 就是把之前的 CIN 里面与每个风格绑定的参数改为了由 P-Net 根据风格生成的参数。P-Net 的主要作用就是根据指导信号生成这些参数，方式可以是卷积或者线性投影等。主要的公式如下：</p>
+<script type="math/tex; mode=display">y_{i j k}=\frac{x_{i j k}-\mu_{i}}{\sqrt{\sigma_{i}^{2}+\epsilon}} \gamma_{i}\left(\mathbf{X}_{s}\right)+\boldsymbol{\beta}_{i}\left(\mathbf{X}_{s}\right),\\
+\gamma^{(l)}\left(\mathbf{X}_{s}\right)=\psi_{l}\left(\mathbf{X}_{s}\right) \mathbf{W}_{\gamma}^{(l)}+\mathbf{b}_{\gamma}^{(l)} \\
+\boldsymbol{\beta}^{(l)}\left(\mathbf{X}_{s}\right)=\psi_{l}\left(\mathbf{X}_{s}\right) \mathbf{W}_{\beta}^{(l)}+\mathbf{b}_{\beta}^{(l)}</script><p>实验中使用了训练数据扩展，使用 Gatys 的模型，选取 300 张风格图片，若干内容图片输入到模型中得到输出，作为扩展的训练数据，据作者指出这样使得 Loss 减少了一半，并且能够提高在没有见过的风格中的表现 <em>（但感觉有效的风格并没有增加，也能叫做扩展训练集中的风格吗？）</em>。</p>
+<p>Word Embedding 作为指导信号。作者只训练了针对 noon, night 的模型，该模型的 P-Net 使用 word embedding 作为输入信号，并且 T-Net 和使用风格图片输入的模型中的 T-Net 不是相同的参数。训练数据就是一些带标签（noon, night）的图片，并且能够泛化到没见过的词语，如：morning, afternoon。不过感觉还是不成熟。</p>
+<p>因为是根据输入风格预测的参数，虽然解决了 MSPM 中 CIN 不能泛化的问题，但是生成图像的质量堪忧，不过 guiding signal 中不仅限于风格图片的思路还是比较新，word embedding 这一类的任务有改进的空间。</p>
 <h2 id="一些拓展领域"><a href="#一些拓展领域" class="headerlink" title="一些拓展领域"></a>一些拓展领域</h2><p>一些应用主要从提高生产作品的观感体验或者迁移到其他领域对当前的方法进行拓展。</p>
-<h3 id="提高观感效果"><a href="#提高观感效果" class="headerlink" title="提高观感效果"></a>提高观感效果</h3><h3 id="根据图像语义进行迁移"><a href="#根据图像语义进行迁移" class="headerlink" title="根据图像语义进行迁移"></a>根据图像语义进行迁移</h3><h3 id="图片中特定物体风格迁移"><a href="#图片中特定物体风格迁移" class="headerlink" title="图片中特定物体风格迁移"></a>图片中特定物体风格迁移</h3><h3 id="根据涂鸦生成艺术画"><a href="#根据涂鸦生成艺术画" class="headerlink" title="根据涂鸦生成艺术画"></a>根据涂鸦生成艺术画</h3><h3 id="场景迁移"><a href="#场景迁移" class="headerlink" title="场景迁移"></a>场景迁移</h3><h3 id="肖像迁移"><a href="#肖像迁移" class="headerlink" title="肖像迁移"></a>肖像迁移</h3><h3 id="视频风格迁移"><a href="#视频风格迁移" class="headerlink" title="视频风格迁移"></a>视频风格迁移</h3><h3 id="真实场景风格迁移"><a href="#真实场景风格迁移" class="headerlink" title="真实场景风格迁移"></a>真实场景风格迁移</h3><h3 id="弱监督属性迁移"><a href="#弱监督属性迁移" class="headerlink" title="弱监督属性迁移"></a>弱监督属性迁移</h3><h3 id="时尚风格迁移"><a href="#时尚风格迁移" class="headerlink" title="时尚风格迁移"></a>时尚风格迁移</h3><h3 id="音频风格迁移"><a href="#音频风格迁移" class="headerlink" title="音频风格迁移"></a>音频风格迁移</h3><!-- 知识蒸馏、对抗学习、NLP 辅助 -->
+<ul>
+<li>提高观感效果；</li>
+<li>根据图像语义进行迁移；</li>
+<li>图片中特定物体风格迁移；</li>
+<li>根据涂鸦生成艺术画；</li>
+<li>场景迁移；</li>
+<li>肖像迁移；</li>
+<li>视频风格迁移；</li>
+<li>真实场景风格迁移；</li>
+<li>弱监督属性迁移；</li>
+<li>时尚风格迁移；</li>
+<li>音频风格迁移。</li>
+</ul>
+<!-- 知识蒸馏、对抗学习、NLP 辅助 -->
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/36346074" target="_blank" rel="noopener">[1] 图像风格化算法综述三部曲</a></p>
 <p><a href="https://arxiv.org/abs/1705.04058" target="_blank" rel="noopener">[2] Neural Style Transfer: A Review</a></p>
 
@@ -680,6 +724,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
