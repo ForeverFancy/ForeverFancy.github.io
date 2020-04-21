@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">121字</span>
+            <span class="post-count">1.6k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1分钟</span>
+            <span class="post-count">6分钟</span>
         </span>
     </span>
 </div>
@@ -99,9 +99,40 @@
       
 
       
-      <h1 id="Neural-Style-Transfer-Review-IV"><a href="#Neural-Style-Transfer-Review-IV" class="headerlink" title="Neural Style Transfer Review IV"></a>Neural Style Transfer Review IV</h1><h2 id="Flickr-30k"><a href="#Flickr-30k" class="headerlink" title="Flickr 30k"></a>Flickr 30k</h2><p>30k 图片，每张图片 5 句标注，并且和图中的实体有对应关系。但像 “outside, parade” 这样的场景或者事件信息没有对应的实体标注。</p>
-<h2 id="MS-COCO"><a href="#MS-COCO" class="headerlink" title="MS COCO"></a>MS COCO</h2><p>200k 有标注，每个图片 5 句标注，但多是以物体为主。</p>
-<h2 id="Google’s-Conceptual-Captions"><a href="#Google’s-Conceptual-Captions" class="headerlink" title="Google’s Conceptual Captions"></a>Google’s Conceptual Captions</h2><p>使用互联网上带有 Alt-text HTML 标签的图片，做一定的预处理之后得到 3M 图片</p>
+      <h1 id="Neural-Style-Transfer-Review-IV"><a href="#Neural-Style-Transfer-Review-IV" class="headerlink" title="Neural Style Transfer Review IV"></a>Neural Style Transfer Review IV</h1><h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><h3 id="Flickr-30k"><a href="#Flickr-30k" class="headerlink" title="Flickr 30k"></a>Flickr 30k</h3><p>30k 图片，每张图片 5 句标注，并且和图中的实体有对应关系。但像 “outside, parade” 这样的场景或者事件信息没有对应的实体标注。</p>
+<h3 id="MS-COCO"><a href="#MS-COCO" class="headerlink" title="MS COCO"></a>MS COCO</h3><p>200k 有标注，每个图片 5 句标注，但多是以物体为主。</p>
+<h3 id="Google’s-Conceptual-Captions"><a href="#Google’s-Conceptual-Captions" class="headerlink" title="Google’s Conceptual Captions"></a>Google’s Conceptual Captions</h3><p>使用互联网上带有 Alt-text HTML 标签的图片，做一定的预处理之后得到 3M 图片</p>
+<a id="more"></a>
+<h2 id="Photorealistic-Style-Transfer"><a href="#Photorealistic-Style-Transfer" class="headerlink" title="Photorealistic Style Transfer"></a>Photorealistic Style Transfer</h2><h3 id="Deep-Photo-Style-Transfer"><a href="#Deep-Photo-Style-Transfer" class="headerlink" title="Deep Photo Style Transfer"></a>Deep Photo Style Transfer</h3><p>Luan et al. CVPR 2017.</p>
+<p>作者想解决的还是真实照片中的风格迁移问题，希望效果尽量真实，细节符合真实观感。作者的工作基于 Gatys 的慢速风格迁移，在损失函数中加入正则化项（平滑），并且合理使用图像的语义标签进一步提升迁移效果。</p>
+<p>平滑操作主要通过希望相同内容邻域之内的像素尽量相似，使用 Matting Laplacian 进行建模：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_m = \sum_{c=1}^3V_c[O]^T\mathcal{M}_IV_c[O]</script><p>其中，$V_c[O]$ 是输出图片通道 $c$ 的向量化形式，$\mathcal{M}_I$ 是由输入内容图片计算而来的矩阵。</p>
+<p>合理利用语义标签能做到更精确的风格转换，只提取希望区域的风格。作者自己生成了一些风格标签分类，包含常见的场景分类（天空，建筑物，海洋等等），之后使用 Gram 矩阵求风格的时候加入包含语义的 MASK 即可 <em>（具体细节可能得参考代码）</em>。</p>
+<p>缺点，基于优化的慢速风格迁移比较慢，内容风格差异较大时迁移效果不好。</p>
+<h3 id="A-Closed-form-Solution-to-Photorealistic-Image-Transfer"><a href="#A-Closed-form-Solution-to-Photorealistic-Image-Transfer" class="headerlink" title="A Closed-form Solution to Photorealistic Image Transfer"></a>A Closed-form Solution to Photorealistic Image Transfer</h3><p>Li et al. ECCV 2018.</p>
+<p>之前的 neural style transfer 在艺术作品的风格迁移方面表现较好，但是在真实照片中的表现较差，经常出现空间扭曲等不协调的情况。Luan et al. 提出在原有的损失函数上加入正则化项，效果有所改进，但部分细节还是与对应的语义不符。作者提出的方法在效果上和速度上都比 Luan et al. 有很大提升。</p>
+<p>主要处理步骤为风格转换+平滑处理。</p>
+<p>风格转换部分基于 WCT 算法：</p>
+<script type="math/tex; mode=display">\hat{H}_{c}=E_{c} D_{c}^{-\frac{1}{2}} E_{c}^{\top} H_{c}</script><script type="math/tex; mode=display">\hat{H}_{c s}=E_{s} D_{s}^{\frac{1}{2}} E_{s}^{\top} \hat{H}_{c}</script><p>即令输出图片的协方差匹配风格图片的协方差，但这样输出图片可能会有一定的扭曲现象。于是作者提出了 PhotoWCT，考虑到 encode 时的 max-pooling 操作会丢失很多空间特征信息，而传统的上采样（插值+卷积）很难恢复这些被破坏的空间特征，所以作者提出使用 unpooling (之前有工作中采用 unpooling 效果很好，能恢复一定的空间信息) 代替 upsampling，实验中也发现这样的 PhotoWCT 效果好于 WCT，但还不能到达令人满意的程度。</p>
+<p>对于 PhotoWCT 之后的图像，需要进一步进行平滑操作。平滑的目标是：</p>
+<ul>
+<li>内容图片中，邻域内相同内容的像素在输出图片中要尽可能相似；</li>
+<li>平滑之后的图像跟 PhotoWCT 不能相差太远。</li>
+</ul>
+<p>首先定义 affinity matrix 表征各像素间的相似关系，之后优化目标被定义为：</p>
+<script type="math/tex; mode=display">\arg \min _{r} \frac{1}{2}\left(\sum_{i, j=1}^{N} w_{i j}\left\|\frac{r_{i}}{\sqrt{d_{i i}}}-\frac{r_{j}}{\sqrt{d_{j j}}}\right\|^{2}+\lambda \sum_{i=1}^{N}\left\|r_{i}-y_{i}\right\|^{2}\right)</script><p>其中，$y_i$ 是在 PhotoWCT 处理后的图片中像素 i 的颜色，$r_i$ 是输出图片中像素 i 的颜色，$d_ii = \sum_{j}w_{ij}$ 相当于是一个归一化项，$\lambda$ 控制前后两项 loss 的权重关系。</p>
+<p>损失函数的灵感来源于 graph-based ranking algorithms，之后对这个二次凸优化问题可以求得闭式解：</p>
+<script type="math/tex; mode=display">
+R^* = (1-\alpha)(I-\alpha S)^{-1}Y</script><p>其中，$\alpha = \frac{1}{1+\lambda}$，$S = D^{-\frac{1}{2}}WD^{-\frac{1}{2}}, D=diag\{d_{11},d_{22}, d_{33}, \dots, d_{NN}\}$ 为从 $I_c$ 推导而来的标准化的拉普拉斯矩阵，由于 $W$ 比较稀疏，能很快求解得到结果。</p>
+<p>对于 $W$ 的选择，比较流行的方法是基于每个像素八邻接的 GaussianAff: $w_{ij} = e^{-|I_i-I_j|^2/\sigma^2}$，其中 $I_i, I_j$ 是 i 像素和它相邻的 j 像素的 RGB 值，$\sigma$ 是需要选择的超参数，但实验发现这个参数非常难选择，很容易造成过平滑（整张图片都被平滑，细节丢失严重）或者不同区域的平滑效果差异显著，风格不同一，于是作者选用 matting affinity，两个图片的相似性是由 local window 中像素的均值和方差决定的，这样避免了超参数选择，实际效果很好。</p>
+<p>训练集使用 MSCOCO，值得注意的是算法可以使用语义标签信息来达到更好的转换效果。可以使用语义标签来明确内容和风格图片中对应的匹配区域，并且由于区域平滑的存在，不需要很精确的 mask 就能达到很好的效果。</p>
+<p><img src="SemanticMask.png" alt=""></p>
+<p>缺点是在含有花纹的风格转换中，效果很差，很难将花纹转换过来，这可能是因为提出的方法使用了很多平滑效果，导致花纹消失。</p>
+<h3 id="A-Closed-Form-Solution-to-Natural-Image-Matting"><a href="#A-Closed-Form-Solution-to-Natural-Image-Matting" class="headerlink" title="A Closed Form Solution to Natural Image Matting"></a>A Closed Form Solution to Natural Image Matting</h3><p>Levin et al. CVPR 2006.</p>
+<p>抠图的主要思想是将原始图片建模为前景和背景的加权，目标是提取前景。作者的主要假设是前景和背景在局部小窗口内都是平滑的，也就是<strong>近似</strong>为常数，那么通过对一个二次能量函数的优化，就可以得到哪些部分属于前景（希望抠出来的部分），哪些属于背景。</p>
+<p>Matting matrix $L_{(i,j)}$:</p>
+<script type="math/tex; mode=display">\sum_{k |(i, j) \in w_{k}}\left(\delta_{i j}-\frac{1}{\left|w_{k}\right|}\left(1+\left(I_{i}-\mu_{k}\right)\left(\Sigma_{k}+\frac{\varepsilon}{\left|w_{k}\right|} I_{3}\right)^{-1}\left(I_{j}-\mu_{k}\right)\right)\right)</script><p>其实可以看作是决定该像素值或者是否为前景的时候，周围像素对其的加权，这也就是上面的 Photo Style Transfer 中使用了 Matting matrix 的原因，无需手动决定参数，权重自动由邻域的方差均值决定。</p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://xxx.itp.ac.cn/pdf/1505.04870" target="_blank" rel="noopener">[1] Flickr 30k Entities.</a></p>
 <p><a href="https://ai.google.com/research/ConceptualCaptions/download" target="_blank" rel="noopener">[2] Google’s Conceptual Captions</a></p>
 

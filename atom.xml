@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-04-19T14:29:23.285Z</updated>
+  <updated>2020-04-21T06:36:00.134Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,17 +21,13 @@
     <link href="http://yoursite.com/2020/04/19/Neural-Style-Transfer-Review-IV/"/>
     <id>http://yoursite.com/2020/04/19/Neural-Style-Transfer-Review-IV/</id>
     <published>2020-04-19T12:27:03.000Z</published>
-    <updated>2020-04-19T14:29:23.285Z</updated>
+    <updated>2020-04-21T06:36:00.134Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          
-        
-      
+      &lt;h1 id=&quot;Neural-Style-Transfer-Review-IV&quot;&gt;&lt;a href=&quot;#Neural-Style-Transfer-Review-IV&quot; class=&quot;headerlink&quot; title=&quot;Neural Style Transfer Review IV&quot;&gt;&lt;/a&gt;Neural Style Transfer Review IV&lt;/h1&gt;&lt;h2 id=&quot;数据集&quot;&gt;&lt;a href=&quot;#数据集&quot; class=&quot;headerlink&quot; title=&quot;数据集&quot;&gt;&lt;/a&gt;数据集&lt;/h2&gt;&lt;h3 id=&quot;Flickr-30k&quot;&gt;&lt;a href=&quot;#Flickr-30k&quot; class=&quot;headerlink&quot; title=&quot;Flickr 30k&quot;&gt;&lt;/a&gt;Flickr 30k&lt;/h3&gt;&lt;p&gt;30k 图片，每张图片 5 句标注，并且和图中的实体有对应关系。但像 “outside, parade” 这样的场景或者事件信息没有对应的实体标注。&lt;/p&gt;
+&lt;h3 id=&quot;MS-COCO&quot;&gt;&lt;a href=&quot;#MS-COCO&quot; class=&quot;headerlink&quot; title=&quot;MS COCO&quot;&gt;&lt;/a&gt;MS COCO&lt;/h3&gt;&lt;p&gt;200k 有标注，每个图片 5 句标注，但多是以物体为主。&lt;/p&gt;
+&lt;h3 id=&quot;Google’s-Conceptual-Captions&quot;&gt;&lt;a href=&quot;#Google’s-Conceptual-Captions&quot; class=&quot;headerlink&quot; title=&quot;Google’s Conceptual Captions&quot;&gt;&lt;/a&gt;Google’s Conceptual Captions&lt;/h3&gt;&lt;p&gt;使用互联网上带有 Alt-text HTML 标签的图片，做一定的预处理之后得到 3M 图片&lt;/p&gt;
     
     </summary>
     
