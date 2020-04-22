@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.6k字</span>
+            <span class="post-count">2.4k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">6分钟</span>
+            <span class="post-count">9分钟</span>
         </span>
     </span>
 </div>
@@ -103,7 +103,17 @@
 <h3 id="MS-COCO"><a href="#MS-COCO" class="headerlink" title="MS COCO"></a>MS COCO</h3><p>200k 有标注，每个图片 5 句标注，但多是以物体为主。</p>
 <h3 id="Google’s-Conceptual-Captions"><a href="#Google’s-Conceptual-Captions" class="headerlink" title="Google’s Conceptual Captions"></a>Google’s Conceptual Captions</h3><p>使用互联网上带有 Alt-text HTML 标签的图片，做一定的预处理之后得到 3M 图片</p>
 <a id="more"></a>
-<h2 id="Photorealistic-Style-Transfer"><a href="#Photorealistic-Style-Transfer" class="headerlink" title="Photorealistic Style Transfer"></a>Photorealistic Style Transfer</h2><h3 id="Deep-Photo-Style-Transfer"><a href="#Deep-Photo-Style-Transfer" class="headerlink" title="Deep Photo Style Transfer"></a>Deep Photo Style Transfer</h3><p>Luan et al. CVPR 2017.</p>
+<h2 id="Photorealistic-Style-Transfer"><a href="#Photorealistic-Style-Transfer" class="headerlink" title="Photorealistic Style Transfer"></a>Photorealistic Style Transfer</h2><h3 id="Controlling-Perceptual-Factors"><a href="#Controlling-Perceptual-Factors" class="headerlink" title="Controlling Perceptual Factors"></a>Controlling Perceptual Factors</h3><p>Gatys et al. CVPR 2017.</p>
+<p>之前的风格迁移很难控制或者预测视觉感受，作者提出的方法可以对转换的结果进行更加细致的控制和预测，以达到更好的视觉效果。</p>
+<h4 id="空间控制"><a href="#空间控制" class="headerlink" title="空间控制"></a>空间控制</h4><p>通过使用“空间指导通道”，也就是 MASK 来控制风格迁移的区域或者实现整张图片结合不同的风格， content mask 中为 1 的区域将会得到对应 style mask 中为 1 区域的风格。</p>
+<p>可以通过 mask 乘对应的 feature map 实现需要的结果。对于不同 layer 中使用的 mask，可以通过下采样的方式得到，但效果不好。作者实验发现使用腐蚀操作能得到更好的效果。</p>
+<h4 id="颜色控制"><a href="#颜色控制" class="headerlink" title="颜色控制"></a>颜色控制</h4><p>图片中的颜色信息相对笔锋大小或者几何形状等信息比较独立，所以能够做到相对独立地在迁移过程中控制颜色信息。有些时候我们仅仅希望内容图片得到风格图片的纹理特征而不引入颜色分布（例如风格图片是一张夜景图片，我们仅仅希望内容图片得到纹理而不会整张图片都变成夜景）。</p>
+<p>由于人的眼睛对亮度的敏感性大于色彩，一种方案是使用亮度与色彩信息分离的颜色空间，使用原来的风格迁移算法作用于亮度，得到新亮度再加原色彩得到迁移之后的风格。</p>
+<p>第二种方法是先对风格图片和内容图片进行直方图匹配，这里使用线性变换 $p_s^{‘} = Ap_s+b$，目标是新的风格图片的像素均值方差等于风格图片，之后用这张新的风格图片进行迁移。</p>
+<h4 id="尺度控制"><a href="#尺度控制" class="headerlink" title="尺度控制"></a>尺度控制</h4><p>有的时候希望在粗粒度上使用一种风格，在细粒度上使用另一种风格。此时不能简单地使用不同尺度的 CNN feature（高层次的 CNN feature 包含了一部分低层次的语义）。作者提出了建立新的风格图片，这是由粗粒度风格作为内容图片，细粒度风格作为风格图片先做一次风格迁移得到新风格，再用这个新风格和内容图片做一次风格迁移得到的。</p>
+<p>在高分辨率下的迁移。高分辨率下也希望得到比较明显的风格迁移结果，作者发现使用 VGG-19 网络效果最好的输入大小在 500<em>500 像素左右，对于高分辨率的效果不好。于是作者选择先将高分辨率的图片下采样至 500\</em>500 像素，再上采样回去，用这样处理的图片进行风格迁移，能够更快收敛并去除一定噪声，会得到较好的效果。</p>
+<h4 id="在其他模型上的应用"><a href="#在其他模型上的应用" class="headerlink" title="在其他模型上的应用"></a>在其他模型上的应用</h4><p>可以将空间控制，颜色控制等加入到前向传播网络的 loss 中，改善这些工作的效果。</p>
+<h3 id="Deep-Photo-Style-Transfer"><a href="#Deep-Photo-Style-Transfer" class="headerlink" title="Deep Photo Style Transfer"></a>Deep Photo Style Transfer</h3><p>Luan et al. CVPR 2017.</p>
 <p>作者想解决的还是真实照片中的风格迁移问题，希望效果尽量真实，细节符合真实观感。作者的工作基于 Gatys 的慢速风格迁移，在损失函数中加入正则化项（平滑），并且合理使用图像的语义标签进一步提升迁移效果。</p>
 <p>平滑操作主要通过希望相同内容邻域之内的像素尽量相似，使用 Matting Laplacian 进行建模：</p>
 <script type="math/tex; mode=display">
