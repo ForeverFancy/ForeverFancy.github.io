@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">2.4k字</span>
+            <span class="post-count">3.6k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">9分钟</span>
+            <span class="post-count">14分钟</span>
         </span>
     </span>
 </div>
@@ -143,6 +143,47 @@ R^* = (1-\alpha)(I-\alpha S)^{-1}Y</script><p>其中，$\alpha = \frac{1}{1+\lam
 <p>抠图的主要思想是将原始图片建模为前景和背景的加权，目标是提取前景。作者的主要假设是前景和背景在局部小窗口内都是平滑的，也就是<strong>近似</strong>为常数，那么通过对一个二次能量函数的优化，就可以得到哪些部分属于前景（希望抠出来的部分），哪些属于背景。</p>
 <p>Matting matrix $L_{(i,j)}$:</p>
 <script type="math/tex; mode=display">\sum_{k |(i, j) \in w_{k}}\left(\delta_{i j}-\frac{1}{\left|w_{k}\right|}\left(1+\left(I_{i}-\mu_{k}\right)\left(\Sigma_{k}+\frac{\varepsilon}{\left|w_{k}\right|} I_{3}\right)^{-1}\left(I_{j}-\mu_{k}\right)\right)\right)</script><p>其实可以看作是决定该像素值或者是否为前景的时候，周围像素对其的加权，这也就是上面的 Photo Style Transfer 中使用了 Matting matrix 的原因，无需手动决定参数，权重自动由邻域的方差均值决定。</p>
+<h3 id="Unpaired-Image-to-Image-Translation-using-Cycle-Consistent-Adversarial-Network"><a href="#Unpaired-Image-to-Image-Translation-using-Cycle-Consistent-Adversarial-Network" class="headerlink" title="Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Network"></a>Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Network</h3><p>Zhu et al. 2018.</p>
+<p>图像风格迁移任务存在缺乏成对的有标注训练数据的问题，而作者提出的 Cycle-GAN 能在一定程度上解决缺乏成对标注数据的问题。诸如风格迁移、图像到油画、油画到图像等任务都可以归结于为 image-to-image translation 的任务。该任务可以被定义为，关于源数据，目标数据 $X, Y$，找到映射 $G: X \rightarrow Y, s.t.  \hat{y} = G(x)$ 无法与 $y \in Y$ 区分。但由于这样的映射只能保证分布是一样的，不能保证每个个体 $x$ 映射之后可能会映射到 $Y$ 中的任意一个个体，不会都能达到我们想要的效果，所以作者在这个想法的基础上提出考虑逆映射 $F: Y \rightarrow{X}$，并且希望 $F(G(x)) \approx x, G(F(y)) \approx x$，将这个损失加入到原来的 GAN 损失中，能够得到很好的效果。</p>
+<p><img src="Cycle-consistency-loss.png" alt=""></p>
+<script type="math/tex; mode=display">\begin{aligned}
+\mathcal{L}_{\mathrm{GAN}}\left(G, D_{Y}, X, Y\right) &=\mathbb{E}_{y \sim p_{\text {data }}(y)}\left[\log D_{Y}(y)\right] \\
+&+\mathbb{E}_{x \sim p_{\text {data }}(x)}\left[\log \left(1-D_{Y}(G(x))\right]\right.
+\\
+\mathcal{L}_{\text {cyc }}(G, F) &=\mathbb{E}_{x \sim p_{\text {data }}(x)}\left[\|F(G(x))-x\|_{1}\right] \\
+&+\mathbb{E}_{y \sim p_{\text {data }}(y)}\left[\|G(F(y))-y\|_{1}\right]
+\\
+\mathcal{L}\left(G, F, D_{X}, D_{Y}\right) &=\mathcal{L}_{\mathrm{GAN}}\left(G, D_{Y}, X, Y\right) \\
+&+\mathcal{L}_{\mathrm{GAN}}\left(F, D_{X}, Y, X\right) \\
+&+\lambda \mathcal{L}_{\mathrm{cyc}}(G, F)\\
+G^*,F^* &= \arg \min_{G,F}\max_{D_X,D_Y}\mathcal{L}(G,F, D_X, D_Y)
+\end{aligned}</script><p>训练的时候将对数似然改为平方误差，generative networks 使用的是 Johnson 的网络，discriminator networks 使用的是 PatchGAN。</p>
+<p>Style Transfer 任务中，作者使用 Cycle-GAN 学习画家的所有作品的绘画风格，而不是一部作品的风格。</p>
+<p>Season Transfer 任务中，作者使用 Flickr 的 API 收集了一个公园不同季节的照片，用来训练。</p>
+<p>缺陷：一些物体转换出现结构变形，背景内容颜色改变较大等。</p>
+<h2 id="Text-to-Image"><a href="#Text-to-Image" class="headerlink" title="Text-to-Image"></a>Text-to-Image</h2><h3 id="Generative-Adversarial-Text-to-Image-Synthesis"><a href="#Generative-Adversarial-Text-to-Image-Synthesis" class="headerlink" title="Generative Adversarial Text to Image Synthesis"></a>Generative Adversarial Text to Image Synthesis</h3><p>Reed et al. ICML 2016.</p>
+<p>之前的图像生成工作都是将不同物体具有区分性的特征编码到一个向量里面，再用反卷积等方式生成图像，但生成这样的向量可能需要很多领域知识（指定特征）。于是作者希望能在描述语料中提取出图像的特征，并生成图像。主要目标是建立一个 words -&gt; image 的映射。</p>
+<p>网络结构如下：</p>
+<p><img src="image-20200427111232916.png" alt="image-20200427111232916"></p>
+<p>主要思路就是使用 text-encoding + 随机噪声 经过反卷积生成 $\hat{x}$，之后通过卷积全连接并加入 text-encoding 给出判断为真实的概率。</p>
+<p>作者认为 text-encoding 中捕捉了图片的内容信息（比如花的形状和颜色），而很少有图片的风格信息（背景颜色等）。所以作者提出可以用来做风格迁移，text-encoding 提供内容，噪声 z 提供风格。可以将希望迁移的风格 + 内容 text-encoding 生成为一张新图片。可以训练一个风格编码器 $S$：</p>
+<script type="math/tex; mode=display">\mathcal{L}_{s t y l e}=\mathbb{E}_{t, z \sim \mathcal{N}(0,1)}\|z-S(G(z, \varphi(t)))\|_{2}^{2}</script><p>思路是如果 $z$ 能代表风格，那么生成出来的图片 $G(z,\phi(t))$ 经过风格编码器 encode 之后的风格应该和 z 相似。</p>
+<p>训练好之后风格转换，对于给定风格图像 $x$，内容 $t$，可以生成：</p>
+<script type="math/tex; mode=display">
+s \leftarrow S(x), \hat{x} \leftarrow G(s, \phi(t))</script><p>另外可以使用 symmetric structured joint embedding 预训练 text-encoding，学习分类器 $f_t$ 最小化如下损失：</p>
+<script type="math/tex; mode=display">
+\frac{1}{N}\sum_{n=1}^{N}\Delta(y_n, f_v(v_n))+\Delta(y_n, f_t(t_n))</script><p>其中，$\Delta$ 是 0-1 损失，$v_n, t_n, y_n$ 是图像、文本描述和类标签。</p>
+<script type="math/tex; mode=display">\begin{array}{l}
+\left.f_{v}(v)=\underset{y \in \mathcal{Y}}{\arg \max } \mathbb{E}_{t \sim \mathcal{T}(y)}\left[\phi(v)^{T} \varphi(t)\right)\right] \\
+\left.f_{t}(t)=\underset{y \in \mathcal{Y}}{\arg \max } \mathbb{E}_{v \sim \mathcal{V}(y)}\left[\phi(v)^{T} \varphi(t)\right)\right]
+\end{array}</script><p>直觉上为给定文本描述或图像后，选择另一个描述中与之关联性最强的作为类别。</p>
+<p>可以预训练来加速之后 GAN 的训练过程。</p>
+<p>个人观点：</p>
+<ul>
+<li>如果想要较强的泛化能力，那么需要学习较多的词向量以获取词之间的相似性；</li>
+<li>并且对于风格迁移，是否可以参考之前的 neural style transfer 来衡量风格差异；</li>
+<li>text 表示内容，image 表示风格是一个很好的想法，但不能假设所有的 text 都是比较局限的形式，如果使用 text 指导风格转换呢？</li>
+</ul>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://xxx.itp.ac.cn/pdf/1505.04870" target="_blank" rel="noopener">[1] Flickr 30k Entities.</a></p>
 <p><a href="https://ai.google.com/research/ConceptualCaptions/download" target="_blank" rel="noopener">[2] Google’s Conceptual Captions</a></p>
 
@@ -630,21 +671,6 @@ R^* = (1-\alpha)(I-\alpha S)^{-1}Y</script><p>其中，$\alpha = \frac{1}{1+\lam
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
