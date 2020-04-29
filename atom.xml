@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-04-27T08:11:22.737Z</updated>
+  <updated>2020-04-29T14:29:45.076Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Natural Language Generation I</title>
+    <link href="http://yoursite.com/2020/04/28/Natural-Language-Generation-I/"/>
+    <id>http://yoursite.com/2020/04/28/Natural-Language-Generation-I/</id>
+    <published>2020-04-28T03:24:17.000Z</published>
+    <updated>2020-04-29T14:29:45.076Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Natural-Language-Generation-I&quot;&gt;&lt;a href=&quot;#Natural-Language-Generation-I&quot; class=&quot;headerlink&quot; title=&quot;Natural Language Generation I&quot;&gt;&lt;/a&gt;Natural Language Generation I&lt;/h1&gt;&lt;h2 id=&quot;NLG-Tasks&quot;&gt;&lt;a href=&quot;#NLG-Tasks&quot; class=&quot;headerlink&quot; title=&quot;NLG Tasks&quot;&gt;&lt;/a&gt;NLG Tasks&lt;/h2&gt;&lt;p&gt;传统的 NLG 问题可以被划分为如下子问题，越靠前的问题与实际数据的结合越紧密，越往后的问题越具有普适性：&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+      <category term="NLG" scheme="http://yoursite.com/tags/NLG/"/>
+    
+  </entry>
   
   <entry>
     <title>Neural Style Transfer Review IV</title>

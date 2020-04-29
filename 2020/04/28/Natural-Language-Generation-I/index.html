@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    CAPCG 复盘（二） |  Bowen&#39;s Blog
+    Natural Language Generation I |  Bowen&#39;s Blog
   </title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   
@@ -33,7 +33,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
+  <article id="post-Natural-Language-Generation-I" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -41,7 +41,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  CAPCG 复盘（二）
+  Natural Language Generation I
 </h1>
   
 
@@ -50,12 +50,12 @@
 
     
     <div class="article-meta">
-      <a href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
-  <time datetime="2020-03-23T03:42:38.000Z" itemprop="datePublished">2020-03-23</time>
+      <a href="/2020/04/28/Natural-Language-Generation-I/" class="article-date">
+  <time datetime="2020-04-28T03:24:17.000Z" itemprop="datePublished">2020-04-28</time>
 </a>
       
   <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
+    <a class="article-category-link" href="/categories/Review/">Review</a>
   </div>
 
       
@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">280字</span>
+            <span class="post-count">890字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1分钟</span>
+            <span class="post-count">3分钟</span>
         </span>
     </span>
 </div>
@@ -99,94 +99,88 @@
       
 
       
-      <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍，其实共轭梯度法本质上就是将 Conjugate Direction 中构建的搜索方向的一组线性无关向量 $u_{(i)}$ 设定为残差 $r_{(i)}$，这样做的原因有以下几点：</p>
-<ul>
-<li>残差在最速下降法中被作为搜索方向使用，虽然在 Conjugate Direction 中的搜索方向构建与最速下降法不同，但仍有相似之处，可以拿来尝试；</li>
-<li>由之前的推导中 $d_{(i)}^{T} r_{(j)} =0$ 可知，残差具有和之前搜索方向正交的性质，这使得我们新的搜索方向总是与之前的搜索方向线性无关，除非 $r_{(j)} = 0$，但这种情况下问题已经被解决了。</li>
+      <h1 id="Natural-Language-Generation-I"><a href="#Natural-Language-Generation-I" class="headerlink" title="Natural Language Generation I"></a>Natural Language Generation I</h1><h2 id="NLG-Tasks"><a href="#NLG-Tasks" class="headerlink" title="NLG Tasks"></a>NLG Tasks</h2><p>传统的 NLG 问题可以被划分为如下子问题，越靠前的问题与实际数据的结合越紧密，越往后的问题越具有普适性：</p>
+<a id="more"></a>
+<ol>
+<li>Content determination:<ul>
+<li>选择何种内容传递给受众；</li>
+<li>使用的方法：<ul>
+<li>HMM；</li>
+<li>考虑信息之间的联系。</li>
 </ul>
-<p>因为 $d_{(i)}$ 都是由 $r_{(i)}$ 构建而来，所以 $\operatorname{span}\left\{r_{(0)}, r_{(1)}, \ldots, r_{(i-1)}\right\} = \operatorname{span}\left\{d_{(0)}, d_{(1)}, \ldots, d_{(i-1)}\right\}$。并且每个残差都与之前的搜索方向正交，于是可以推出：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
-\Rightarrow r_{(i)}^{T} r_{(j)} &= 0 \quad i<j
-\end{aligned}</script><a id="more"></a>
-<p>由之前的推导：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-r_{(i+1)} &=-A e_{(i+1)} \\
-&=-A\left(e_{(i)}+\alpha_{(i)} d_{(i)}\right) \\
-&=r_{(i)}-\alpha_{(i)} A d_{(i)}
-\end{aligned}</script><p>可以发现新的残差是旧的残差和 $A d_{(i)}$ 的一个线性组合。注意到 $d_{(i-1)}, r_{(i-1)} \in \mathcal{D_i}$，可以得到 $r_{(i)} \in \mathcal{D_i} \bigcup A\mathcal{D_i} = \mathcal{D_{i+1}}$，并且由 $\mathcal{D_0} = {span}\{d_0\}$ 以及<br>$d_0=u_0=r_0$ 可以推出：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-\mathcal{D}_{i} &=\operatorname{span}\left\{d_{(0)}, A d_{(0)}, A^{2} d_{(0)}, \ldots, A^{i-1} d_{(0)}\right\} \\
-&=\operatorname{span}\left\{r_{(0)}, A r_{(0)}, A^{2} r_{(0)}, \ldots, A^{i-1} r_{(0)}\right\}
-\end{aligned}</script><p>这个子空间被称为 <em>krylov subspace</em>，子空间是由一个矩阵反复作用于一个向量产生的。<em>krylov subspace</em> 有比较好的性质，因为 $A\mathcal{D_i} \in \mathcal{D_{i+1}}$，而下一个残差又与之前的所有搜索方向，即搜索空间正交。</p>
-<script type="math/tex; mode=display">\begin{aligned}
-r_{(i+1)} &\perp \mathcal{D_{i+1}} \\
-\Rightarrow r_{(i+1)} &\perp A\mathcal{D_{i}} \\
-\end{aligned}</script><p>所以 $r_{(i+1)}$ 与 $\mathcal{D_i}$ (之前的所有搜索方向除 $d_{(i)}$) A-正交，这将为 Gram-Schimidt 共轭化提供方便。之前我们推出过：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-d_{(i)} &=u_{(i)}+\sum_{k=0}^{i-1} \beta_{i k} d_{(k)} \\
-\beta_{i j} &=-\frac{u_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}
-\end{aligned}</script><p>将 $u_{(i)}$ 替换为 $r_{(i)}$ 可得 $\beta_{i j} =-\frac{r_{i}^{T} A d_{(j)}}{d_{(j)}^{T} A d_{(j)}}$.</p>
-<p>我们将进一步简化系数的表达式：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-r_{(j+1)} &=r_{(j)}-\alpha_{(j)} A d_{(j)}\\
-\Rightarrow r_{(i)}^T r_{(j+1)} &=r_{(i)}^T r_{(j)}-\alpha_{(j)} r_{(i)}^T A d_{(j)}\\
-\Rightarrow \alpha_{(j)} r_{(i)}^T A d_{(j)} &= r_{(i)}^T r_{(j)} - r_{(i)}^T r_{(j+1)}\\
-
-r_{(i)}^{T} A d_{(j)} &=\left\{\begin{array}{ll}
-\frac{1}{\alpha_{(i)}} r_{(i)}^{T} r_{(i)}, & i=j \\
--\frac{1}{\alpha_{(i-1)}} r_{(i)}^{T} r_{(i)}, &i=j+1 & \\
-0, & \text { otherwise. }
-\end{array}\right.\\
-\therefore \beta_{i j} &=\left\{\begin{array}{ll}
-\frac{1}{\alpha_{(i-1)}} \frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} A d_{(i-1)}}, & i=j+1 \\
-0, & i>j+1
-\end{array}\right.
-\end{aligned}</script><p>这样我们也就无需存储之前的搜索向量，而且大多数 $\beta_{ij}$ 都变成了 0，每次迭代的时间空间复杂度由 $\mathcal{O}\left(n^{2}\right)$ 降至 $\mathcal{O}(m)$，其中 m 是 A 中非零元素个数。代入 $\alpha_{(i-1)}$ 的值进一步简化表达式：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-
-\alpha_{(i)} &=-\frac{d_{(i)}^{T} A e_{(i)}}{d_{(i)}^{T} A d_{(i)}} \\
-&=\frac{d_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}  \\
-
-d_{(i)}^{T} r_{(i)}&=u_{(i)}^{T} r_{(i)} = r_{(i)}^T r_{(i)}\\
-\Rightarrow \beta_{(i)} &=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i-1)}^{T} r_{(i-1)}} \\
-&=\frac{r_{(i)}^{T} r_{(i)}}{r_{(i-1)}^{T} r_{(i-1)}}
-\end{aligned}</script><p>综上，我们得到：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-d_{(0)}&=r_{(0)}=b-A x_{(0)}\\
-\alpha_{(i)}&=\frac{r_{(i)}^{T} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
-x_{(i+1)}&=x_{(i)}+\alpha_{(i)} d_{(i)} \\
-r_{(i+1)}&=r_{(i)}-\alpha_{(i)} A d_{(i)} \\
-\beta_{(i+1)}&=\frac{r_{(i+1)}^{T} r_{(i+1)}}{r_{(i)}^{T} r_{(i)}} \\
-d_{(i+1)}&=r_{(i+1)}+\beta_{(i+1)} d_{(i)}
-\end{aligned}</script><p>其实共轭梯度法并不是以梯度作为搜索方向，准确地说是用梯度构建搜索方向。</p>
-<h3 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h3><p>不断迭代可能会残差精度不断损失降低，这可以通过像最速梯度法中每迭代固定步数就重新计算残差解决。但精度的损失可能使搜索方向丧失 A-正交性，不过后来经过证明，共轭梯度法的确可以收敛。证明略过，可以参照参考文献。最终可以推出：</p>
-<script type="math/tex; mode=display">\left\|e_{(i)}\right\|_{A} \leq 2\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^{i}\left\|e_{(0)}\right\|_{A}</script><h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p>在迭代过程中，对于矩阵向量乘法，需要 $\mathcal{O}(m)$ 的时间复杂度，m 是 A 矩阵中非零元的个数，如果 A 是稀疏矩阵，那么 $m \in \mathcal{O}(n)$。当我们要求误差足够小时，即 $\left|e_{(i)}\right| \leq \varepsilon\left|e_{(0)}\right|$，最速梯度法的迭代次数：</p>
-<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \kappa \ln \left(\frac{1}{\epsilon}\right)\right\rceil</script><p>使用共轭梯度法则需要：</p>
-<script type="math/tex; mode=display">i \leq\left\lceil\frac{1}{2} \sqrt{\kappa} \ln \left(\frac{2}{\epsilon}\right)\right\rceil</script><p>综上最速梯度法的时间复杂度可以总结为 $\mathcal{O}(\kappa m)$，共轭梯度法的时间复杂度为 $\mathcal{O}(\sqrt\kappa m)$，空间复杂度均为 $\mathcal{O}(m)$。</p>
-<h2 id="Preconditioning"><a href="#Preconditioning" class="headerlink" title="Preconditioning"></a>Preconditioning</h2><p>预处理是数值计算中常用的技巧，用来降低待求解方程的条件数。</p>
-<h3 id="Condition-number"><a href="#Condition-number" class="headerlink" title="Condition number"></a>Condition number</h3><p>条件数是数值计算领域中用来衡量输出结果受到输出影响的程度的一个指标，简单来说，就是看输入发生轻微变化时，输出受到影响，发生变化的剧烈程度，变化越剧烈，则条件数越大，称该系统病态；反之变化越小，条件数越小，称该系统良好。良好的系统求解具有优势，选取不同的初始值或者参数不会对输出产生很大影响，是我们期望的结果。</p>
-<p>对称正定矩阵的条件数为：</p>
-<script type="math/tex; mode=display">\kappa=\lambda_{\max } / \lambda_{\min }</script><p>设 $M$ 是一个近似于 $A$ 的对称正定矩阵，并且容易得到 $M^{-1}$，我们可以用 $M^{-1}Ax=M^{-1}b$ 来间接求解 $Ax=b$。我们希望 $\kappa\left(M^{-1} A\right) \ll \kappa(A)$ 或者 $M^{-1}A$ 的特征值尽可能相互接近，这样迭代法将会更快地求解出方程。但问题是 $M^{-1}A$ 往往不是对称或者正定的，即使 $M$ 和 $A$ 都是。</p>
-<p>为了解决这个问题，一个对称、正定矩阵 $M$ 可以被分解为 $EE^T=M$ (例如 Cholesky 分解)，并且 $M^{-1}A$ 和 $E^{-1}AE^T$ 有相同的特征值，设 $M^{-1}A$ 有特征值 $\lambda$ 和特征向量 $v$，那么：</p>
-<script type="math/tex; mode=display">\left(E^{-1} A E^{-T}\right)\left(E^{T} v\right)=\left(E^{T} E^{-T}\right) E^{-1} A v=E^{T} M^{-1} A v=\lambda E^{T} v</script><p>问题 $Ax=b$ 转化为：</p>
-<script type="math/tex; mode=display">E^{-1} A E^{-T} \widehat{x}=E^{-1} b, \quad \widehat{x}=E^{T} x</script><p>因为 $E^{-1}AE^{-T}$ 对称正定，可以先用 CG 求得 $\widehat{x}$ 再求 $x$，得到 Preconditioned Conjugate Gradient 迭代公式如下：</p>
-<script type="math/tex; mode=display">\begin{aligned}
-&r_{(0)}=b-A x_{(0)}\\
-&d_{(0)}=M^{-1} r_{(0)}\\
-&\alpha_{(i)}=\frac{r_{(i)}^{T} M^{-1} r_{(i)}}{d_{(i)}^{T} A d_{(i)}}\\
-&\begin{aligned}
-x_{(i+1)} &=x_{(i)}+\alpha_{(i)} d_{(i)} \\
-r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
-\end{aligned}\\
-&\beta_{(i+1)}=\frac{r_{(i+1)}^{T} M^{-1} r_{(i+1)}}{r_{(i)}^{T} M^{-1} r_{(i)}}\\
-&d_{(i+1)}=M^{-1} r_{(i+1)}+\beta_{(i+1)} d_{(i)}
-\end{aligned}</script><p>算法的效率还是取决于条件数减少所缩短的时间和多出来的一次矩阵乘法 $M^{-1}A$ 时间哪个比较短。可以看出可以选取 $M=A$，这样问题变成 $x=M^{-1}b=A^{-1}b$，问题的条件数为 1，但 $A^{-1}$ 求解复杂度很高，如果求解出来了我们可以直接得到答案，也不再需要迭代了。</p>
-<p>常用的一个预处理算子为 diagonal preconditioner or Jacobi preconditioner，预处理矩阵 $M$ 为 $A$ 的对角元素，这个预处理矩阵很容易求得逆矩阵，并且对降低条件数有还不错的效果。</p>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank" rel="noopener">1. painless-conjugate-gradient.</a></p>
+</li>
+</ul>
+</li>
+<li>Text structuring:<ul>
+<li>考虑信息传递的顺序；</li>
+<li>使用的方法：<ul>
+<li>Hand-crafted, domain-dependent rules;</li>
+<li>ML-approach: find an optimal ordering of ‘information-bearing items’.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Sentence aggregation:<ul>
+<li>将一些信息 (message level) 聚集到一个单句中；</li>
+<li>使用的方法：<ul>
+<li>Hand-crafted, domain-dependent rules;</li>
+<li>ML-approach: 根据相似性判定数据库中的条目是否需要聚合，聚合的时候考虑一定的语法规则修改结果，之后找到全局最优的聚合策略。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Lexicalisation:<ul>
+<li>将聚合后的句子转换为自然语言，需要语法及表达进行一定的处理;</li>
+<li>候选项越多，问题越复杂；</li>
+<li>考虑内容约束和风格约束；</li>
+<li>使用的方法：<ul>
+<li>直接将 message 转化为 lexical item，但可能会引入语义类似但在语境下有偏差的替代词，而且这个转化的映射也很难定义；</li>
+<li>Unification-based with grammer rules encoding lexical as well as syntactic choices.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Referring expression generation:<ul>
+<li>从文章中选择出能标识该文章领域的单词和短语 ；</li>
+<li>使用的方法：<ul>
+<li>分类指代词；</li>
+<li>根据描述属性是否具有区分性选择。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Linguistic realisation:<ul>
+<li>将句子修改为符合语法和日常习惯的表达；</li>
+<li>使用的方法：<ul>
+<li>human-crafted templates: 只需要往对应位置填空，质量可控，但泛化能力较弱，需要手动构造模板；</li>
+<li>human-crafted grammer-based systems：基于语法的模板，有一定的泛化性，但很难设计出符合所有输入及句式的模板；</li>
+<li>statistical approaches：在大量语料中学习到语法规则的概率模型，一类是先利用低层次手工构造语法构建词组等可供选择的语料，再使用统计模型将候选排序并选择（或者直接使用统计模型生成）最优的选项，另一类全部使用统计信息生成，或者也可以对生成的语句进行进一步地优化。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>由上可以看出，这些任务的发展趋势都是由手工构造、领域特定逐步过渡到由大量语料学习到的基于概率统计建模方法。</p>
+<h2 id="NLG-Architecture-and-Approaches"><a href="#NLG-Architecture-and-Approaches" class="headerlink" title="NLG Architecture and Approaches"></a>NLG Architecture and Approaches</h2><ol>
+<li>Modular architecture: 将任务划分为多个子模块进行求解；</li>
+<li>Planning perspectives: 从规划视角看问题，提供一种更少划分的解决方案；</li>
+<li>Intergrated or global approches: 从整体解决问题，也是现在 NLP 的主要趋势，比较依赖于统计学习或者机器学习。</li>
+</ol>
+<p>两大类：数据驱动和知识（手工）驱动。</p>
+<h3 id="Modular-Architecture"><a href="#Modular-Architecture" class="headerlink" title="Modular Architecture"></a>Modular Architecture</h3><p><img src="Modular%20Architecture.png" alt=""></p>
+<p>大致分为如下步骤：</p>
+<ul>
+<li>Text Planner： content selection + text structuring，决定 what to say；</li>
+<li>Sentence Planner： sentence aggregation + lexicalisation + referring pression generation，决定 how to say；</li>
+<li>Linguistic Realiser：应用语法规则等对最终输出的句子做进一步修改。</li>
+</ul>
+<p>有时做这样很清晰的划分并不适用于所有任务，所以有人提出了更加灵活的架构，不对任务做清晰划分。</p>
+<p>缺陷：</p>
+<ul>
+<li>上游的错误不可避免地影响到下游；</li>
+<li>在前期的任务中难以用规则限制错误。</li>
+</ul>
+<p>一种改进方案是加入下游任务和上游任务之间的反馈，以及可以不断迭代最终生成的版本。这样就减小了上游任务错误可能导致的影响。</p>
 
       
       <!-- reward -->
@@ -256,14 +250,14 @@ r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/04/28/Natural-Language-Generation-I/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLG/" rel="tag">NLG</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/" rel="tag">NLP</a></li></ul>
 
 
     </footer>
@@ -274,19 +268,10 @@ r_{(i+1)} &=r_{(i)}-\alpha_{(i)} A d_{(i)}
   
   <nav class="article-nav">
     
-      <a href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            CAPCG 复盘（三）
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/03/22/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-nav-link">
+      <a href="/2020/04/19/Neural-Style-Transfer-Review-IV/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">CAPCG 复盘（一）</div>
+        <div class="article-nav-title">Neural Style Transfer Review IV</div>
       </a>
     
   </nav>
