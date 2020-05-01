@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">890字</span>
+            <span class="post-count">1.4k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">3分钟</span>
+            <span class="post-count">5分钟</span>
         </span>
     </span>
 </div>
@@ -167,7 +167,7 @@
 <li>Intergrated or global approches: 从整体解决问题，也是现在 NLP 的主要趋势，比较依赖于统计学习或者机器学习。</li>
 </ol>
 <p>两大类：数据驱动和知识（手工）驱动。</p>
-<h3 id="Modular-Architecture"><a href="#Modular-Architecture" class="headerlink" title="Modular Architecture"></a>Modular Architecture</h3><p><img src="Modular%20Architecture.png" alt=""></p>
+<h3 id="Modular-Architecture"><a href="#Modular-Architecture" class="headerlink" title="Modular Architecture"></a>Modular Architecture</h3><p><img src="Modular Architecture.png" alt=""></p>
 <p>大致分为如下步骤：</p>
 <ul>
 <li>Text Planner： content selection + text structuring，决定 what to say；</li>
@@ -181,6 +181,27 @@
 <li>在前期的任务中难以用规则限制错误。</li>
 </ul>
 <p>一种改进方案是加入下游任务和上游任务之间的反馈，以及可以不断迭代最终生成的版本。这样就减小了上游任务错误可能导致的影响。</p>
+<h3 id="Planning-Based-Approaches"><a href="#Planning-Based-Approaches" class="headerlink" title="Planning-Based Approaches"></a>Planning-Based Approaches</h3><p>使用规划的思想，将初始目标分解为小目标进行求解。这种分解并不像上面的 pipeline 一样对每个问题都进行同样的划分，而是在不同层级的任务上对任务提出不同的约束来控制最后的输出。</p>
+<h4 id="Planning-through-the-Grammar"><a href="#Planning-through-the-Grammar" class="headerlink" title="Planning through the Grammar"></a>Planning through the Grammar</h4><p>对语法进行修改，可以将一些语法结构抽象为 operator 的形式，进一步控制生成过程。例如：考虑句子 <em>Mary likes the white rabbit</em>，我们可以将 <em>like</em> 抽象为如下 operator：</p>
+<p>likes(u, x, y):</p>
+<ul>
+<li>Preconditions:<ul>
+<li>x likes y 应该在 knowledge base 中（被支持的，符合常理的情况）；</li>
+<li>x 是有生命的事物；</li>
+<li>语句 u 可以被 S （比如语法树之类的结构）推导出来。</li>
+</ul>
+</li>
+<li>Effect:<ul>
+<li>u 变为 S 的一部分；</li>
+<li>为 x, y 增加名词词组的节点，并在后续过程中填入。</li>
+</ul>
+</li>
+</ul>
+<p>这种方法的好处：一旦实现，可以在很多基于规划的方法中使用；但坏处是人工确定规则工作量大，效率不高。</p>
+<h4 id="Stochastic-Planning-under-Uncertainty-using-Reinforcement-Learning"><a href="#Stochastic-Planning-under-Uncertainty-using-Reinforcement-Learning" class="headerlink" title="Stochastic Planning under Uncertainty using Reinforcement Learning"></a>Stochastic Planning under Uncertainty using Reinforcement Learning</h4><p>上面使用的大部分都是基于规则的，考虑一个动作及其影响，这样在复杂的场景下很难有很好的效果。</p>
+<p>试图达到一个很好的目标可以看作一个随机优化问题，这和强化学习的想法是相近的。</p>
+<p>生成过程可以看作为一个马尔科夫决策过程，t 时刻到 t + 1 时刻的转移与动作 a 及其概率有关。RL 的架构能更好地处理变化环境中的非确定性。</p>
+<p>RL 的结构可以通过共享子任务中学得的知识，并适应对子任务的不同约束。一些层次化的联合的模型被提出，它完成从选择内容到最终美化输出一系列的任务，相比对多个子任务分别建模，联合建模能控制子任务之间的联系，表现更好。</p>
 
       
       <!-- reward -->
