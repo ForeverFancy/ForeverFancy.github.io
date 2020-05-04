@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.4k字</span>
+            <span class="post-count">2.5k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">5分钟</span>
+            <span class="post-count">8分钟</span>
         </span>
     </span>
 </div>
@@ -202,7 +202,25 @@
 <p>试图达到一个很好的目标可以看作一个随机优化问题，这和强化学习的想法是相近的。</p>
 <p>生成过程可以看作为一个马尔科夫决策过程，t 时刻到 t + 1 时刻的转移与动作 a 及其概率有关。RL 的架构能更好地处理变化环境中的非确定性。</p>
 <p>RL 的结构可以通过共享子任务中学得的知识，并适应对子任务的不同约束。一些层次化的联合的模型被提出，它完成从选择内容到最终美化输出一系列的任务，相比对多个子任务分别建模，联合建模能控制子任务之间的联系，表现更好。</p>
-<h3 id="Data-driven-Approach"><a href="#Data-driven-Approach" class="headerlink" title="Data-driven Approach"></a>Data-driven Approach</h3><h4 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h4>
+<h3 id="Data-driven-Approach"><a href="#Data-driven-Approach" class="headerlink" title="Data-driven Approach"></a>Data-driven Approach</h3><h4 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h4><p>数据是 data-driven 方法的前提。</p>
+<p>研究人员尝试从之前常用的 tree-bank 数据和近期的大语料数据中构建新的数据集。</p>
+<p>比较重要的方法是如何对数据进行对齐，以及如何处理半结构化的数据。</p>
+<p>有人提出使用概率生成模型进行数据对齐，概率值综合考虑三种不同的因素，之后最大化期望。</p>
+<p>另外有人提出使用众包策略收集信息，尽可能简化标注难度以获得更多更优质的数据。</p>
+<p>依赖对齐数据的模型只适用于特定的几个领域，泛化能力较差。目前更多的模型避免了对齐数据的需要，在训练过程中可以自动对齐（例如：神经网络 + Attention 等）。</p>
+<h4 id="Sequential-Stochastic-Process"><a href="#Sequential-Stochastic-Process" class="headerlink" title="Sequential, Stochastic Process"></a>Sequential, Stochastic Process</h4><p>当可以使用对齐数据时，一种生成方法是使用统计模型进行内容选择，之后使用规则、模板等进行真实化。</p>
+<p>有研究人员将生成过程建模为一个序列马尔科夫过程。选择内容根据历史对话数据以及重要属性（对话生成领域），真实化使用模板加 n-gram 模型。</p>
+<p>一般的决策过程只考虑历史数据对当前数据的影响，而没有考虑到当前的决策可能影响到以后的决策，于是有人提出了递归预测左右成分的解决方案，效果比只从单方向考虑要好。</p>
+<p>Mairesse and Young 提出使用动作树 + 语义栈来进行对话生成，选择概率最大的 stack 序列对应的 word sequence 生成。</p>
+<p><img src="TreeStructureForDialogue.png" alt=""></p>
+<h4 id="Classification-and-optimisation"><a href="#Classification-and-optimisation" class="headerlink" title="Classification and optimisation"></a>Classification and optimisation</h4><p>NLG 也可以看作一个分类问题，当前状态生成的词可以看作是根据当前输入和上个分类器的输入，在若干候选词中进行选择。之后，生成多个待选词并排序的途径也被提出。</p>
+<p>Pipeline 结构的生成有错误传播的风险，于是可以将 NLG 看成一个优化问题，多次迭代减小上游误差对下游的影响。实验发现优化的方法会比 分类+pipeline 的方法表现好。</p>
+<h4 id="Parsing"><a href="#Parsing" class="headerlink" title="Parsing"></a>Parsing</h4><p>使用 Probabilistic Context-Free Grammar 的思想，用表达式推导来表示决策过程。语言生成过程可以看成自下而上的构建过程（是否可以构建出开始的目标），过程中可以使用像 CYK 这样自下而上的算法帮助构建。</p>
+<h4 id="Deep-Learning-Methods"><a href="#Deep-Learning-Methods" class="headerlink" title="Deep Learning Methods"></a>Deep Learning Methods</h4><p>目前逐渐成为主流方法。目前使用神经网络的一个很重要的应用是学习语言的高层次抽象表征，特别是 dense, low-dimensional, distributed 表征。</p>
+<h4 id="Encoder-Decoder-结构"><a href="#Encoder-Decoder-结构" class="headerlink" title="Encoder-Decoder 结构"></a>Encoder-Decoder 结构</h4><p>使用 RNN 将输入编码到一个表征向量中，之后使用 decoder-RNN 得到输出。输入和输出的解码使得输入的编码具有在多个子任务中使用的可能性。Attention 机制的提出使得在生成过程中可以自动考虑和 input 序列之间的联系，无需手动对齐。所以 SEQ2SEQ + Attention 是目前比较常用的生成方法。</p>
+<h4 id="Conditioned-Language-Models"><a href="#Conditioned-Language-Models" class="headerlink" title="Conditioned Language Models"></a>Conditioned Language Models</h4><p>另一种生成方法是将 generator 看成 conditioned language model，输出是从以输入特征作为条件的分布中采样得到的，这里的输入特征可以有很多种，例如语义、内容或者风格属性等。</p>
+<h3 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h3><p>目前的发展趋势越来越倾向于模糊化各个子任务之间的边界，区分的不是那么明显。对于数据驱动的方法，获取高质量的数据是生成高质量文本的重要条件。有些系统对数据的要求比较高，需要对齐的数据，另一些系统则要求不高（例如 attention 机制）。目前非常重要的一方向是试图学习到分布式的、可重用的特征表达（例如：word-embedding 等），这些特征表达无需重复训练，之后的任务可以直接使用，提高了效率，会产生比较广泛的影响（transfer learning，现在的 bert 等）。</p>
+
       
       <!-- reward -->
       
