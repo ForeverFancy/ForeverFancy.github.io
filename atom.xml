@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-05-04T09:57:18.587Z</updated>
+  <updated>2020-05-05T14:54:12.356Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>2019-CCF-BDCI-Competition-Review</title>
+    <link href="http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/"/>
+    <id>http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/</id>
+    <published>2020-05-05T09:41:34.000Z</published>
+    <updated>2020-05-05T14:54:12.356Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="Boosting" scheme="http://yoursite.com/tags/Boosting/"/>
+    
+      <category term="Data Science" scheme="http://yoursite.com/tags/Data-Science/"/>
+    
+  </entry>
   
   <entry>
     <title>Natural Language Generation I</title>
