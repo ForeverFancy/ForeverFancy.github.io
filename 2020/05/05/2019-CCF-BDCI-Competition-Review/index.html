@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.5k字</span>
+            <span class="post-count">3.6k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">6分钟</span>
+            <span class="post-count">15分钟</span>
         </span>
     </span>
 </div>
@@ -99,7 +99,8 @@
       
 
       
-      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h2><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的，由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
+      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h2><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
+<a id="more"></a>
 <p>集成学习的主要思路是使用多个学习器结合，希望获取能够比单一学习器更强的泛化性能，目前的方法大概分为两种，一种是 bagging，另一种是 boosting。Bagging 的个体学习器之间不存在很强的依赖关系，能够同时生成，可以并行化；而 boosting 的个体学习器之间存在比较强的依赖关系，必须串行生成。</p>
 <p>Boosting 是一种可以将一组弱学习器（泛化性能略优于随机猜测的学习器）提升为一个强学习器的算法。大体思路是先从初始训练集中训练处一个基学习器，在根据基学习器的表现对训练样本分布进行调整，使得做错的训练样本受到更多的关注，然后基于调整后的训练样本来训练下一个基学习器，反复进行直到基学习器数目到达指定的值，最后将这些基学习器进行加权组合得到最后的强学习器。常用的算法为 AdaBoost 和 GradientBoost。</p>
 <h3 id="AdaBoost"><a href="#AdaBoost" class="headerlink" title="AdaBoost"></a>AdaBoost</h3><p>AdaBoost 算法的推导过程有多种，这里采用加性模型的方法。希望找到最终的学习器 $H(x) = \sum\limits_{t=1}^{T}\alpha_th_t(x)$ 来最小化指数损失函数：</p>
@@ -118,16 +119,16 @@ L(y, H(x)+c h(x))=E\left[e^{-y(H(x)+c h(x))}\right] \\
 =E\left[e^{-y H(x)}\left(1-y c h(x)+c^{2} / 2\right)\right]
 \end{array}</script><p>所以：</p>
 <script type="math/tex; mode=display">
-h(x) = \argmin_h E_w(1-ych(x)+\frac{1}{2}c^2|x)\\
+h(x) = \arg\min_h E_w(1-ych(x)+\frac{1}{2}c^2|x)\\
 w(x_i,y_i) = e^{-y_iH(x_i)}, i=1, 2, ..., n</script><p>希望找到 $h(x)$ 最小化加权期望，令 $c&gt;0$，那么优化目标等价于:</p>
-<script type="math/tex; mode=display">\argmax_h E_w(yh(x))\\
+<script type="math/tex; mode=display">\arg\max_h E_w(yh(x))\\
 =h(x)P_w(y=1|x)-h(x)P_w(y=-1|x)</script><p>最优解为：</p>
 <script type="math/tex; mode=display">h(x)=\left\{\begin{array}{ll}
 1, & \text { if } P_{w}(y=1 | x)>P_{w}(y=-1 | x) \\
 -1, & \text { otherwise }
 \end{array}\right.</script><p>我们需要进一步找到 $c$:</p>
 <script type="math/tex; mode=display">\begin{aligned}
-    c = \argmin_c{E_w(e^{-cyh(x)})}
+    c = \arg\min_{c}{E_w(e^{-cyh(x)})}
 \end{aligned}</script><script type="math/tex; mode=display">\begin{aligned}
 &\frac{\partial E_{w}\left[e^{-c y h(x)}\right]}{\partial c}=E_{w}\left[-y h(x) e^{-c y h(x)}\right]=0\\
 &E_{w}\left[1_{y \neq h(x)}\right] e^{c}-E_{w}\left[1_{y=h(x)}\right] e^{-c}=0
@@ -145,8 +146,64 @@ w(x_i,y_i) = e^{-y_iH(x_i)}, i=1, 2, ..., n</script><p>希望找到 $h(x)$ 最�
 <blockquote>
 <p>Boosting 的基本思想是通过某种方式使得每一轮基学习器在训练过程中更加关注上一轮学习错误的样本，区别在于是采用何种方式。AdaBoost 采用的是增加上一轮学习错误样本的权重的策略，而在 Gradient Boosting 中则将负梯度作为上一轮基学习器犯错的衡量指标，在下一轮学习中通过拟合负梯度来纠正上一轮犯的错误。</p>
 </blockquote>
+<p>使用决策树作为基学习器的 Gradient Boost 方法称为 GBDT，和上面一样最终的模型可以看成是加性模型：</p>
+<script type="math/tex; mode=display">
+\hat{y}_i = \sum_{k=1}^Kf_k(x_i), f_k \in F</script><p>损失函数：</p>
+<script type="math/tex; mode=display">
+L = \sum_{i=1}^nl(y_i,\hat{y}_i) + \sum_{k=1}^K\Omega(f_k)</script><p>后面的一项是正则化项。</p>
+<script type="math/tex; mode=display">\begin{aligned}
+\hat{y}_{i}^{0} &=0 \\
+\hat{y}_{i}^{1} &=f_{1}\left(x_{i}\right)=\hat{y}_{i}^{0}+f_{1}\left(x_{i}\right) \\
+\hat{y}_{i}^{2} &=f_{1}\left(x_{i}\right)+f_{2}\left(x_{i}\right)=\hat{y}_{i}^{1}+f_{2}\left(x_{i}\right) \\
+& \cdots \\
+\hat{y}_{i}^{t} &=\sum_{k=1}^{t} f_{k}\left(x_{i}\right)=\hat{y}_{i}^{t-1}+f_{t}\left(x_{i}\right)
+\end{aligned}</script><p>每次新加入的学习器，都是以减小之前学习器产生的误差为目标。考察第 t 步的拟合，这一步模型对第 i 个样本的预测为 $\hat{y}_i^t = \hat{y}_i^{t-1}+f_t(x_i)$，目标函数为：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+O b j^{(t)} &=\sum_{i=1}^{n} l\left(y_{i}, \hat{y}_{i}^{t}\right)+\sum_{i=i}^{t} \Omega\left(f_{i}\right) \\
+&=\sum_{i=1}^{n} l\left(y_{i}, \hat{y}_{i}^{t-1}+f_{t}\left(x_{i}\right)\right)+\Omega\left(f_{t}\right)+\text {constant}
+\end{aligned}</script><p>使用泰勒展开至二阶：</p>
+<script type="math/tex; mode=display">O b j^{(t)}=\sum_{i=1}^{n}\left[l\left(y_{i}, \hat{y}_{i}^{t-1}\right)+g_{i} f_{t}\left(x_{i}\right)+\frac{1}{2} h_{i} f_{t}^{2}\left(x_{i}\right)\right]+\Omega\left(f_{t}\right)+\text { constant }</script><p>其中，$g_i, h_i$ 分别为损失函数对 $\hat{y}_i^{t-1}$的一阶导数和二阶导数。</p>
+<p>去掉对没有影响的表达式，优化目标变为：</p>
+<script type="math/tex; mode=display">O b j^{(t)}=\sum_{i=1}^{n}\left[g_{i} f_{t}\left(x_{i}\right)+\frac{1}{2} h_{i} f_{t}^{2}\left(x_{i}\right)\right]+\Omega\left(f_{t}\right)</script><p>上面提到，我们的弱学习器使用的是决策树。假设新加入的决策树有 $T$ 片叶子，每片叶子对应的值为 $w\in R^T$，在分类问题中，每片叶子预测值是某一类；在回归问题中，每片叶子预测的是某一个值，那么存在函数 $q$，可以将 $f_t(x)$ 的预测值映射到一个叶子节点上，即 $f_t(x) = w_{q(x)}$，$q(x)$ 代表样本在哪个节点上，$w$ 是其取值。</p>
+<p>决策树的复杂度被定义为 $\Omega\left(f_{t}\right)=\gamma T+\frac{1}{2} \lambda \sum_{j=1}^{T} w_{j}^{2}$，即跟叶节点的数量和取值有关，设 $I_j=\{i|q(x_i) = j\}$，那么目标可以写为：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+O b j^{(t)} & \approx \sum_{i=1}^{n}\left[g_{i} f_{t}\left(x_{i}\right)+\frac{1}{2} h_{i} f_{t}^{2}\left(x_{i}\right)\right]+\Omega\left(f_{t}\right) \\
+&=\sum_{i=1}^{n}\left[g_{i} w_{q\left(x_{i}\right)}+\frac{1}{2} h_{i} w_{q\left(x_{i}\right)}^{2}\right]+\gamma T+\frac{1}{2} \lambda \sum_{j=1}^{T} w_{j}^{2} \\
+&=\sum_{j=1}^{T}\left[\left(\sum_{i \in I_{j}} g_{i}\right) w_{j}+\frac{1}{2}\left(\sum_{i \in I_{j}} h_{i}+\lambda\right) w_{j}^{2}\right]+\gamma T
+\end{aligned}</script><p>记 $G_j = \sum\limits_{i \in I_{j}}g_i, H_j=\sum\limits_{i \in I_{j}}h_i$ 那么目标函数可以变为 $O b j^{(t)}=\sum_{j=1}^{T}\left[G_j w_{j}+\frac{1}{2}\left(H_j+\lambda\right) w_{j}^{2}\right]+\gamma T$</p>
+<p>对于一棵确定结构的决策树，即已知 $q$，那么 $G_j, H_j$ 是确定的，现在 $w$ 未知，也就是我们需要预测的值，那么令目标函数的一阶导为 0，得到：</p>
+<script type="math/tex; mode=display">
+w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
+<script type="math/tex; mode=display">O b j^{(t)}=-\frac{1}{2}\sum_{j=1}^{T}\frac{G_j^2}{H_j+\lambda} +\gamma T</script><p>如何选择树的结构以及获得最优化的目标函数？</p>
+<blockquote>
+<p>那么对于单棵决策树，一种理想的优化状态就是枚举所有可能的树结构，因此过程如下：</p>
+<p>a、首先枚举所有可能的树结构，即 [公式] ；</p>
+<p>b、计算每种树结构下的目标函数值，即等式7的值；</p>
+<p>c、取目标函数最小（大）值为最佳的数结构，根据等式6求得每个叶子节点的 [公式] 取值，即样本的预测值。</p>
+<p>但上面的方法肯定是不可行的，因为树的结构千千万，所以一般用贪心策略来优化：</p>
+<p>a、从深度为0的树开始，对每个叶节点枚举所有的可用特征</p>
+<p>b、 针对每个特征，把属于该节点的训练样本根据该特征值升序排列，通过线性扫描的方式来决定该特征的最佳分裂点，并记录该特征的最大收益（采用最佳分裂点时的收益）</p>
+<p>c、 选择收益最大的特征作为分裂特征，用该特征的最佳分裂点作为分裂位置，把该节点生长出左右两个新的叶节点，并为每个新节点关联对应的样本集</p>
+<p>d、回到第1步，递归执行到满足特定条件为止</p>
+<p>那么如何计算上面的收益呢，很简单，仍然紧扣目标函数就可以了。假设我们在某一节点上二分裂成两个节点，分别是左（L）右（R），则分列前的目标函数是 $-\frac{1}{2}\left[\frac{\left(G_{L}+G_{R}\right)^{2}}{H_{L}+H_{R}+\lambda}\right]+\gamma$ ，分裂后则是 $-\frac{1}{2}\left[\frac{G_{L}^{2}}{H_{L}+\lambda} + \frac{G_{R}^{2}}{H_{R}+\lambda}\right]+\gamma$ ，则对于目标函数来说，分裂后的收益是（这里假设是最小化目标函数，所以用分裂前-分裂后）：</p>
+<script type="math/tex; mode=display">\operatorname{Gain}=\frac{1}{2}\left[\frac{G_{L}^{2}}{H_{L}+\lambda}+\frac{G_{R}^{2}}{H_{R}+\lambda}-\frac{\left(G_{L}+G_{R}\right)^{2}}{H_{L}+H_{R}+\lambda}\right]-\gamma</script><p>等式8计算出来的收益，也是作为变量重要度输出的重要依据。</p>
+</blockquote>
+<p>综上，GBDT 算法的大概过程为：</p>
+<ol>
+<li>每一步都生成一个新的决策树；</li>
+<li>拟合决策树之前，计算出损失函数在每个样本上的一阶导和二阶导 $g_i, h_i$；</li>
+<li>通过贪心策略生成一棵新的决策树，计算每个叶子节点的 $G_j, H_j$，并预测 $w$；</li>
+<li>把新生成的决策树加入总的学习器，预测结果变为 $\hat{y}_i^t = \hat{y}_i^{t-1}+\epsilon f_t(x_i)$，$\epsilon$ 为学习率，抑制过拟合。</li>
+</ol>
+<p>但其实上面所述的是 XGBoost 的原理，严格的 GBDT 只展开到一阶导数，不过其实大同小异。</p>
+<blockquote>
+<p>Gradient Boosting 算法理论上可以选择多种不同的学习算法作为基学习器，但实际使用地最多的无疑是决策树，这并非偶然。决策树有很多优良的特性，比如能灵活处理各种类型的数据，包括连续值和离散值；对缺失值不敏感；不需要做特征标准化/归一化；可解释性好等等，但其致命缺点是不稳定，导致容易过拟合，因而很多时候准确率不如其他算法。</p>
+<p>决策树是非参数模型，这并不意味着其没有参数，而是在训练之前参数数量是不确定的，因此完全生长的决策树有着较大的自由度，能最大化地拟合训练数据。然而单颗决策树是不稳定的，样本数相同的训练集产生微小变动就能导致最终模型的较大差异，即模型的方差大，泛化性能不好。集成学习的另一代表 Bagging 是对付这个问题的一大利器 (Bagging 降低方差，Boosting 降低偏差) 。而 Bagging 的拓展算法 —— 随机森林，通过在树内部结点的分裂过程中，随机选取固定数量的特征纳入分裂的候选项，这样就进一步降低了单模型之间的相关性，总体模型的方差也比 Bagging 更低。</p>
+<p>由于 GBDT 采用的树都是复杂度低的树，所以方差很小（<em>简单模型的方差较小，偏差可能较大；复杂模型的方差较大，偏差较小</em>），通过梯度提升的方法集成多个决策树，最终能够很好的解决过拟合的问题。然而 Boosting 共有的缺点为训练是按顺序的，难以并行，这样在大规模数据上可能导致速度过慢，所幸近年来 XGBoost 和 LightGBM 的出现都极大缓解了这个问题，后文详述。</p>
+</blockquote>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://towardsdatascience.com/boosting-algorithm-adaboost-b6737a9ee60c" target="_blank" rel="noopener">[1] boosting-algorithm-adaboost</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/37358517" target="_blank" rel="noopener">[2] 集成学习之Boosting —— AdaBoost原理</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/29765582" target="_blank" rel="noopener">[3] 机器学习-一文理解GBDT的原理-20171001</a></p>
 
       
       <!-- reward -->

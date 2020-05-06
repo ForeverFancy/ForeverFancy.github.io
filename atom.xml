@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-05-05T14:54:12.356Z</updated>
+  <updated>2020-05-06T04:08:06.828Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,17 +21,11 @@
     <link href="http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/"/>
     <id>http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/</id>
     <published>2020-05-05T09:41:34.000Z</published>
-    <updated>2020-05-05T14:54:12.356Z</updated>
+    <updated>2020-05-06T04:08:06.828Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          
-        
-      
+      &lt;h1 id=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;a href=&quot;#2019-CCF-BDCI-Competition-Review&quot; class=&quot;headerlink&quot; title=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;/a&gt;2019-CCF-BDCI-Competition-Review&lt;/h1&gt;&lt;h2 id=&quot;Boosting-原理&quot;&gt;&lt;a href=&quot;#Boosting-原理&quot; class=&quot;headerlink&quot; title=&quot;Boosting 原理&quot;&gt;&lt;/a&gt;Boosting 原理&lt;/h2&gt;&lt;p&gt;目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。&lt;/p&gt;
     
     </summary>
     
