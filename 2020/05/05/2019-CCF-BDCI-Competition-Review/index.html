@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">3.6k字</span>
+            <span class="post-count">4.5k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">15分钟</span>
+            <span class="post-count">18分钟</span>
         </span>
     </span>
 </div>
@@ -199,11 +199,25 @@ w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
 <blockquote>
 <p>Gradient Boosting 算法理论上可以选择多种不同的学习算法作为基学习器，但实际使用地最多的无疑是决策树，这并非偶然。决策树有很多优良的特性，比如能灵活处理各种类型的数据，包括连续值和离散值；对缺失值不敏感；不需要做特征标准化/归一化；可解释性好等等，但其致命缺点是不稳定，导致容易过拟合，因而很多时候准确率不如其他算法。</p>
 <p>决策树是非参数模型，这并不意味着其没有参数，而是在训练之前参数数量是不确定的，因此完全生长的决策树有着较大的自由度，能最大化地拟合训练数据。然而单颗决策树是不稳定的，样本数相同的训练集产生微小变动就能导致最终模型的较大差异，即模型的方差大，泛化性能不好。集成学习的另一代表 Bagging 是对付这个问题的一大利器 (Bagging 降低方差，Boosting 降低偏差) 。而 Bagging 的拓展算法 —— 随机森林，通过在树内部结点的分裂过程中，随机选取固定数量的特征纳入分裂的候选项，这样就进一步降低了单模型之间的相关性，总体模型的方差也比 Bagging 更低。</p>
-<p>由于 GBDT 采用的树都是复杂度低的树，所以方差很小（<em>简单模型的方差较小，偏差可能较大；复杂模型的方差较大，偏差较小</em>），通过梯度提升的方法集成多个决策树，最终能够很好的解决过拟合的问题。然而 Boosting 共有的缺点为训练是按顺序的，难以并行，这样在大规模数据上可能导致速度过慢，所幸近年来 XGBoost 和 LightGBM 的出现都极大缓解了这个问题，后文详述。</p>
+<p>由于 GBDT 采用的树都是复杂度低的树，所以方差很小（<em>简单模型的方差较小，偏差可能较大；复杂模型的方差较大，偏差较小</em>），通过梯度提升的方法集成多个决策树，最终能够很好的解决过拟合的问题。然而 Boosting 共有的缺点为训练是按顺序的，难以并行，这样在大规模数据上可能导致速度过慢，所幸近年来 XGBoost 和 LightGBM 的出现都极大缓解了这个问题。</p>
 </blockquote>
+<h3 id="各种实现的一些特点"><a href="#各种实现的一些特点" class="headerlink" title="各种实现的一些特点"></a>各种实现的一些特点</h3><p>在特征选择（决策树的节点分裂）部分，比较常用的方法是 pre-sorting splitting：</p>
+<ul>
+<li>对于每个节点，枚举所有特征；</li>
+<li>所有数据按照该特征排序；</li>
+<li>遍历所有可能的分裂值，选取 gain 最高作为分裂点；</li>
+<li>选择最佳分类点（所有 feature 中 gain 最高的）。</li>
+</ul>
+<p>这样做的时间复杂度非常高，所以 XGBoost 使用的是基于直方图的分裂算法，大致思路是将连续的 feature 划分到若干个不同的桶中（离散化），每个桶中累加桶中样本对应的一阶和二阶梯度等信息（建立直方图）。由于离散化之后的桶的数量远远小于样本的数量，所以之后根据建立的直方图进行分裂的效率会有很大提升。</p>
+<p>直方图算法可以减少内存的占用，计算效率有很大提升，但特征被离散化之后往往不能找到精确的分裂点，所以对结果会有一定影响。但因为决策树本身就是弱模型，分割点不准确对最终结果的影响有限，并且粗略的分割点有一定正则化的效果，可以防止过拟合。</p>
+<p>LightGBM 在此基础上又做了改进。AdaBoost 中，样本的权重向量很好地反映了样本的重要性，而 GBDT 中，没有直接的权重反应样本的重要程度。但梯度可以间接反应样本的误差（梯度越大，误差越大）。要减少样本数来加速，一个直接的想法是抛弃那些梯度很小的样本，但是这样训练集的分布会被改变，可能会使得模型准确率下降。LightGBM 提出 Gradient-based One-Side Sampling (GOSS) 来解决这个问题。GOSS 按照样本的梯度降序排序，选择前 $a\times100\%$ 的样本，剩下的数据 $(1-a)\times100\%$ 中选取 $b\times100\%$ 的样本（计算增益时梯度放大 $\frac{1-a}{b}$ 倍），用这些样本可以在尽量保持原先分布的基础上减少训练样本，更加关注误差较大的样本。</p>
+<p>LightGBM 等实现都使用了 Exclusive Feature Bunding 算法。一个高维的特征空间的数据往往是稀疏的，而稀疏的特征空间中，很多特征是互斥的（不会同时具有非零值，例如 One-hot 编码），LightGBM 提出使用 EFB 算法进行互斥特征合并减少特征数量。CatBoost 在这方面也是大同小异，它可以处理类别特征，也自动对输入特征进行组合。</p>
+<p>XGBoost 中，树是按层生长（Level-wise tree growth）的生长策略，即同一层的所有节点都做分裂。这样容易进行多线程优化，但不加区分地对待同一层的叶子，带来了很多没有必要的开销（很多叶子分裂收益低，没有分裂的必要）。而 LightGBM 使用 Leaf-wise tree growth，每次只分裂增益最大的一个叶子，分裂次数相同的情况下 Leaf-wise 可以降低更多的误差，得到更好的精度。但缺点是容易生长出比较深的决策树，造成过拟合，因此 LightGBM, 增加了一些最大深度的限制，保证高效率的同时防止过拟合。</p>
+<p>通过实验，我们选择在回归问题使用 XGBoost，分类问题使用 CatBoost。</p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://towardsdatascience.com/boosting-algorithm-adaboost-b6737a9ee60c" target="_blank" rel="noopener">[1] boosting-algorithm-adaboost</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/37358517" target="_blank" rel="noopener">[2] 集成学习之Boosting —— AdaBoost原理</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/29765582" target="_blank" rel="noopener">[3] 机器学习-一文理解GBDT的原理-20171001</a></p>
+<p><a href="https://www.hrwhisper.me/machine-learning-lightgbm/" target="_blank" rel="noopener">[4] 『我爱机器学习』集成学习（四）LightGBM</a></p>
 
       
       <!-- reward -->
@@ -689,6 +703,21 @@ w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
