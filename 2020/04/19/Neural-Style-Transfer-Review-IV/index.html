@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">3.6k字</span>
+            <span class="post-count">4.5k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">14分钟</span>
+            <span class="post-count">17分钟</span>
         </span>
     </span>
 </div>
@@ -184,6 +184,50 @@ s \leftarrow S(x), \hat{x} \leftarrow G(s, \phi(t))</script><p>另外可以使�
 <li>并且对于风格迁移，是否可以参考之前的 neural style transfer 来衡量风格差异；</li>
 <li>text 表示内容，image 表示风格是一个很好的想法，但不能假设所有的 text 都是比较局限的形式，如果使用 text 指导风格转换呢？</li>
 </ul>
+<h2 id="Semantic-segmentation"><a href="#Semantic-segmentation" class="headerlink" title="Semantic segmentation"></a>Semantic segmentation</h2><h3 id="Unified-Perceptual-Parsing-for-Scene-Understanding"><a href="#Unified-Perceptual-Parsing-for-Scene-Understanding" class="headerlink" title="Unified Perceptual Parsing for Scene Understanding"></a>Unified Perceptual Parsing for Scene Understanding</h3><p>T. Xiao et al. ECCV 2018.</p>
+<p>文章的思路来源于人可以轻松对所看到的场景和场景内的各种物体以及物体的信息作出准确的判断，作者提出 UPerNet，希望做到从单一图片识别出尽可能多的场景、物体等语义信息。</p>
+<p><img src="image-20200507211720900.png" alt="image-20200507211720900"></p>
+<p>目前各种语义识别和分割大多数都是单一任务，而统一的识别分割任务存在以下难点：</p>
+<ul>
+<li>没有数据集是同时包含所有需要的语义标注的；</li>
+<li>数据集的标注尺度也是不同的，有的是 pixel-level，有的是 image-level.</li>
+</ul>
+<h4 id="训练数据"><a href="#训练数据" class="headerlink" title="训练数据"></a>训练数据</h4><p>为了解决数据的问题，作者使用了 Broden dataset，里面包括 ADE20K, Pascal-Context, Pascal Part, OpenSurface, Describable Texture Dataset. 作者使用了相似概念合并、去除低频概念及图片以及类别平衡化处理等手段得到一个比较合理的数据集。</p>
+<h4 id="模型思路"><a href="#模型思路" class="headerlink" title="模型思路"></a>模型思路</h4><p>使用层次化模型，高层次用来预测场景语义，低层次用来预测物体、材质、纹理等语义。</p>
+<p>训练时，对于特定的训练数据，只更新用于识别该数据的对应 layers.</p>
+<p><img src="image-20200507214254413.png" alt="image-20200507214254413"></p>
+<p>最上层的 Pyramid Pooling Module 用来增强空间结构信息。</p>
+<p><img src="20190627153843754.png" alt=""></p>
+<p>关于 texture，作者采取的方法是当整个网络在其他任务上训练好之后，对 texture 进行单独训练，并且梯度不回传到主干网络。</p>
+<p>因为 texture label 是 image-level 并且 non-natural 的，直接与正常的图片混合进行训练可能会使模型的表现下降。而且 texture 的识别不需要高层次的语义信息，所以直接使用低层次的 feature 输入，对其进行判定。</p>
+<p>从语义分割中建立语义信息图（考虑通过这种方式建立相关 word embedding?）：</p>
+<p><img src="image-20200507221122285.png" alt="image-20200507221122285"></p>
+<p><img src="image-20200507222310917.png" alt="image-20200507222310917"></p>
+<h3 id="Semantic-Image-Synthesis-with-Spatially-Adaptive-Normalization"><a href="#Semantic-Image-Synthesis-with-Spatially-Adaptive-Normalization" class="headerlink" title="Semantic Image Synthesis with Spatially-Adaptive Normalization"></a>Semantic Image Synthesis with Spatially-Adaptive Normalization</h3><p>T. Park et al. CVPR 2019 (Oral).</p>
+<p>主要应用的任务是 semantic segmentation mask to photorealistic image translation. 这篇工作的主要贡献是提出了 <em>spatially-adaptive normalization</em>，这种归一化与之前的 BN 和 IN 相比，能更好地保存输入的语义和空间信息。</p>
+<p>作者观察到之前的 CIN, AdaIN 以及各种普通的归一化会损失语义和空间信息，在真实场景风格迁移中表现不好，而后面会看到 SPADE 能够更好地保留语义特征。</p>
+<p><img src="image-20200507115612515.png" alt="image-20200507115612515"></p>
+<h4 id="问题定义和任务"><a href="#问题定义和任务" class="headerlink" title="问题定义和任务"></a>问题定义和任务</h4><p>问题定义：$m \in \mathcal{L}^{H\times W}$，这里 $\mathcal{L}$ 是语义标签集，$H, W$ 是图像的长和宽。$m$ 中的每个位置都表示该像素的语义标签，任务是把该输入转换为一张真实场景图片。</p>
+<h4 id="SPADE-Design"><a href="#SPADE-Design" class="headerlink" title="SPADE Design"></a>SPADE Design</h4><p>$h^i$ 表示经过第 i 个 CNN-layer 得到的 feature，$C^i, H^i, W^i, N$ 分别为通道数，高度，宽度，batch_size，SPADE 将 BN 改为：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+&\gamma_{c, y, x}^{i}(\mathbf{m}) \frac{h_{n, c, y, x}^{i}-\mu_{c}^{i}}{\sigma_{c}^{i}}+\beta_{c, y, x}^{i}(\mathbf{m})\\
+&\mu_{c}^{i}=\frac{1}{N H^{i} W^{i}} \sum_{n, y, x} h_{n, c, y, x}^{i}\\
+&\sigma_{c}^{i}=\sqrt{\frac{1}{N H^{i} W^{i}} \sum_{n, y, x}\left(h_{n, c, y, x}^{i}\right)^{2}-\left(\mu_{c}^{i}\right)^{2}}
+\end{aligned}</script><p>其中，$\gamma_{c, y, x}^{i}, \beta_{c, y, x}^{i}$ 是根据输入 semantic mask 生成的均值和偏移，可以看出这是一个位置有关的变量。</p>
+<p>当输入空间不变的语义图片时，SPADE 退化为 CBN (Conditional Batch Normalization); 当输入变为一张风格图片时，令 $\gamma, \beta$ 空间不变，batch_size 为 1，SPADE 退化为 AdaIN.</p>
+<p>模型采用的是 GAN 的训练方式。</p>
+<p>SPADE 结构：</p>
+<p><img src="image-20200507124928769.png" alt="image-20200507124928769"></p>
+<p>Res 结构：</p>
+<p><img src="image-20200507124941283.png" alt="image-20200507124941283"></p>
+<p>Generator 结构：</p>
+<p><img src="image-20200507124951759.png" alt="image-20200507124951759"></p>
+<p>Discriminator 结构：</p>
+<p><img src="image-20200507125013941.png" alt="image-20200507125013941"></p>
+<p>风格迁移任务：</p>
+<p><img src="image-20200507125227475.png" alt="image-20200507125227475"></p>
+<p>image encoder 结构：</p>
+<p><img src="image-20200507125302355.png" alt="image-20200507125302355"></p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://xxx.itp.ac.cn/pdf/1505.04870" target="_blank" rel="noopener">[1] Flickr 30k Entities.</a></p>
 <p><a href="https://ai.google.com/research/ConceptualCaptions/download" target="_blank" rel="noopener">[2] Google’s Conceptual Captions</a></p>
 
@@ -680,21 +724,6 @@ s \leftarrow S(x), \hat{x} \leftarrow G(s, \phi(t))</script><p>另外可以使�
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
