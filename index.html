@@ -108,7 +108,16 @@
       
 
       
-      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h2><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
+      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="比赛简介"><a href="#比赛简介" class="headerlink" title="比赛简介"></a>比赛简介</h2><p>我们选取的赛题是<a href="https://www.datafountain.cn/competitions/351" target="_blank" rel="noopener">离散制造过程中典型工件的质量符合率预测</a>，赛题背景为：</p>
+<blockquote>
+<p>在高端制造领域，随着数字化转型的深入推进，越来越多的数据可以被用来分析和学习，进而实现制造过程中重要决策和控制环节的智能化，例如生产质量管理。从数据驱动的方法来看，生产质量管理通常需要完成质量影响因素挖掘及质量预测、质量控制优化等环节，本赛题将关注于第一个环节，基于对潜在的相关参数及历史生产数据的分析，完成质量相关因素的确认和最终质量符合率的预测。在实际生产中，该环节的结果将是后续控制优化的重要依据。</p>
+</blockquote>
+<p>赛题的任务是：</p>
+<blockquote>
+<p>由于在实际生产中，同一组工艺参数设定下生产的工件会出现多种质检结果，所以我们针对各组工艺参数定义其质检标准符合率，即为该组工艺参数生产的工件的质检结果分别符合优、良、合格与不合格四类指标的比率。相比预测各个工件的质检结果，预测该质检标准符合率会更具有实际意义。</p>
+<p>本赛题要求参赛者对给定的工艺参数组合所生产工件的质检标准符合率进行预测。</p>
+</blockquote>
+<p>简单来说，对于给定的生产工艺参数，生产出来的工件会有相应的质量数据，以及根据质量数据进行质检得到的质检结果。</p>
       
       <a class="article-more-link" href="/2020/05/05/2019-CCF-BDCI-Competition-Review/">阅读更多...</a>
       
@@ -1194,6 +1203,21 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

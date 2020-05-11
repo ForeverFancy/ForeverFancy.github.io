@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-05-06T13:31:44.435Z</updated>
+  <updated>2020-05-11T15:32:07.109Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,11 +21,20 @@
     <link href="http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/"/>
     <id>http://yoursite.com/2020/05/05/2019-CCF-BDCI-Competition-Review/</id>
     <published>2020-05-05T09:41:34.000Z</published>
-    <updated>2020-05-06T13:31:44.435Z</updated>
+    <updated>2020-05-11T15:32:07.109Z</updated>
     
     <summary type="html">
     
-      &lt;h1 id=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;a href=&quot;#2019-CCF-BDCI-Competition-Review&quot; class=&quot;headerlink&quot; title=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;/a&gt;2019-CCF-BDCI-Competition-Review&lt;/h1&gt;&lt;h2 id=&quot;Boosting-原理&quot;&gt;&lt;a href=&quot;#Boosting-原理&quot; class=&quot;headerlink&quot; title=&quot;Boosting 原理&quot;&gt;&lt;/a&gt;Boosting 原理&lt;/h2&gt;&lt;p&gt;目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。&lt;/p&gt;
+      &lt;h1 id=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;a href=&quot;#2019-CCF-BDCI-Competition-Review&quot; class=&quot;headerlink&quot; title=&quot;2019-CCF-BDCI-Competition-Review&quot;&gt;&lt;/a&gt;2019-CCF-BDCI-Competition-Review&lt;/h1&gt;&lt;h2 id=&quot;比赛简介&quot;&gt;&lt;a href=&quot;#比赛简介&quot; class=&quot;headerlink&quot; title=&quot;比赛简介&quot;&gt;&lt;/a&gt;比赛简介&lt;/h2&gt;&lt;p&gt;我们选取的赛题是&lt;a href=&quot;https://www.datafountain.cn/competitions/351&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;离散制造过程中典型工件的质量符合率预测&lt;/a&gt;，赛题背景为：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在高端制造领域，随着数字化转型的深入推进，越来越多的数据可以被用来分析和学习，进而实现制造过程中重要决策和控制环节的智能化，例如生产质量管理。从数据驱动的方法来看，生产质量管理通常需要完成质量影响因素挖掘及质量预测、质量控制优化等环节，本赛题将关注于第一个环节，基于对潜在的相关参数及历史生产数据的分析，完成质量相关因素的确认和最终质量符合率的预测。在实际生产中，该环节的结果将是后续控制优化的重要依据。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;赛题的任务是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;由于在实际生产中，同一组工艺参数设定下生产的工件会出现多种质检结果，所以我们针对各组工艺参数定义其质检标准符合率，即为该组工艺参数生产的工件的质检结果分别符合优、良、合格与不合格四类指标的比率。相比预测各个工件的质检结果，预测该质检标准符合率会更具有实际意义。&lt;/p&gt;
+&lt;p&gt;本赛题要求参赛者对给定的工艺参数组合所生产工件的质检标准符合率进行预测。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;简单来说，对于给定的生产工艺参数，生产出来的工件会有相应的质量数据，以及根据质量数据进行质检得到的质检结果。&lt;/p&gt;
     
     </summary>
     

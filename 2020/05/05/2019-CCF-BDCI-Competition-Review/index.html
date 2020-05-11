@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">4.5k字</span>
+            <span class="post-count">6k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">18分钟</span>
+            <span class="post-count">23分钟</span>
         </span>
     </span>
 </div>
@@ -99,11 +99,43 @@
       
 
       
-      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h2><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
+      <h1 id="2019-CCF-BDCI-Competition-Review"><a href="#2019-CCF-BDCI-Competition-Review" class="headerlink" title="2019-CCF-BDCI-Competition-Review"></a>2019-CCF-BDCI-Competition-Review</h1><h2 id="比赛简介"><a href="#比赛简介" class="headerlink" title="比赛简介"></a>比赛简介</h2><p>我们选取的赛题是<a href="https://www.datafountain.cn/competitions/351" target="_blank" rel="noopener">离散制造过程中典型工件的质量符合率预测</a>，赛题背景为：</p>
+<blockquote>
+<p>在高端制造领域，随着数字化转型的深入推进，越来越多的数据可以被用来分析和学习，进而实现制造过程中重要决策和控制环节的智能化，例如生产质量管理。从数据驱动的方法来看，生产质量管理通常需要完成质量影响因素挖掘及质量预测、质量控制优化等环节，本赛题将关注于第一个环节，基于对潜在的相关参数及历史生产数据的分析，完成质量相关因素的确认和最终质量符合率的预测。在实际生产中，该环节的结果将是后续控制优化的重要依据。</p>
+</blockquote>
+<p>赛题的任务是：</p>
+<blockquote>
+<p>由于在实际生产中，同一组工艺参数设定下生产的工件会出现多种质检结果，所以我们针对各组工艺参数定义其质检标准符合率，即为该组工艺参数生产的工件的质检结果分别符合优、良、合格与不合格四类指标的比率。相比预测各个工件的质检结果，预测该质检标准符合率会更具有实际意义。</p>
+<p>本赛题要求参赛者对给定的工艺参数组合所生产工件的质检标准符合率进行预测。</p>
+</blockquote>
+<p>简单来说，对于给定的生产工艺参数，生产出来的工件会有相应的质量数据，以及根据质量数据进行质检得到的质检结果。</p>
 <a id="more"></a>
+<h2 id="数据集简介"><a href="#数据集简介" class="headerlink" title="数据集简介"></a>数据集简介</h2><p>给定的训练集有 6000 条训练数据，每条数据有：</p>
+<ul>
+<li>Parameter 1 - 10：生产工艺参数；</li>
+<li>Attribute 1 - 10：工件的质量数据；</li>
+<li>Quality Label {Fail, Pass, Good, Excellent}：工件对应的质检指标。</li>
+</ul>
+<p>测试集中只有 Parameter 1 - 10，需要预测对应的 Quality label。特别地，测试集包括 120 组数据，每组包含 50 条样本，最终提交时只需明确每组中各个类别数据所占的比例（比如：{Fail: 25%, Pass: 25%, Good: 25%, Excellent: 25%}），这一定程度上放松了对预测准确性的约束，允许更多的容错。</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>观察数据集和测试集所给的数据特征，我们考虑了两种思路：</p>
+<ol>
+<li>由于测试集中没有 Attribute，直接使用 Parameter 预测 Quality Label。这样的思路比较直接，调参过程会比较简单，同时也从某种意义上避免了误差传播的风险（具体会在后面提及），缺点是没有充分利用到数据集中给出的数据，可能出现过拟合等瓶颈；</li>
+<li>建立两阶段模型：首先通过 Parameter 回归预测 Attribute，然后通过 Attribute 分类 Quaility Label。这种思路充分利用了数据集中的有效数据，从理论和实验上看，Attribute 到 Quaility Label 有非常明确的对应关系（用给定的 Attribute 预测 Quaility Label 准确率可以接近 99%），但这样有误差传播的风险，如果回归预测不准确，那么会很大程度上影响到之后分类的结果。同时，在后面我们也发现，其实我们的两阶段思路是大体上正确的，但同时也存在一个比较大的问题：按照工业界的实际意义，Parameter 到 Attribute 不应该被建模为一个回归问题。实际上在工业生产当中，给定工艺参数 $\textbf{c}$ 之后，得到的质量数据应该是从概率分布 $P(\textbf{x}|\textbf{c})$ 采样得到的 $\textbf{x}$，而不是一个一一对应的回归预测，所以这也是这种思路最后效果没有达到预期的重要原因。</li>
+</ol>
+<h2 id="数据预处理和特征工程"><a href="#数据预处理和特征工程" class="headerlink" title="数据预处理和特征工程"></a>数据预处理和特征工程</h2><p>观察到原始 Parameter 数据有一些右偏的现象，我们选择对Parameter 取 log 以更好地观察数据的特征。</p>
+<p><img src="image-20200511222035589.png" alt="image-20200511222035589"></p>
+<p>Parameter 1 - 4 的数据分布近似呈正态连续分布，Parameter 7 - 9 呈现明显的离散分布，Parameter 5, 6, 10 有明显的单峰与多峰。</p>
+<p>为了进一步分析 Parameter 和 Quality Label 之间的关系，我们画出按照 Quality Label 标记颜色的 Parameter 散点图：</p>
+<p><img src="Quality-to-Parameter.png" alt=""></p>
+<p>分析以上5幅图片，我们发现， Parameter 1 - 4 的按照Quality Label 标记颜色的散点图基本上呈现随机分布， 同时通过对不同特征选取的尝试， 我们判断使用 Parameter 1 - 4 对最终 Quality Label 的预测没有太大贡献，因此舍去 Parameter 1 - 4。另外分析了剩下的参数的相关系数之后，由于 Parameter 5 和 Parameter 6 之间的相关系数接近 1（接近线性关系），为了简化模型，我们也去掉了 Parameter 5，剩下使用 Parameter 6 - 10 用作 Parameter 特征集。</p>
+<p>对 Attribute 做相同的分析处理，最终选择比较具有区分性的 Attribute 4 - 10 用作 Attribute 特征集。 </p>
+<h2 id="模型构建"><a href="#模型构建" class="headerlink" title="模型构建"></a>模型构建</h2><p>我们决定使用第二个思路进行建模。根据实验以及提交成绩，我们最终选用 XGBoost 进行回归预测，CatBoost 进行分类预测。大致的预测模型结构及流程如下：</p>
+<p><img src="model.png" alt=""></p>
+<p>注意，分类时使用的是预测出来的 attribute 进行训练。虽然使用原始 attribute 预测 Label 的准确度非常高，但由于测试集并没有给我们 attribute，我们肯定会使用根据 parameter 预测出来的 attribute 来预测 label，所以为了保证数据分布一致，我们的分类器也必须使用训练集 parameter 预测出来的 attribute 进行训练。</p>
+<h3 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h3><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
 <p>集成学习的主要思路是使用多个学习器结合，希望获取能够比单一学习器更强的泛化性能，目前的方法大概分为两种，一种是 bagging，另一种是 boosting。Bagging 的个体学习器之间不存在很强的依赖关系，能够同时生成，可以并行化；而 boosting 的个体学习器之间存在比较强的依赖关系，必须串行生成。</p>
 <p>Boosting 是一种可以将一组弱学习器（泛化性能略优于随机猜测的学习器）提升为一个强学习器的算法。大体思路是先从初始训练集中训练处一个基学习器，在根据基学习器的表现对训练样本分布进行调整，使得做错的训练样本受到更多的关注，然后基于调整后的训练样本来训练下一个基学习器，反复进行直到基学习器数目到达指定的值，最后将这些基学习器进行加权组合得到最后的强学习器。常用的算法为 AdaBoost 和 GradientBoost。</p>
-<h3 id="AdaBoost"><a href="#AdaBoost" class="headerlink" title="AdaBoost"></a>AdaBoost</h3><p>AdaBoost 算法的推导过程有多种，这里采用加性模型的方法。希望找到最终的学习器 $H(x) = \sum\limits_{t=1}^{T}\alpha_th_t(x)$ 来最小化指数损失函数：</p>
+<h4 id="AdaBoost"><a href="#AdaBoost" class="headerlink" title="AdaBoost"></a>AdaBoost</h4><p>AdaBoost 算法的推导过程有多种，这里采用加性模型的方法。希望找到最终的学习器 $H(x) = \sum\limits_{t=1}^{T}\alpha_th_t(x)$ 来最小化指数损失函数：</p>
 <script type="math/tex; mode=display">\mathcal{l}(y, H(x)) = E(e^{-yH(x)})\\
 \frac{\partial l}{\partial H(x)} = 0</script><p>这里考虑二分类问题，$y = -1 / 1$，那么：</p>
 <script type="math/tex; mode=display">
@@ -142,7 +174,7 @@ w(x_i,y_i) = e^{-y_iH(x_i)}, i=1, 2, ..., n</script><p>希望找到 $h(x)$ 最�
 <li>Early Stopping：在验证集上的准确率下降到一定阈值以下时就停止训练，防止过拟合；</li>
 <li>Weight Trimming：提高训练速度的一种手法，每一轮学习中可能只有小部分样本权重较大，其他大部分权重小的样本对训练的影响比较小。Weight Trimming 的思想是每一轮迭代中只使用高权重的样本，例如权重占比前 90% 的样本。每一轮计算之后所有样本的权重依然会被重新计算，所以之前被舍弃的样本仍然可能被重新用于训练。这样可以加速训练过程。</li>
 </ul>
-<h3 id="GradientBoost"><a href="#GradientBoost" class="headerlink" title="GradientBoost"></a>GradientBoost</h3><p>指数损失对异常点比较敏感，对异常点会有特别大的惩罚，因此过拟合的风险比较大，鲁棒性比较差。而 AdaBoost 的结论几乎都是建立在损失函数为指数损失的基础上，所以有人提出了 Gradient Boost，使得可以使用任意连续可导的损失函数，这样可以使用一些更鲁棒的损失函数，增强泛化能力。</p>
+<h4 id="GradientBoost"><a href="#GradientBoost" class="headerlink" title="GradientBoost"></a>GradientBoost</h4><p>指数损失对异常点比较敏感，对异常点会有特别大的惩罚，因此过拟合的风险比较大，鲁棒性比较差。而 AdaBoost 的结论几乎都是建立在损失函数为指数损失的基础上，所以有人提出了 Gradient Boost，使得可以使用任意连续可导的损失函数，这样可以使用一些更鲁棒的损失函数，增强泛化能力。</p>
 <blockquote>
 <p>Boosting 的基本思想是通过某种方式使得每一轮基学习器在训练过程中更加关注上一轮学习错误的样本，区别在于是采用何种方式。AdaBoost 采用的是增加上一轮学习错误样本的权重的策略，而在 Gradient Boosting 中则将负梯度作为上一轮基学习器犯错的衡量指标，在下一轮学习中通过拟合负梯度来纠正上一轮犯的错误。</p>
 </blockquote>
@@ -201,7 +233,7 @@ w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
 <p>决策树是非参数模型，这并不意味着其没有参数，而是在训练之前参数数量是不确定的，因此完全生长的决策树有着较大的自由度，能最大化地拟合训练数据。然而单颗决策树是不稳定的，样本数相同的训练集产生微小变动就能导致最终模型的较大差异，即模型的方差大，泛化性能不好。集成学习的另一代表 Bagging 是对付这个问题的一大利器 (Bagging 降低方差，Boosting 降低偏差) 。而 Bagging 的拓展算法 —— 随机森林，通过在树内部结点的分裂过程中，随机选取固定数量的特征纳入分裂的候选项，这样就进一步降低了单模型之间的相关性，总体模型的方差也比 Bagging 更低。</p>
 <p>由于 GBDT 采用的树都是复杂度低的树，所以方差很小（<em>简单模型的方差较小，偏差可能较大；复杂模型的方差较大，偏差较小</em>），通过梯度提升的方法集成多个决策树，最终能够很好的解决过拟合的问题。然而 Boosting 共有的缺点为训练是按顺序的，难以并行，这样在大规模数据上可能导致速度过慢，所幸近年来 XGBoost 和 LightGBM 的出现都极大缓解了这个问题。</p>
 </blockquote>
-<h3 id="各种实现的一些特点"><a href="#各种实现的一些特点" class="headerlink" title="各种实现的一些特点"></a>各种实现的一些特点</h3><p>在特征选择（决策树的节点分裂）部分，比较常用的方法是 pre-sorting splitting：</p>
+<h4 id="各种实现的一些特点"><a href="#各种实现的一些特点" class="headerlink" title="各种实现的一些特点"></a>各种实现的一些特点</h4><p>在特征选择（决策树的节点分裂）部分，比较常用的方法是 pre-sorting splitting：</p>
 <ul>
 <li>对于每个节点，枚举所有特征；</li>
 <li>所有数据按照该特征排序；</li>
@@ -703,6 +735,21 @@ w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
