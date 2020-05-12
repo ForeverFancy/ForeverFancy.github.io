@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">6k字</span>
+            <span class="post-count">6.7k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">23分钟</span>
+            <span class="post-count">26分钟</span>
         </span>
     </span>
 </div>
@@ -120,7 +120,7 @@
 <h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>观察数据集和测试集所给的数据特征，我们考虑了两种思路：</p>
 <ol>
 <li>由于测试集中没有 Attribute，直接使用 Parameter 预测 Quality Label。这样的思路比较直接，调参过程会比较简单，同时也从某种意义上避免了误差传播的风险（具体会在后面提及），缺点是没有充分利用到数据集中给出的数据，可能出现过拟合等瓶颈；</li>
-<li>建立两阶段模型：首先通过 Parameter 回归预测 Attribute，然后通过 Attribute 分类 Quaility Label。这种思路充分利用了数据集中的有效数据，从理论和实验上看，Attribute 到 Quaility Label 有非常明确的对应关系（用给定的 Attribute 预测 Quaility Label 准确率可以接近 99%），但这样有误差传播的风险，如果回归预测不准确，那么会很大程度上影响到之后分类的结果。同时，在后面我们也发现，其实我们的两阶段思路是大体上正确的，但同时也存在一个比较大的问题：按照工业界的实际意义，Parameter 到 Attribute 不应该被建模为一个回归问题。实际上在工业生产当中，给定工艺参数 $\textbf{c}$ 之后，得到的质量数据应该是从概率分布 $P(\textbf{x}|\textbf{c})$ 采样得到的 $\textbf{x}$，而不是一个一一对应的回归预测，所以这也是这种思路最后效果没有达到预期的重要原因。</li>
+<li>建立两阶段模型：首先通过 Parameter 回归预测 Attribute，然后通过 Attribute 分类 Quaility Label。这种思路充分利用了数据集中的有效数据，从理论和实验上看，Attribute 到 Quaility Label 有非常明确的对应关系（用给定的 Attribute 预测 Quaility Label 准确率可以接近 97%），但这样有误差传播的风险，如果回归预测不准确，那么会很大程度上影响到之后分类的结果。同时，在后面我们也发现，其实我们的两阶段思路是大体上正确的，但同时也存在一个比较大的问题：按照工业界的实际意义，Parameter 到 Attribute 不应该被建模为一个回归问题。实际上在工业生产当中，给定工艺参数 $\textbf{c}$ 之后，得到的质量数据应该是从概率分布 $P(\textbf{x}|\textbf{c})$ 采样得到的 $\textbf{x}$，而不是一个一一对应的回归预测，所以这也是这种思路最后效果没有达到预期的重要原因。</li>
 </ol>
 <h2 id="数据预处理和特征工程"><a href="#数据预处理和特征工程" class="headerlink" title="数据预处理和特征工程"></a>数据预处理和特征工程</h2><p>观察到原始 Parameter 数据有一些右偏的现象，我们选择对Parameter 取 log 以更好地观察数据的特征。</p>
 <p><img src="image-20200511222035589.png" alt="image-20200511222035589"></p>
@@ -132,6 +132,7 @@
 <h2 id="模型构建"><a href="#模型构建" class="headerlink" title="模型构建"></a>模型构建</h2><p>我们决定使用第二个思路进行建模。根据实验以及提交成绩，我们最终选用 XGBoost 进行回归预测，CatBoost 进行分类预测。大致的预测模型结构及流程如下：</p>
 <p><img src="model.png" alt=""></p>
 <p>注意，分类时使用的是预测出来的 attribute 进行训练。虽然使用原始 attribute 预测 Label 的准确度非常高，但由于测试集并没有给我们 attribute，我们肯定会使用根据 parameter 预测出来的 attribute 来预测 label，所以为了保证数据分布一致，我们的分类器也必须使用训练集 parameter 预测出来的 attribute 进行训练。</p>
+<p>共同确定了模型结构之后，我的队友使用 Grid Search 以及手动调参的方法确定了超参数，我们的分数比 baseline model 有明显提升。</p>
 <h3 id="Boosting-原理"><a href="#Boosting-原理" class="headerlink" title="Boosting 原理"></a>Boosting 原理</h3><p>目前的数据科学比赛中很大一部分算法都是使用 CatBoost 和 XGBoost 等基于 Boosting 开源库实现的。当训练数据和训练时间都有限的情况下，使用 Boosting 算法可能会收获比神经网络（训练需要的数据量较大）更好的效果。由于我们在比赛中也使用了 CatBoost 和 XGBoost，这里来简单探讨一下 Boosting 算法的原理。</p>
 <p>集成学习的主要思路是使用多个学习器结合，希望获取能够比单一学习器更强的泛化性能，目前的方法大概分为两种，一种是 bagging，另一种是 boosting。Bagging 的个体学习器之间不存在很强的依赖关系，能够同时生成，可以并行化；而 boosting 的个体学习器之间存在比较强的依赖关系，必须串行生成。</p>
 <p>Boosting 是一种可以将一组弱学习器（泛化性能略优于随机猜测的学习器）提升为一个强学习器的算法。大体思路是先从初始训练集中训练处一个基学习器，在根据基学习器的表现对训练样本分布进行调整，使得做错的训练样本受到更多的关注，然后基于调整后的训练样本来训练下一个基学习器，反复进行直到基学习器数目到达指定的值，最后将这些基学习器进行加权组合得到最后的强学习器。常用的算法为 AdaBoost 和 GradientBoost。</p>
@@ -246,6 +247,20 @@ w_j^* = -\frac{G_j}{H_j+\lambda}</script><p>这时目标函数值为：</p>
 <p>LightGBM 等实现都使用了 Exclusive Feature Bunding 算法。一个高维的特征空间的数据往往是稀疏的，而稀疏的特征空间中，很多特征是互斥的（不会同时具有非零值，例如 One-hot 编码），LightGBM 提出使用 EFB 算法进行互斥特征合并减少特征数量。CatBoost 在这方面也是大同小异，它可以处理类别特征，也自动对输入特征进行组合。</p>
 <p>XGBoost 中，树是按层生长（Level-wise tree growth）的生长策略，即同一层的所有节点都做分裂。这样容易进行多线程优化，但不加区分地对待同一层的叶子，带来了很多没有必要的开销（很多叶子分裂收益低，没有分裂的必要）。而 LightGBM 使用 Leaf-wise tree growth，每次只分裂增益最大的一个叶子，分裂次数相同的情况下 Leaf-wise 可以降低更多的误差，得到更好的精度。但缺点是容易生长出比较深的决策树，造成过拟合，因此 LightGBM, 增加了一些最大深度的限制，保证高效率的同时防止过拟合。</p>
 <p>通过实验，我们选择在回归问题使用 XGBoost，分类问题使用 CatBoost。</p>
+<h2 id="数据后处理"><a href="#数据后处理" class="headerlink" title="数据后处理"></a>数据后处理</h2><p>使用 CatBoost 预测分类问题时，得到的是属于每个样本属于各个类别的概率，所以我们考虑有以下两种后处理方法：</p>
+<ol>
+<li>对每个样本得到的概率使用 argmax，得到预测的类别，统计每组中不同类别的数目，除以 50 得到每组中各个类别的概率；</li>
+<li>对每一组，直接对我们所得的每个样本属于不同类别的概率按类别求和，之后除以 50，得到该组中四个类别出现的概率（例如：将一组中所有样本属于 Good 的概率加起来除以 50 近似得到一组中 Good 产品的比例）。这样做从某种意义上可以减轻我们预测不准带来的误差（实际上预测应该说非常不准），并且我的队友提出了进一步修正结果的取整方案，这也很大程度上帮助我们提高了比赛成绩。</li>
+</ol>
+<h3 id="取整技巧"><a href="#取整技巧" class="headerlink" title="取整技巧"></a>取整技巧</h3><p>由于每一组都是 50 个样本，那么最后结果的比例应该都是 0.02 的倍数，而使用第二种思路进行预测得到的比例是一个小数点之后有很多位的浮点数，不符合实际意义，所以需要进行“取整”操作，把我们预测的结果变为 0.02 的倍数。</p>
+<p>简单来说，可以进行如下操作，假设 $x$ 是我们某个预测结果，那么我们需要：</p>
+<script type="math/tex; mode=display">
+\hat{x} = x \times 100 \\
+\hat{x} = \lfloor \hat{x} \rfloor \\
+\text{if } {\hat{x}\%2==1} \text{ then } x =  \frac{\hat{x}+1}{100}\\
+\text{else } x =  \frac{\hat{x}}{100}</script><p>这样我们就得到了取整之后的结果。最后我们尝试取整方法之后正确率有明显提升。</p>
+<h2 id="最后的一点思考"><a href="#最后的一点思考" class="headerlink" title="最后的一点思考"></a>最后的一点思考</h2><p>数据科学比赛对数据的理解和认识还是非常重要的，最终我们的预测效果不好的一个非常重要的原因是把第一阶段的模型建模成了回归模型，事实上这是一个很严重的错误，导致我们预测出来的 attribute 误差很大，最终的效果不好。考虑到实际意义，给定工艺参数之后，产品的质量数据是对分布的一个采样，而不是固定的一个点（生产过程虽然很精确，但还是存在误差），所以使用生成对抗网络可能会有更好的效果。另外训练集的数据偏少，如果使用生成对抗网络还可以考虑使用生成网络造一些数据出来帮助学习，这也是我们没有考虑到的点。</p>
+<p>总之通过这次比赛了解了数据科学比赛的一个整体流程，学到了不少模型有关的知识，还是很有收获的。</p>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://towardsdatascience.com/boosting-algorithm-adaboost-b6737a9ee60c" target="_blank" rel="noopener">[1] boosting-algorithm-adaboost</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/37358517" target="_blank" rel="noopener">[2] 集成学习之Boosting —— AdaBoost原理</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/29765582" target="_blank" rel="noopener">[3] 机器学习-一文理解GBDT的原理-20171001</a></p>
