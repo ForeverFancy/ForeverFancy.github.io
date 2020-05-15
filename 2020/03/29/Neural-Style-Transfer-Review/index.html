@@ -117,7 +117,7 @@
 <p><img src="https://pic2.zhimg.com/80/v2-1af1ab49257d807f9cdfe396871e0839_720w.jpg" alt=""></p>
 <p>常用的算法也可以分为两类：</p>
 <ul>
-<li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；</li>
+<li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；o</li>
 <li>基于离线模型优化的快速图像重建方法：即训练好一个网络，对于给定输入只需一次前向传播即可得到输出图片。优点是实时性较好，缺点是有可能不如慢速方法精细。</li>
 </ul>
 <p>所以上述的方法相结合我们就可以得到 5 大类图像风格迁移算法：</p>
@@ -314,11 +314,11 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
   
   <nav class="article-nav">
     
-      <a href="/2020/04/05/Neural-Style-Transfer-Review-II/" class="article-nav-link">
+      <a href="/2020/04/01/Batch-Normalization/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            Neural Style Transfer Review II
+            Batch Normalization
           
         </div>
       </a>
@@ -721,6 +721,21 @@ E_{c}\left(\Phi(\mathbf{x}), \Phi\left(\mathbf{x}_{c}\right)\right)=\left\|\Phi(
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

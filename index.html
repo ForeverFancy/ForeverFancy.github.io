@@ -526,6 +526,103 @@
 
 </article>
     
+    <article id="post-Batch-Normalization" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/04/01/Batch-Normalization/"
+    >Batch Normalization</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/04/01/Batch-Normalization/" class="article-date">
+  <time datetime="2020-04-01T06:54:19.000Z" itemprop="datePublished">2020-04-01</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Review/">Review</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h1><p>传统的 Mini-batch 随机梯度下降法训练神经网络时，调参工作变得非常复杂，网络学习的效率不高，主要是因为 Internal Convariate Shift 问题，而 Batch Normalization 就是用来解决这个问题的一个方案。</p>
+<h2 id="Internal-Convariate-Shift"><a href="#Internal-Convariate-Shift" class="headerlink" title="Internal Convariate Shift"></a>Internal Convariate Shift</h2><p>在深层网络的训练过程中，网络参数不断变化，导致每一层的输入数据分布很可能会发生变化，这个过程被称为 Internal Convariate Shift. </p>
+<p>ICS 会带来很多问题：</p>
+<ul>
+<li>底层网络参数的变化会导致高层次网络的数据输入分布改变，高层次的网络就需要不停地调整以适应这种变化，有可能导致学习速率过慢；</li>
+<li>如果激活函数使用的是饱和类激活函数（例如：sigmoid, tanh 等函数），随着权重 $W$ 的不断增大，输出 $Z=Wx+b$ 会接近梯度饱和区，梯度消失问题严重，参数更新速度变慢，网络的收敛速度也受到严重影响。</li>
+</ul>
+<h2 id="之前的一些解决方案"><a href="#之前的一些解决方案" class="headerlink" title="之前的一些解决方案"></a>之前的一些解决方案</h2><p>针对梯度消失的问题，使用 ReLU 代替饱和类激活函数。</p>
+<p>使用 Whitening 方法（e.g. PCA Whitening, ZCA Whitening），这两种方法可以使输入特征具有相同的均值和方差，并且去除特征之间的相关性。但如果对每一层的数据都进行 Whitening，开销会非常大（PCA 分解时间复杂度很高），并且 Whitening 一定程度上改变了网络每一层的分布，数据的表达能力减弱。</p>
+<h2 id="Batch-Normalization-1"><a href="#Batch-Normalization-1" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><p>通过一定的规范化手段，使得每个隐藏层的输出（也就是下一个隐藏层的输入）的均值和方差变为 0 和 1，使之分布的变化不是那么剧烈。这样做可以一定程度上远离梯度饱和区，解决梯度消失的问题。另外减小底层权重变化对上层分布的影响，相使得输入对稳定，高层的变化可以不那么剧烈。</p>
+<p>但 BN 之后的输出大多位于激活函数的线性区，这意味着网络的非线性表达能力下降，所以可以加入 $\gamma, \beta$ 两个可学习参数，将 BN 变为：</p>
+<script type="math/tex; mode=display">\begin{array}{l}
+Z^{[l]}=W^{[l]} A^{[l-1]}+b^{[l]} \\
+\mu=\frac{1}{m} \sum_{i=1}^{m} Z^{[l](i)} \\
+\sigma^{2}=\frac{1}{m} \sum_{i=1}^{m}\left(Z^{[l](i)}-\mu\right)^{2} \\
+\tilde{Z}^{[l]}=\gamma \cdot \frac{Z^{[l]}-\mu}{\sqrt{\sigma^{2}+\epsilon}}+\beta \\
+A^{[l]}=g^{[l]}\left(\tilde{Z}^{[l]}\right)
+\end{array}</script><p>即特征每个维度对 batch 求平均，之后再做一个线性变换，再经过一个激活函数。</p>
+<p>预测阶段，测试的样本可能很少，这时使用和训练阶段一样的正则化可能导致测试集的 $\mu, \sigma^2$ 是整个分布的有偏估计。解决方案是保留训练集每一组 batch 在网络每一层的 $\mu_{batch}, \sigma_{batch}$，使用整个训练集的统计量来对测试集进行归一化：</p>
+<script type="math/tex; mode=display">
+\mu_{test}^l = \mathbin{E}(\mu_{batch}^l)\\
+(\sigma_{test}^{2})^l = \frac{batch\_size}{batch\_size-1} \mathbin{E}((\sigma_{batch}^2)^l)</script><p>之后：</p>
+<script type="math/tex; mode=display">B N\left(X_{t e s t}\right)=\gamma \cdot \frac{X_{t e s t}-\mu_{t e s t}}{\sqrt{\sigma_{t e s t}^{2}+\epsilon}}+\beta</script><p>就可以正常进行 BN 操作了。</p>
+<p>这适用于训练集和测试集同分布的情况，如果是迁移学习等不同分布的情况，应该需要另行处理。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/34879333" target="_blank" rel="noopener">[1] Batch Normalization 原理与实战</a></p>
+<p><a href="https://www.cnblogs.com/guoyaohua/p/8724433.html" target="_blank" rel="noopener">[2] 【深度学习】深入理解Batch Normalization批标准化</a></p>
+<p><a href="https://www.youtube.com/watch?v=nUUqwaxLnWs" target="_blank" rel="noopener">[3] Why does Batch Normalization work?</a></p>
+
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Machine-Learning/" rel="tag">Machine Learning</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
     <article id="post-Neural-Style-Transfer-Review" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
@@ -585,7 +682,7 @@
 <p><img src="https://pic2.zhimg.com/80/v2-1af1ab49257d807f9cdfe396871e0839_720w.jpg" alt=""></p>
 <p>常用的算法也可以分为两类：</p>
 <ul>
-<li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；</li>
+<li>基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；o</li>
 <li>基于离线模型优化的快速图像重建方法：即训练好一个网络，对于给定输入只需一次前向传播即可得到输出图片。优点是实时性较好，缺点是有可能不如慢速方法精细。</li>
 </ul>
 <p>所以上述的方法相结合我们就可以得到 5 大类图像风格迁移算法：</p>
@@ -776,89 +873,6 @@
 <p>应用中主要求解的是正压 (barotropic) 模型，stencil operator 的作用是差分，可以发现源码中矩阵乘法的部分都是使用 stencil 计算。这也和微分方程的离散化有所对应（可以看成稀疏矩阵乘法的一种替代形式）。</p>
       
       <a class="article-more-link" href="/2020/03/24/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%B8%89%EF%BC%89/">阅读更多...</a>
-      
-      
-      <!-- reward -->
-      
-    </div>
-    
-    
-      <!-- copyright -->
-      
-    <footer class="article-footer">
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Math/" rel="tag">Math</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Optimization/" rel="tag">Optimization</a></li></ul>
-
-
-    </footer>
-
-  </div>
-
-  
-
-  
-  
-  
-
-  
-
-</article>
-    
-    <article id="post-CAPCG-复盘（二）" class="article article-type-post" itemscope
-  itemprop="blogPost" data-scroll-reveal>
-
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/"
-    >CAPCG 复盘（二）</a
-  >
-</h2>
-  
-
-    </header>
-    
-
-    
-    <div class="article-meta">
-      <a href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
-  <time datetime="2020-03-23T03:42:38.000Z" itemprop="datePublished">2020-03-23</time>
-</a>
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
-  </div>
-
-      
-      
-      
-    </div>
-    
-
-    
-
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-      
-
-      
-      <h1 id="CAPCG-复盘（二）"><a href="#CAPCG-复盘（二）" class="headerlink" title="CAPCG 复盘（二）"></a>CAPCG 复盘（二）</h1><h2 id="PCG-简介"><a href="#PCG-简介" class="headerlink" title="PCG 简介"></a>PCG 简介</h2><h3 id="Conjugate-Gradient"><a href="#Conjugate-Gradient" class="headerlink" title="Conjugate Gradient"></a>Conjugate Gradient</h3><p>经过了前面<strike>（充分的）</strike>的铺垫，终于到了 Conjugate Gradient 的介绍，其实共轭梯度法本质上就是将 Conjugate Direction 中构建的搜索方向的一组线性无关向量 $u_{(i)}$ 设定为残差 $r_{(i)}$，这样做的原因有以下几点：</p>
-<ul>
-<li>残差在最速下降法中被作为搜索方向使用，虽然在 Conjugate Direction 中的搜索方向构建与最速下降法不同，但仍有相似之处，可以拿来尝试；</li>
-<li>由之前的推导中 $d_{(i)}^{T} r_{(j)} =0$ 可知，残差具有和之前搜索方向正交的性质，这使得我们新的搜索方向总是与之前的搜索方向线性无关，除非 $r_{(j)} = 0$，但这种情况下问题已经被解决了。</li>
-</ul>
-<p>因为 $d_{(i)}$ 都是由 $r_{(i)}$ 构建而来，所以 $\operatorname{span}\left\{r_{(0)}, r_{(1)}, \ldots, r_{(i-1)}\right\} = \operatorname{span}\left\{d_{(0)}, d_{(1)}, \ldots, d_{(i-1)}\right\}$。并且每个残差都与之前的搜索方向正交，于是可以推出：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
-\Rightarrow r_{(i)}^{T} r_{(j)} &= 0 \quad i<j
-\end{aligned}</script>
-      
-      <a class="article-more-link" href="/2020/03/23/CAPCG-%E5%A4%8D%E7%9B%98%EF%BC%88%E4%BA%8C%EF%BC%89/">阅读更多...</a>
       
       
       <!-- reward -->
@@ -1203,6 +1217,21 @@ u_{i}^{T} r_{(j)} &= 0 \quad i<j \\
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

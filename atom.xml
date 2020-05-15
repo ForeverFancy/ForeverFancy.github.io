@@ -174,11 +174,38 @@
   </entry>
   
   <entry>
+    <title>Batch Normalization</title>
+    <link href="http://yoursite.com/2020/04/01/Batch-Normalization/"/>
+    <id>http://yoursite.com/2020/04/01/Batch-Normalization/</id>
+    <published>2020-04-01T06:54:19.000Z</published>
+    <updated>2020-05-15T02:47:51.126Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/tags/Machine-Learning/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Neural Style Transfer Review I</title>
     <link href="http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/"/>
     <id>http://yoursite.com/2020/03/29/Neural-Style-Transfer-Review/</id>
     <published>2020-03-29T13:54:05.000Z</published>
-    <updated>2020-04-12T09:07:59.233Z</updated>
+    <updated>2020-05-12T09:46:24.753Z</updated>
     
     <summary type="html">
     
@@ -200,7 +227,7 @@
 &lt;p&gt;&lt;img src=&quot;https://pic2.zhimg.com/80/v2-1af1ab49257d807f9cdfe396871e0839_720w.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;常用的算法也可以分为两类：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；&lt;/li&gt;
+&lt;li&gt;基于在线图像优化的慢速图像重建方法：即给定输入图片，建立 Loss，并使用梯度下降对 Loss 进行优化，最终得到输出图片，优点是效果不错，但缺点同样明显，那就是速度太慢，实时性不够；o&lt;/li&gt;
 &lt;li&gt;基于离线模型优化的快速图像重建方法：即训练好一个网络，对于给定输入只需一次前向传播即可得到输出图片。优点是实时性较好，缺点是有可能不如慢速方法精细。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;所以上述的方法相结合我们就可以得到 5 大类图像风格迁移算法：&lt;/p&gt;
