@@ -568,33 +568,9 @@
 
       
       <h1 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h1><p>传统的 Mini-batch 随机梯度下降法训练神经网络时，调参工作变得非常复杂，网络学习的效率不高，主要是因为 Internal Convariate Shift 问题，而 Batch Normalization 就是用来解决这个问题的一个方案。</p>
-<h2 id="Internal-Convariate-Shift"><a href="#Internal-Convariate-Shift" class="headerlink" title="Internal Convariate Shift"></a>Internal Convariate Shift</h2><p>在深层网络的训练过程中，网络参数不断变化，导致每一层的输入数据分布很可能会发生变化，这个过程被称为 Internal Convariate Shift. </p>
-<p>ICS 会带来很多问题：</p>
-<ul>
-<li>底层网络参数的变化会导致高层次网络的数据输入分布改变，高层次的网络就需要不停地调整以适应这种变化，有可能导致学习速率过慢；</li>
-<li>如果激活函数使用的是饱和类激活函数（例如：sigmoid, tanh 等函数），随着权重 $W$ 的不断增大，输出 $Z=Wx+b$ 会接近梯度饱和区，梯度消失问题严重，参数更新速度变慢，网络的收敛速度也受到严重影响。</li>
-</ul>
-<h2 id="之前的一些解决方案"><a href="#之前的一些解决方案" class="headerlink" title="之前的一些解决方案"></a>之前的一些解决方案</h2><p>针对梯度消失的问题，使用 ReLU 代替饱和类激活函数。</p>
-<p>使用 Whitening 方法（e.g. PCA Whitening, ZCA Whitening），这两种方法可以使输入特征具有相同的均值和方差，并且去除特征之间的相关性。但如果对每一层的数据都进行 Whitening，开销会非常大（PCA 分解时间复杂度很高），并且 Whitening 一定程度上改变了网络每一层的分布，数据的表达能力减弱。</p>
-<h2 id="Batch-Normalization-1"><a href="#Batch-Normalization-1" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h2><p>通过一定的规范化手段，使得每个隐藏层的输出（也就是下一个隐藏层的输入）的均值和方差变为 0 和 1，使之分布的变化不是那么剧烈。这样做可以一定程度上远离梯度饱和区，解决梯度消失的问题。另外减小底层权重变化对上层分布的影响，相使得输入对稳定，高层的变化可以不那么剧烈。</p>
-<p>但 BN 之后的输出大多位于激活函数的线性区，这意味着网络的非线性表达能力下降，所以可以加入 $\gamma, \beta$ 两个可学习参数，将 BN 变为：</p>
-<script type="math/tex; mode=display">\begin{array}{l}
-Z^{[l]}=W^{[l]} A^{[l-1]}+b^{[l]} \\
-\mu=\frac{1}{m} \sum_{i=1}^{m} Z^{[l](i)} \\
-\sigma^{2}=\frac{1}{m} \sum_{i=1}^{m}\left(Z^{[l](i)}-\mu\right)^{2} \\
-\tilde{Z}^{[l]}=\gamma \cdot \frac{Z^{[l]}-\mu}{\sqrt{\sigma^{2}+\epsilon}}+\beta \\
-A^{[l]}=g^{[l]}\left(\tilde{Z}^{[l]}\right)
-\end{array}</script><p>即特征每个维度对 batch 求平均，之后再做一个线性变换，再经过一个激活函数。</p>
-<p>预测阶段，测试的样本可能很少，这时使用和训练阶段一样的正则化可能导致测试集的 $\mu, \sigma^2$ 是整个分布的有偏估计。解决方案是保留训练集每一组 batch 在网络每一层的 $\mu_{batch}, \sigma_{batch}$，使用整个训练集的统计量来对测试集进行归一化：</p>
-<script type="math/tex; mode=display">
-\mu_{test}^l = \mathbin{E}(\mu_{batch}^l)\\
-(\sigma_{test}^{2})^l = \frac{batch\_size}{batch\_size-1} \mathbin{E}((\sigma_{batch}^2)^l)</script><p>之后：</p>
-<script type="math/tex; mode=display">B N\left(X_{t e s t}\right)=\gamma \cdot \frac{X_{t e s t}-\mu_{t e s t}}{\sqrt{\sigma_{t e s t}^{2}+\epsilon}}+\beta</script><p>就可以正常进行 BN 操作了。</p>
-<p>这适用于训练集和测试集同分布的情况，如果是迁移学习等不同分布的情况，应该需要另行处理。</p>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/34879333" target="_blank" rel="noopener">[1] Batch Normalization 原理与实战</a></p>
-<p><a href="https://www.cnblogs.com/guoyaohua/p/8724433.html" target="_blank" rel="noopener">[2] 【深度学习】深入理解Batch Normalization批标准化</a></p>
-<p><a href="https://www.youtube.com/watch?v=nUUqwaxLnWs" target="_blank" rel="noopener">[3] Why does Batch Normalization work?</a></p>
-
+      
+      <a class="article-more-link" href="/2020/04/01/Batch-Normalization/">阅读更多...</a>
+      
       
       <!-- reward -->
       
@@ -1217,21 +1193,6 @@ A^{[l]}=g^{[l]}\left(\tilde{Z}^{[l]}\right)
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

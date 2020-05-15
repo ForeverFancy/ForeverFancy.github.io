@@ -178,17 +178,11 @@
     <link href="http://yoursite.com/2020/04/01/Batch-Normalization/"/>
     <id>http://yoursite.com/2020/04/01/Batch-Normalization/</id>
     <published>2020-04-01T06:54:19.000Z</published>
-    <updated>2020-05-15T02:47:51.126Z</updated>
+    <updated>2020-05-15T02:48:17.258Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          
-        
-      
+      &lt;h1 id=&quot;Batch-Normalization&quot;&gt;&lt;a href=&quot;#Batch-Normalization&quot; class=&quot;headerlink&quot; title=&quot;Batch Normalization&quot;&gt;&lt;/a&gt;Batch Normalization&lt;/h1&gt;&lt;p&gt;传统的 Mini-batch 随机梯度下降法训练神经网络时，调参工作变得非常复杂，网络学习的效率不高，主要是因为 Internal Convariate Shift 问题，而 Batch Normalization 就是用来解决这个问题的一个方案。&lt;/p&gt;
     
     </summary>
     
