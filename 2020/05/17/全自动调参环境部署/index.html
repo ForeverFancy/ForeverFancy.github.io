@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="Bowen&#39;s Blog" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    全自动调参环境部署 |  Bowen&#39;s Blog
+  </title>
+  <meta name="generator" content="hexo-theme-yilia-plus">
+  
+  <link rel="shortcut icon" href="/logo.ico" />
+  
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+<link rel="alternate" href="/atom.xml" title="Bowen's Blog" type="application/atom+xml">
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-全自动调参环境部署" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  全自动调参环境部署
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/05/17/%E5%85%A8%E8%87%AA%E5%8A%A8%E8%B0%83%E5%8F%82%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2020-05-17T00:09:46.000Z" itemprop="datePublished">2020-05-17</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Review/">Review</a> / <a class="article-category-link" href="/categories/Review/Environment/">Environment</a>
+  </div>
+
+      
+      
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">941字</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">4分钟</span>
+        </span>
+    </span>
+</div>
+
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="全自动调参环境部署"><a href="#全自动调参环境部署" class="headerlink" title="全自动调参环境部署"></a>全自动调参环境部署</h1><p>昨天终于完成了 snode5 上的全自动调参环境部署，目前 docker + fitlog 调参体验良好（雾），记录一下过程。</p>
+<p>先安装 nvidia-container-toolkit 提供容器中的 GPU 支持：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Add the package repositories</span></span><br><span class="line">distribution=$(. /etc/os-release;<span class="built_in">echo</span> <span class="variable">$ID</span><span class="variable">$VERSION_ID</span>)</span><br><span class="line">curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -</span><br><span class="line">curl -s -L https://nvidia.github.io/nvidia-docker/<span class="variable">$distribution</span>/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list</span><br><span class="line"></span><br><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install -y nvidia-container-toolkit</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
+<p>根据自己的 NVIDIA driver 版本以及对应的 pytorch 需要的 CUDA 版本选择正确的 CUDA 镜像，然后拉取：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull nvidia/cuda:10.0-base</span><br></pre></td></tr></table></figure>
+<p>测试是否安装成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#### Test nvidia-smi with the latest official CUDA image</span></span><br><span class="line">docker run --gpus all nvidia/cuda:10.0-base nvidia-smi</span><br></pre></td></tr></table></figure>
+<p>之后可以启动一个容器，并在容器里配置 pytorch 环境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### 启动一个容器，-i 交换模式 -t 启动一个终端 -d 后台运行，此时默认不会进入容器 -p 跟主机进行端口映射，之后会用到 --gpus all 允许使用所有 GPU</span></span><br><span class="line">docker run -itd -p 5000:5000 --gpus all nvidia/cuda:10.0-base /bin/bash</span><br><span class="line"></span><br><span class="line"><span class="comment">### 查看所有容器</span></span><br><span class="line">docker ps -a</span><br><span class="line"></span><br><span class="line"><span class="comment">### 启动已经停止的容器</span></span><br><span class="line">docker restart [CONTAINER-ID]</span><br><span class="line"></span><br><span class="line"><span class="comment">### 进入一个后台容器</span></span><br><span class="line">docker <span class="built_in">exec</span> -it [CONTAINER-ID] [Command]</span><br><span class="line"></span><br><span class="line"><span class="comment">### 向容器中拷贝文件</span></span><br><span class="line">docker cp [SRC] [CONTAINER-ID:Dest_dir]</span><br></pre></td></tr></table></figure>
+<p>当我们把环境差不多配置好之后，可以将这个容器 commit 为一个新的镜像，方便之后使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### -a author -m message </span></span><br><span class="line">docker commit -a <span class="string">"author"</span> -m <span class="string">"Save"</span> [CONTAINER-ID] [REPOSITORY[:TAG]]</span><br></pre></td></tr></table></figure>
+<p>这样环境基本上就没有问题了，但我们还需要一个能记录调参过程的工具，因为手动管理非常容易乱，正好最近复旦大学 fastNLP 组开源了他们实验室的 fitlog 调参管理记录工具，实践体验很赞。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pip3 install fitlog</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line">    fitlog &lt;<span class="built_in">command</span>&gt; [&lt;args&gt;...]</span><br><span class="line">    fitlog <span class="built_in">help</span> &lt;<span class="built_in">command</span>&gt;</span><br><span class="line">    fitlog -h | --<span class="built_in">help</span></span><br><span class="line">    fitlog --version</span><br><span class="line"></span><br><span class="line">Supported commands</span><br><span class="line">    init            Initialize a fitlog project</span><br><span class="line">    list            List committed versions</span><br><span class="line">    revert          Revert to a specific version</span><br><span class="line">    <span class="built_in">log</span>             Visualize logs by a server</span><br><span class="line"></span><br><span class="line">See <span class="string">"fitlog help &lt;command&gt;"</span> <span class="keyword">for</span> more information on a specific <span class="built_in">command</span></span><br></pre></td></tr></table></figure>
+<p>目前看起来 <code>fitlog list</code> 功能还未实现，不过有其他的命令基本够用了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### 新建一个 fitlog 项目</span></span><br><span class="line">fitlog init</span><br></pre></td></tr></table></figure>
+<p>在主要的入口文件，比如 <code>run.py</code> 中加入一些 fitlog 代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fitlog</span><br><span class="line"></span><br><span class="line">fitlog.commit(__file__)</span><br><span class="line"></span><br><span class="line"><span class="comment">### Some code below</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### 添加需要记录的超参数</span></span><br><span class="line">fitlog.add_hyper(args.per_gpu_train_batch_size, name=<span class="string">"per_gpu_train_batch_size"</span>)</span><br><span class="line">fitlog.add_hyper(args.num_train_epochs, name=<span class="string">"epochs"</span>)</span><br><span class="line">fitlog.add_hyper(args.learning_rate, name=<span class="string">"learning_rate"</span>)</span><br><span class="line">fitlog.add_hyper(args.max_seq_length, name=<span class="string">"max_seq_length"</span>)</span><br><span class="line">fitlog.add_hyper(args.doc_stride, name=<span class="string">"doc_stride"</span>)</span><br><span class="line">fitlog.add_hyper(args.weight_decay, name=<span class="string">"weight_decay"</span>)</span><br><span class="line">fitlog.add_hyper(args.adam_epsilon, name=<span class="string">"adam_epsilon"</span>)</span><br><span class="line">fitlog.add_hyper(args.max_grad_norm, name=<span class="string">"max_grad_norm"</span>)</span><br><span class="line">fitlog.add_hyper(args.warmup_steps, name=<span class="string">"warmup_steps"</span>)</span><br><span class="line">fitlog.add_hyper(args.gradient_accumulation_steps, name=<span class="string">"gradient_accumulation_steps"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">### 添加最后的指标（一般是验证集上的表现）</span></span><br><span class="line">fitlog.add_best_metric(results[<span class="string">'exact'</span>], name=<span class="string">"eval_em"</span>)</span><br><span class="line">fitlog.add_best_metric(results[<span class="string">'f1'</span>], name=<span class="string">"eval_f1"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">### 如果训练过程中有验证，也可以记录对应的指标</span></span><br><span class="line">fitlog.add_metric(results[<span class="string">'exact'</span>], name=<span class="string">"em"</span>, step=global_step)</span><br><span class="line">fitlog.add_metric(results[<span class="string">'f1'</span>], name=<span class="string">"f1"</span>, step=global_step)</span><br><span class="line"></span><br><span class="line"><span class="comment">### 可以记录损失函数的变化</span></span><br><span class="line">fitlog.add_loss((tr_loss - logging_loss) / args.logging_steps, name=<span class="string">"Loss"</span>, step=global_step)</span><br><span class="line"></span><br><span class="line"><span class="comment">### 最后需要的一步</span></span><br><span class="line">fitlog.finish()</span><br></pre></td></tr></table></figure>
+<p>之后可以 <code>fitlog log [path to logs]</code> 启动一个本地管理日志（可视化）的网页，可以方便地查看各种参数以及表现。</p>
+<p>配合暴力的 <code>grid_search.py</code>，炼丹环境就基本上构建完成了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">grid_search</span><span class="params">()</span>:</span></span><br><span class="line">    lrs = [<span class="number">1e-4</span>, <span class="number">5e-5</span>, <span class="number">3e-5</span>, <span class="number">1e-5</span>, <span class="number">5e-6</span>]</span><br><span class="line">    epochs = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">    batch_sizes = [<span class="number">12</span>, <span class="number">16</span>, <span class="number">18</span>, <span class="number">20</span>]</span><br><span class="line">    weight_decay = [<span class="number">0</span>, <span class="number">1e-8</span>, <span class="number">1e-9</span>, <span class="number">1e-7</span>]</span><br><span class="line">    warmup_steps = [<span class="number">100</span>, <span class="number">500</span>]</span><br><span class="line">    <span class="keyword">for</span> lr <span class="keyword">in</span> lrs:</span><br><span class="line">        <span class="keyword">for</span> ep <span class="keyword">in</span> epochs:</span><br><span class="line">            <span class="keyword">for</span> bs <span class="keyword">in</span> batch_sizes:</span><br><span class="line">                <span class="keyword">for</span> wd <span class="keyword">in</span> weight_decay:</span><br><span class="line">                    <span class="keyword">for</span> wstp <span class="keyword">in</span> warmup_steps:</span><br><span class="line">                        command = <span class="string">"python3.6 ./examples/run_squad.py --model_type bert --model_name_or_path ./examples/bert_base --do_train --do_eval --train_file $SQUAD_DIR/train-v1.1.json --predict_file $SQUAD_DIR/dev-v1.1.json --learning_rate &#123;0&#125; --num_train_epochs &#123;1&#125; --max_seq_length 384 --doc_stride 128 --output_dir ../models/finetuned_squad_with_fitlog/ --per_gpu_eval_batch_size=&#123;2&#125; --per_gpu_train_batch_size=16 --overwrite_output_dir --do_lower_case --evaluate_during_training --weight_decay &#123;3&#125; --warmup_steps &#123;4&#125;"</span>.format(</span><br><span class="line">                            lr, ep, bs, wd, wstp)</span><br><span class="line">                        <span class="comment"># print(command)</span></span><br><span class="line">                        os.system(command)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    grid_search()</span><br></pre></td></tr></table></figure>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://github.com/NVIDIA/nvidia-docker" target="_blank" rel="noopener">[1] nvidia-docker</a></p>
+<p><a href="https://fitlog.readthedocs.io/zh/latest/index.html" target="_blank" rel="noopener">[2] fitlog 中文文档</a></p>
+
+      
+      <!-- reward -->
+      
+      <div id="reward-btn">
+        打赏
+      </div>
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+        <div class="declare">
+          <ul class="post-copyright">
+            <li>
+              <i class="ri-copyright-line"></i>
+              <strong>版权声明： </strong s>
+              本博客所有文章除特别声明外，均采用 <a href="https://www.apache.org/licenses/LICENSE-2.0.html" rel="external nofollow"
+                target="_blank">Apache License 2.0</a> 许可协议。转载请注明出处！
+            </li>
+          </ul>
+        </div>
+        
+    <footer class="article-footer">
+      
+          
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/05/17/%E5%85%A8%E8%87%AA%E5%8A%A8%E8%B0%83%E5%8F%82%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Machine-Learning/" rel="tag">Machine Learning</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/05/05/2019-CCF-BDCI-Competition-Review/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">2019-CCF-BDCI-Competition-Review</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        notify: 'false',
+        verify: 'false',
+        avatar: 'mp',
+        placeholder: '给我的文章加点评论吧~',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2020
+        Bowen
+      </li>
+      <li>
+        
+        Powered by
+        
+        
+        <a href="https://hexo.io" target="_blank">Hexo</a> Theme <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+      </li>
+      
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    <aside class="sidebar">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.svg" alt="Bowen&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://home.ustc.edu.cn/~zhangbowen" target="_blank" rel="noopener">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.png">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/share.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script>
+  try {
+    var typed = new Typed("#subtitle", {
+      strings: ['没有什么会永垂不朽', '想要的都拥有，得不到的都释怀', ''],
+      startDelay: 0,
+      typeSpeed: 200,
+      loop: true,
+      backSpeed: 100,
+      showCursor: true
+    });
+  } catch (err) {
+  }
+
+</script>
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    onClick: (e) => {
+      $('.toc-link').removeClass('is-active-link');
+      $(`a[href=${e.target.hash}]`).addClass('is-active-link');
+      $(e.target.hash).scrollIntoView();
+      return false;
+    }
+  });
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/js/ayer.js"></script>
+
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=3&id=2063028227&auto=0&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</body>
+
+</html>

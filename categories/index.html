@@ -35,13 +35,21 @@
       <section class="outer">
   
     <h1 class="page-type-title">Categories</h1>
-    <!-- <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul> -->
+    <!-- <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Review/">Review</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Review/Environment/">Environment</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul> -->
     <ul class="category-list">
+      
+         
+          <a class="category-list-link" href="/categories/Review/Environment/" title="Environment">
+            <li class="category-list-item">
+            Environment<i>1</i>
+            </li>
+          </a>
+        
       
          
           <a class="category-list-link" href="/categories/Review/" title="Review">
             <li class="category-list-item">
-            Review<i>8</i>
+            Review<i>9</i>
             </li>
           </a>
         
@@ -368,6 +376,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
