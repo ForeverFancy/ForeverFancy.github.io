@@ -100,6 +100,7 @@
 
       
       <h1 id="全自动调参环境部署"><a href="#全自动调参环境部署" class="headerlink" title="全自动调参环境部署"></a>全自动调参环境部署</h1><p>昨天终于完成了 snode5 上的全自动调参环境部署，目前 docker + fitlog 调参体验良好（雾），记录一下过程。</p>
+<a id="more"></a>
 <p>先安装 nvidia-container-toolkit 提供容器中的 GPU 支持：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Add the package repositories</span></span><br><span class="line">distribution=$(. /etc/os-release;<span class="built_in">echo</span> <span class="variable">$ID</span><span class="variable">$VERSION_ID</span>)</span><br><span class="line">curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -</span><br><span class="line">curl -s -L https://nvidia.github.io/nvidia-docker/<span class="variable">$distribution</span>/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list</span><br><span class="line"></span><br><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install -y nvidia-container-toolkit</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
 <p>根据自己的 NVIDIA driver 版本以及对应的 pytorch 需要的 CUDA 版本选择正确的 CUDA 镜像，然后拉取：</p>
