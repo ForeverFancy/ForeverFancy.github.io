@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">1.7k字</span>
+            <span class="post-count">2.5k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">6分钟</span>
+            <span class="post-count">9分钟</span>
         </span>
     </span>
 </div>
@@ -112,7 +112,8 @@
 </ul>
 </li>
 </ul>
-<h3 id="Model-Architecture"><a href="#Model-Architecture" class="headerlink" title="Model Architecture"></a>Model Architecture</h3><table>
+<h3 id="Model-Architecture"><a href="#Model-Architecture" class="headerlink" title="Model Architecture"></a>Model Architecture</h3><div class="table-container">
+<table>
 <thead>
 <tr>
 <th>Model</th>
@@ -121,7 +122,8 @@
 <th>attention heads (in multi-head attention)</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>BERT-BASE</td>
 <td>12 encoder layers</td>
 <td>768 hidden units</td>
@@ -133,9 +135,10 @@
 <td>1024 hidden units</td>
 <td>16 attention heads</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <a id="more"></a>
-
 <h3 id="简单实用示例"><a href="#简单实用示例" class="headerlink" title="简单实用示例"></a>简单实用示例</h3><p>例如使用 BERT 进行垃圾邮件分类，将每段待分类文本的第一个词替换为 [CLS] (Classification 的缩写)，输入模型得到输出：</p>
 <p><img src="BERT_example.png" alt=""></p>
 <p>每个输入 token 对应的 output vector 的大小都是 hidden_size (768 in BERT-BASE)，对于这样的分类问题只需要关注第一个 output vector，即输入 [CLS] 对应的输出。将这个输出接入一个神经网络来分类（Linear + Softmax）输出垃圾邮件和非垃圾邮件的概率。</p>
@@ -161,12 +164,43 @@
 <p><img src="BERT_usage.png" alt=""></p>
 <p>BERT 还可以用于特征抽取，像 VGG16 一样，每层 encoder 都包含一定的信息，可以代表输入的某部分特征，可以使用 encoder 中的 hidden units 作为特征用于其他的任务。</p>
 <p><img src="BERT_feature.png" alt=""></p>
-<p><em>PS：</em>BERT 预训练的时候使用的激活函数是 gelu:<br>$$<br>GLEU(x) = xP(X \leq x) = x \Phi(x)<br>$$<br>其中 $\Phi(x)$ 满足正态分布，x 越小，被 drop 掉的概率（变为 0 ）越大，这克服了 relu 缺乏一定的统计性的缺点。这个函数的输出与自身有关，同时具有非线性和随机正则性的因素，因此效果更好。</p>
+<p><em>PS：</em>BERT 预训练的时候使用的激活函数是 gelu:</p>
+<script type="math/tex; mode=display">
+GLEU(x) = xP(X \leq x) = x \Phi(x)</script><p>其中 $\Phi(x)$ 满足正态分布，x 越小，被 drop 掉的概率（变为 0 ）越大，这克服了 relu 缺乏一定的统计性的缺点。这个函数的输出与自身有关，同时具有非线性和随机正则性的因素，因此效果更好。</p>
 <p>激活函数能够自归一化（给定输入是标准化之后的数据，输出也是归一化数据 i.e. 均值为 0，方差为 1）的要求：</p>
 <blockquote>
 <p>这个激活函数需要有：（1）负值和正值，以便控制均值；（2）饱和区域（导数趋近于零），以便抑制更低层中较大的方差；（3）大于 1 的斜率，以便在更低层中的方差过小时增大方差（可以直观上考虑一下，输出的方差越大，那么梯度也就越大 e.g. MSE Loss）；（4）连续曲线。后者能确保一个固定点，其中方差抑制可通过方差增大来获得均衡。我们能通过乘上指数线性单元（ELU）来满足激活函数的这些性质，而且 λ&gt;1 能够确保正值净输入的斜率大于 1。</p>
 </blockquote>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://jalammar.github.io/illustrated-bert/" target="_blank" rel="noopener">1. Illustrated-bert.</a></p>
+<h2 id="BERT-缺陷以及-XLNet"><a href="#BERT-缺陷以及-XLNet" class="headerlink" title="BERT 缺陷以及 XLNet"></a>BERT 缺陷以及 XLNet</h2><p>Auto-regressive 模型：</p>
+<ul>
+<li>给定 $x_1, x_2, x_3, \cdots, x_n$，要求预测 $x_{n+1}$；</li>
+<li>在语言生成方面的表现很好；</li>
+<li>但只能捕获到单向的语义信息。</li>
+</ul>
+<p>Auto-encoder 模型：</p>
+<ul>
+<li>预训练任务是对输入的句子加入一些 [MASK]，目标要求对 [MASK] 进行预测；</li>
+<li>pretrain 和 fine-tuning 之间的 gap：<ul>
+<li>在预训练的时候是使用 [MASK] 进行预测，但在进行下游任务时，下游任务的输入并没有 [MASK]，所以预训练的时候有可能会学到 [MASK] 作为 feature，这对后面的下游任务是没有帮助甚至是有伤害的；</li>
+<li>在预测 [MASK] tokens 时，预测是并行的，所以 MASK token 之间没有依赖关系，导致可能会有一些比较离谱的预测（前两个是正常的预测，第三个是因为没有依赖导致的不正常的预测）：<ul>
+<li>Whenever she goes to the <strong>shopping center</strong>, she buys a lot of <strong>clothes</strong>;</li>
+<li>Whenever she goes to the <strong>cinema hall</strong> she buys a lot of <strong>popcorn</strong>;</li>
+<li>Whenever she goes to the <strong>cinema hall</strong> she buys a lot of <strong>clothes</strong>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>XLNet 就是为了既能利用到综合上下文的信息，又具有 auto-regressive 模型的优势而产生的。XLNet 使用的是 Permutation Language Modeling，在 auto-regression 的基础上，但预测不是按照句子顺序进行的，而是乱序进行的。这样既保留的 auto-regressive 的优点，又能够提取双向的语义信息。</p>
+<p>XLNet 的结构主要使用的是 Transformer-XL，Transformer-XL 主要是使用了相对的位置编码（针对长文本，长文本需要分块，解决绝对位置编码无法区分不同块的问题），并且相邻块之间做了缓存，后面的块能使用到前面块的语义信息。</p>
+<p>XLNet 发现 NSP 任务的用处不大，于是预训练任务只使用了生成的自监督任务。</p>
+<p>综上 XLNet 相比 BERT 能够更好的解决预训练和下游任务之间的 gap，吸取自回归模型的优点，并提取双向信息。</p>
+<p>XLNet 的一些问题：</p>
+<blockquote>
+<p>XLNet 在 GLUE benchmark 的几乎所有任务上都比先前最优水平得到了提升，但是 CoLA 这一项的表现似乎不尽如人意。CoLA 是判断一个句子是否在语法上合理的，是不是说明这个任务较为依赖单词顺序？<br>XLNet 计算量和激活值比 BERT 更大，有可能接近 BERT 的 2 倍（因为 XLNet 要给每个位置维护两套隐状态，一套是包含当前 token 信息的 content stream h，另一套是不包含当前 token 信息的 query stream g，此外还有前一个 segment 的缓存。模型太大，可能不适合某些场景，并且对研究人员的硬件要求也变高了。</p>
+</blockquote>
+<p>但实际上，RoBERTa 对 BERT 的参数进行精调之后，表现进一步提高，所以说 BERT 的性能因为超参数限制没有发挥到极致也是之前 XLNet 到达 SOTA 的原因之一。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://jalammar.github.io/illustrated-bert/" target="_blank" rel="noopener">1. Illustrated-bert.</a><br><a href="https://www.zhihu.com/question/330307904/answer/721986216" target="_blank" rel="noopener">2. 如何评价在20个任务上超越BERT的XLNet？</a></p>
 
       
       <!-- reward -->
@@ -656,21 +690,6 @@
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>

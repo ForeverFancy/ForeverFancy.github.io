@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-05-17T01:36:48.405Z</updated>
+  <updated>2020-05-17T15:20:29.173Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Natural Language Generation II</title>
+    <link href="http://yoursite.com/2020/05/17/Natural-Language-Generation-II/"/>
+    <id>http://yoursite.com/2020/05/17/Natural-Language-Generation-II/</id>
+    <published>2020-05-17T11:53:42.000Z</published>
+    <updated>2020-05-17T15:20:29.173Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Natural-Language-Generation-II&quot;&gt;&lt;a href=&quot;#Natural-Language-Generation-II&quot; class=&quot;headerlink&quot; title=&quot;Natural Language Generation II&quot;&gt;&lt;/a&gt;Natural Language Generation II&lt;/h1&gt;&lt;h2 id=&quot;Image-Captioning-and-Beyond&quot;&gt;&lt;a href=&quot;#Image-Captioning-and-Beyond&quot; class=&quot;headerlink&quot; title=&quot;Image Captioning and Beyond&quot;&gt;&lt;/a&gt;Image Captioning and Beyond&lt;/h2&gt;&lt;p&gt;Image Captioning 可以看作是一种 data-to-text 的生成过程。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Review" scheme="http://yoursite.com/categories/Review/"/>
+    
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+      <category term="NLG" scheme="http://yoursite.com/tags/NLG/"/>
+    
+  </entry>
   
   <entry>
     <title>全自动调参环境部署</title>
@@ -410,7 +433,7 @@ u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
     <link href="http://yoursite.com/2020/03/20/BERT-illustration/"/>
     <id>http://yoursite.com/2020/03/20/BERT-illustration/</id>
     <published>2020-03-20T09:55:25.000Z</published>
-    <updated>2020-03-21T13:10:44.232Z</updated>
+    <updated>2020-05-17T15:17:26.821Z</updated>
     
     <summary type="html">
     
@@ -427,7 +450,8 @@ u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&quot;Model-Architecture&quot;&gt;&lt;a href=&quot;#Model-Architecture&quot; class=&quot;headerlink&quot; title=&quot;Model Architecture&quot;&gt;&lt;/a&gt;Model Architecture&lt;/h3&gt;&lt;table&gt;
+&lt;h3 id=&quot;Model-Architecture&quot;&gt;&lt;a href=&quot;#Model-Architecture&quot; class=&quot;headerlink&quot; title=&quot;Model Architecture&quot;&gt;&lt;/a&gt;Model Architecture&lt;/h3&gt;&lt;div class=&quot;table-container&quot;&gt;
+&lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
 &lt;th&gt;Model&lt;/th&gt;
@@ -436,7 +460,8 @@ u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
 &lt;th&gt;attention heads (in multi-head attention)&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
-&lt;tbody&gt;&lt;tr&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
 &lt;td&gt;BERT-BASE&lt;/td&gt;
 &lt;td&gt;12 encoder layers&lt;/td&gt;
 &lt;td&gt;768 hidden units&lt;/td&gt;
@@ -448,7 +473,9 @@ u_{i}^{T} r_{(j)} &amp;= 0 \quad i&lt;j \\
 &lt;td&gt;1024 hidden units&lt;/td&gt;
 &lt;td&gt;16 attention heads&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
     
     </summary>
     

@@ -67,6 +67,79 @@
     
     
     
+    <article id="post-Natural-Language-Generation-II" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/05/17/Natural-Language-Generation-II/"
+    >Natural Language Generation II</a
+  >
+</h2>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/05/17/Natural-Language-Generation-II/" class="article-date">
+  <time datetime="2020-05-17T11:53:42.000Z" itemprop="datePublished">2020-05-17</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Review/">Review</a>
+  </div>
+
+      
+      
+      
+    </div>
+    
+
+    
+
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+
+      
+      <h1 id="Natural-Language-Generation-II"><a href="#Natural-Language-Generation-II" class="headerlink" title="Natural Language Generation II"></a>Natural Language Generation II</h1><h2 id="Image-Captioning-and-Beyond"><a href="#Image-Captioning-and-Beyond" class="headerlink" title="Image Captioning and Beyond"></a>Image Captioning and Beyond</h2><p>Image Captioning 可以看作是一种 data-to-text 的生成过程。</p>
+      
+      <a class="article-more-link" href="/2020/05/17/Natural-Language-Generation-II/">阅读更多...</a>
+      
+      
+      <!-- reward -->
+      
+    </div>
+    
+    
+      <!-- copyright -->
+      
+    <footer class="article-footer">
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLG/" rel="tag">NLG</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/" rel="tag">NLP</a></li></ul>
+
+
+    </footer>
+
+  </div>
+
+  
+
+  
+  
+  
+
+  
+
+</article>
+    
     <article id="post-全自动调参环境部署" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
@@ -779,90 +852,6 @@
 
 </article>
     
-    <article id="post-Introduction-to-IncludeOS" class="article article-type-post" itemscope
-  itemprop="blogPost" data-scroll-reveal>
-
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2020/03/25/Introduction-to-IncludeOS/"
-    >Introduction to IncludeOS</a
-  >
-</h2>
-  
-
-    </header>
-    
-
-    
-    <div class="article-meta">
-      <a href="/2020/03/25/Introduction-to-IncludeOS/" class="article-date">
-  <time datetime="2020-03-25T07:54:18.000Z" itemprop="datePublished">2020-03-25</time>
-</a>
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%A4%8D%E7%9B%98/">复盘</a>
-  </div>
-
-      
-      
-      
-    </div>
-    
-
-    
-
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-      
-
-      
-      <h1 id="Introduction-to-IncludeOS"><a href="#Introduction-to-IncludeOS" class="headerlink" title="Introduction to IncludeOS"></a>Introduction to IncludeOS</h1><p>这是我和队友在 2019 年操作系统（H）课程中做的项目，这里做一个简单的回顾。</p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="Unikernel"><a href="#Unikernel" class="headerlink" title="Unikernel"></a>Unikernel</h3><p>传统内核都选择对硬件做了抽象，避免应用程序直接访问硬件资源，只提供抽象层提供的接口，例如 Linux 的应用程序全部运行在用户态，对硬件的操作全部通过系统调用进入内核态实现。这样做当然有好处，可以隐藏复杂的硬件细节，使用户专注于逻辑实现，但用户态和内核态之间的切换开销很大，损伤应用性能（在通常情况下影响不大，但对一些特殊场景，例如延迟敏感的 IoT 设备，会对影响性能）。</p>
-<p>Unikernel 不区分用户态和内核态，所有应用都运行在同一层级，减少不必要的硬件抽象，（大多数 Unikernel）每次只运行一个应用，最大程度精简以提升性能表现。</p>
-<p>当前社会，IoT 设备具有极大发展，具有很多有潜力的应用场景，我们希望在大量基于 ARM 架构的 IoT 设备上部署 Unikernel，因为 Unikernel 有如下优势：</p>
-<ul>
-<li>更高的运行性能；</li>
-<li>更高的资源利用效率；</li>
-<li>更好的隔离性和安全性；</li>
-<li>更好的可迁移性和可伸缩性。</li>
-</ul>
-<p>但 Unikernel 也存在缺陷，最大的缺点就是调试非常困难。</p>
-<p>经过调研，我们选择了 IncludeOS 作为基础的 Unikernel 实现，并将其移植到 ARM 上。</p>
-      
-      <a class="article-more-link" href="/2020/03/25/Introduction-to-IncludeOS/">阅读更多...</a>
-      
-      
-      <!-- reward -->
-      
-    </div>
-    
-    
-      <!-- copyright -->
-      
-    <footer class="article-footer">
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/System/" rel="tag">System</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unikernel/" rel="tag">Unikernel</a></li></ul>
-
-
-    </footer>
-
-  </div>
-
-  
-
-  
-  
-  
-
-  
-
-</article>
-    
   </article>
   
 
@@ -1178,21 +1167,6 @@
 </style>
     
   </div>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
