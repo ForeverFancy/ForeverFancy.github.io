@@ -65,7 +65,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">23字</span>
+            <span class="post-count">1.2k字</span>
         </span>
     </span>
 
@@ -74,7 +74,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1分钟</span>
+            <span class="post-count">4分钟</span>
         </span>
     </span>
 </div>
@@ -101,6 +101,65 @@
       
       <h1 id="Natural-Language-Generation-II"><a href="#Natural-Language-Generation-II" class="headerlink" title="Natural Language Generation II"></a>Natural Language Generation II</h1><h2 id="Image-Captioning-and-Beyond"><a href="#Image-Captioning-and-Beyond" class="headerlink" title="Image Captioning and Beyond"></a>Image Captioning and Beyond</h2><p>Image Captioning 可以看作是一种 data-to-text 的生成过程。</p>
 <a id="more"></a>
+<p>Input: static and non-sequential image</p>
+<p>Output: sequential text</p>
+<h3 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h3><p>目前使用比较广泛的数据集为 Flickr8K, Flickr30K, MS-COCO, SBU1M Captioned Photo Dataset.</p>
+<p>领域内的任务：COCO-Captioning Challenge, Mutimodal Machine Translation Task.</p>
+<h3 id="Core-Task"><a href="#Core-Task" class="headerlink" title="Core Task"></a>Core Task</h3><p>核心任务有两个，分别是图像分析和文字生成。</p>
+<h4 id="Image-Analysis"><a href="#Image-Analysis" class="headerlink" title="Image Analysis"></a>Image Analysis</h4><p>大概有三种途径来分析图像：</p>
+<ul>
+<li>Detection:<ul>
+<li>使用 detection 的方法检测物体、属性、空间关系和动作信息等图片中具有的信息；</li>
+<li>之后在 text-generation 阶段把这些信息组织成句子；</li>
+<li>所以 detection 部分的准确率是非常重要的。</li>
+</ul>
+</li>
+<li>Holistic scene analysis:<ul>
+<li>与 detection 不同，holistic scene analysis 是从全局角度看问题，使用全局的统计信息（比如直方图）。这种方法在图像检索匹配相似度方面用的比较多，而在 image captioning 领域用的少一些。</li>
+</ul>
+</li>
+<li>Dense image feature vectors:<ul>
+<li>使用预训练 CNN 提取特征；</li>
+<li>是现在比较主流的方法。 </li>
+</ul>
+</li>
+</ul>
+<h4 id="Text-Generation-or-Retrieval"><a href="#Text-Generation-or-Retrieval" class="headerlink" title="Text Generation or Retrieval"></a>Text Generation or Retrieval</h4><ul>
+<li>Using templates or trees:<ul>
+<li>使用 detection 的系统与这种语句生成方法结合得更加紧密，目标是将 detector 捕捉到的信息转换为具有语法结构的数据（比如物体对应名词，空间关系对应介词等）；</li>
+<li>常用的方法是使用 HMM 或者 conditional random fields 方法对 detector 生成的信息进行整合生成比较符合语法的信息；</li>
+<li>也有人尝试模板的生成方法，这种方法生成出来的句子比较流畅，但缺乏变化；</li>
+<li>Mitchell 等人提出使用三元组 &lt;<em>noun, verb, preposition</em>&gt; 的方法来表示 detector 检测到的 物体、动作、空间关系信息，之后再使用语法树生成句子；</li>
+<li>Elliott and Keller 提出使用 <em>visual dependency representations</em> (VDR) 方法，像语法一样建模图像中不同物体之间的空间位置结构关系，之后使用 machine translation 任务再生成句子。</li>
+</ul>
+</li>
+<li>Using Language models:<ul>
+<li>能够突破模板的限制，生成更具有创新性的描述；</li>
+<li>如果使用 n-gram 语言模型，一般在大规模 out-of-domain 语料上进行预训练；</li>
+<li>深度学习方法更多是基于 RNN, LSTM 的自回归语言模型进行生成任务，输入一般是 CNN 提取的 image feature vector.</li>
+</ul>
+</li>
+<li>Caption retrieval and recombination:<ul>
+<li>与之前的生成方法不同，这种途径选择在大规模训练数据中进行检索，检索依据的是构造出来的特征；</li>
+<li>想法是在训练数据中找到根据 query image 找到最相似的 caption (rank or k-nearest neighbors)；</li>
+<li>优点是可以生成流畅的语言（毕竟是基于之前标注语料）；</li>
+<li>缺点是可能无法在训练集中找到非常相似的图像，一种可能的方案是不进行全局匹配，而是进行局部匹配检索再进行组合；</li>
+<li>实验发现这种方法在测试集上会大量重复训练集中出现过的 captioning，缺少创新性和多样性。</li>
+</ul>
+</li>
+</ul>
+<h3 id="Combine-Language-and-Visual-Data"><a href="#Combine-Language-and-Visual-Data" class="headerlink" title="Combine Language and Visual Data"></a>Combine Language and Visual Data</h3><p>从上面看出大多数工作还是将 image caption 任务建模为两个子任务，不同的方法建立子任务之间联系的方式不同。</p>
+<p>基于 detection 的方法倾向于划清两个子任务之间的联系，之间的联系为 detector 的输出。</p>
+<p>基于 retrieval 的方法通过建模相似性间接联系图像的 feature 和语言的表达，所以相似性的表达和 feature 的抽取是很重要的。</p>
+<p>最近深度学习的方法倾向于将两个子任务直接结合起来，例如文本生成下一个词的时候使用上一个 hidden states 和 CNN feature 一起作为输入，或者使用两层的 LSTM，一层会以 CNN feature 作为输入，另一层提取底层的输出并结合之前的预测产生下一个词。也有的研究人员直接将 CNN feature 和 word embedding 投影到一个多模态特征空间进行建模。</p>
+<h3 id="Current-and-Future-Direction"><a href="#Current-and-Future-Direction" class="headerlink" title="Current and Future Direction"></a>Current and Future Direction</h3><p>目前还存在的缺陷以及之后的发展方向：</p>
+<ul>
+<li>泛化能力不强，面对 out-of-domain 数据时，表现很差。未来可以考虑 transfer learning, zero-shot learning 加强泛化能力；</li>
+<li>Attention 是一个很好的方法，能够加强生成句子和图像之间的联系，attention 是否可以进一步加强或改进；</li>
+<li>目前的任务不局限于对图像进行具体的描述，进一步加强为产生可解释性的概括，各种 QA 任务及数据集也在进一步出现；</li>
+<li>任务也从非序列化的 image 输入过渡为序列化的 Video 输入，充分考虑 Video 之间各帧之间的冗余和变化关系是非常重要的一个问题。</li>
+</ul>
+
       
       <!-- reward -->
       
@@ -585,6 +644,21 @@
 </style>
     
   </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </body>
 
 </html>
